@@ -6,9 +6,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\MaintenanceController;
+use App\Http\Controllers\ContractController;
 
 Route::get('/', [LandingController::class, 'main'])->name('landing');
-
 
 Route::get('/sendotp', function () {
     // You can load a view or redirect elsewhere
@@ -35,14 +37,17 @@ Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
 // Logout (must be POST)
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-//For Successfully registered users
+// For Successfully registered users
 Route::get('/success', function () {
     return view('auth.success');
 })->name('auth.success');
 
+/*
+// Commented out duplicate dashboard route
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
+*/
 
 Route::get('/order', function () {
     return view('Billing and Invoicing.order');
@@ -52,9 +57,12 @@ Route::get('/invoice', function () {
     return view('Billing and Invoicing.invoice');
 })->name('invoice');
 
+/*
+// Commented out duplicate delivery route (closure)
 Route::get('/delivery', function () {
     return view('Billing and Invoicing.delivery');
 })->name('delivery');
+*/
 
 Route::get('/payment', function () {
     return view('Billing and Invoicing.payment');
@@ -81,24 +89,23 @@ Route::get('/payment-reminders', function () {
 })->name('payment-reminders');
 
 Route::get('/maintenance-notif', function () {
-    return view('Schedule Preventive.maintenance-notif');
+    return view('SchedulePreventive.maintenance-notif');
 })->name('maintenance-notif');
 
 Route::get('/maintenance-history', function () {
-    return view('Schedule Preventive.maintenance-history');
+    return view('SchedulePreventive.maintenance-history');
 })->name('maintenance-history');
 
 Route::get('/assign-tech', function () {
-    return view('Schedule Preventive.assign-tech');
+    return view('SchedulePreventive.assign-tech');
 })->name('assign-tech');
 
-Route::get('/maintenance-sched', function () {
-    return view('Schedule Preventive.maintenance-sched');
-})->name('maintenance-sched');
 
+// Commented out duplicate make-contract closure route
 Route::get('/make-contract', function () {
     return view('Contract and Permit.make-contract');
 })->name('make-contract');
+
 
 Route::get('/manage-permits', function () {
     return view('Contract and Permit.manage-permits');
@@ -127,3 +134,23 @@ Route::get('/contractpermit-report', function () {
 Route::get('/ai-report', function () {
     return view('Reporting and Analytics.ai-report');
 })->name('ai-report');
+
+Route::get('/invoice/create', [InvoiceController::class, 'create'])->name('invoice.create');
+Route::post('/invoice/store', [InvoiceController::class, 'store'])->name('invoice.store');
+
+Route::get('/delivery', [InvoiceController::class, 'delivery'])->name('delivery');
+
+Route::prefix('maintenance')->name('maintenance.')->group(function () {
+    Route::get('/', [MaintenanceController::class, 'index'])->name('index');
+    Route::get('/create', [MaintenanceController::class, 'create'])->name('create');
+    Route::post('/store', [MaintenanceController::class, 'store'])->name('store');
+    Route::get('/{id}/edit', [MaintenanceController::class, 'edit'])->name('edit');
+    Route::put('/{id}', [MaintenanceController::class, 'update'])->name('update');
+    Route::delete('/{id}', [MaintenanceController::class, 'destroy'])->name('destroy');
+});
+
+Route::get('/maintenance-sched', [MaintenanceController::class, 'index'])->name('maintenance-sched');
+
+Route::get('/make-contract', [ContractController::class, 'create'])->name('make-contract');
+Route::post('/make-contract', [ContractController::class, 'store'])->name('contracts.store');
+

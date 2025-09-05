@@ -7,13 +7,12 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="//unpkg.com/alpinejs" defer></script>
     <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
-
     <title>Dashboard</title>
+    
 </head>
 <body>
-
    <!-- nav bar -->
-<nav class="fixed bg-[#111111] top-0 z-50 w-full shadow">
+<nav class="fixed bg-[#1f1f1f] top-0 z-50 w-full shadow">
     <div class="px-3 py-3 lg:px-5 lg:pl-3">
         <div class="flex items-center justify-between">
             <div class="flex items-center justify-start rtl:justify-end">
@@ -119,22 +118,20 @@
                 </a>
             </li>
 
-            <!-- Billing and Invoicing -->
-
           <li x-data="{ open: false }" class="relative">
-    <!-- Parent button -->
-    <button @click="open = !open" 
-        class="flex items-center w-full p-3 rounded-lg hover:bg-blue-900 transition focus:outline-none select-none">
-        <img src="{{ asset('svg/billing.svg') }}"
-            alt="Billing Icon"
-            class="w-4 h-4 mr-3">
-        <span class="ml-4">Billing and Invoicing</span>
-        <svg :class="{ 'rotate-180': open }" class="w-4 h-4 ml-auto transition-transform"
-            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M19 9l-7 7-7-7" />
-        </svg>
-    </button>
+            <!-- Parent button -->
+              <button @click="open = !open" 
+                class="flex items-center w-full p-3 rounded-lg hover:bg-blue-900 transition focus:outline-none select-none">
+                  <img src="{{ asset('svg/billing.svg') }}"
+                    alt="Billing Icon"
+                    class="w-4 h-4 mr-3">
+                    <span class="ml-4">Billing and Invoicing</span>
+                        <svg :class="{ 'rotate-180': open }" class="w-4 h-4 ml-auto transition-transform"
+                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                             d="M19 9l-7 7-7-7" />
+                       </svg>
+              </button>
 
     <!-- Dropdown menu -->
     <ul x-show="open" x-transition
@@ -167,9 +164,6 @@
     </ul>
 </li>
 
-
-
-            <!-- Record and Payment Management -->
            <li x-data="{ open: false }" class="relative">
   <!-- Parent button -->
   <button @click="open = !open" 
@@ -210,7 +204,6 @@
   </ul>
 </li>
 
-            <!-- Schedule Preventive Maintenance -->
             <li x-data="{ open: false }" class="relative">
   <!-- Parent button -->
   <button @click="open = !open"
@@ -251,8 +244,6 @@
   </ul>
 </li>
 
-
-            <!-- Contract and Permit Management -->
             <li x-data="{ open: false }" class="relative">
   <!-- Parent button -->
   <button @click="open = !open"
@@ -293,7 +284,6 @@
   </ul>
 </li>
 
-            <!-- Reporting and Analytics -->
             <li x-data="{ open: false }" class="relative">
   <!-- Parent button -->
   <button @click="open = !open" class="flex items-center w-full p-3 rounded-lg hover:bg-blue-900 transition focus:outline-none select-none">
@@ -309,8 +299,6 @@
     </svg>
  </button>
 
-
-  <!-- Dropdown menu -->
   <ul x-show="open" x-transition class="pl-10 mt-2 space-y-1 text-sm font-medium text-white overflow-hidden">
     <li>
       <a href="{{ route('financial-report') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition"> Financial Reports </a>
@@ -326,9 +314,9 @@
     </li>
   </ul>
 </li>
-        </ul>
+  </ul>
     </div>
-</aside>
+  </aside>
 <!-- side bar -->
 
 <!-- content -->
@@ -362,79 +350,79 @@
         <!-- Main Content -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-            <!-- User Management -->
+            <!-- Billing and Invoicing -->
             <div class="bg-gray-50 rounded-2xl shadow-lg border-l-4 border-gray-900 p-6 hover:shadow-xl transition">
                 <div class="flex items-center justify-between mb-2">
-                    <h2 class="text-lg font-bold text-gray-900">👤 User Management</h2>
+                    <h2 class="text-lg font-bold text-gray-900">👤 Billing & Invoicing</h2>
                     <span class="text-sm bg-gray-800 text-white px-2 py-1 rounded-full">Module</span>
                 </div>
                 <p class="text-gray-600 mb-3">Manage user roles, permissions, and accounts.</p>
                 <div class="text-sm">
-                    <span class="block text-lg font-bold text-gray-800">Ulbata, Aemejie A.</span>
+                    <span class="block text-lg font-bold text-gray-800">Lumantas lll, Romeo A.</span>
                     <span class="text-gray-500">Administrator in Charge</span>
                 </div>
             </div>
 
-            <!-- Facility Management -->
             <div class="bg-gray-50 rounded-2xl shadow-lg border-l-4 border-gray-900 p-6 hover:shadow-xl transition">
                 <div class="flex items-center justify-between mb-2">
-                    <h2 class="text-lg font-bold text-gray-900">🏢 Facility Management</h2>
+                    <h2 class="text-lg font-bold text-gray-900">🏢 Record & Payment </h2>
                     <span class="text-sm bg-gray-800 text-white px-2 py-1 rounded-full">Module</span>
                 </div>
                 <p class="text-gray-600 mb-3">Oversee office equipment, rooms, and maintenance.</p>
                 <div class="text-sm">
-                    <span class="block text-lg font-bold text-gray-800">Nuqui, Christan M.</span>
+                    <span class="block text-lg font-bold text-gray-800">Olandria, Jan Ryan D.</span>
                     <span class="text-gray-500">Administrator in Charge</span>
                 </div>
             </div>
 
-            <!-- Audit Trails and Logs -->
             <div class="bg-gray-50 rounded-2xl shadow-lg border-l-4 border-gray-900 p-6 hover:shadow-xl transition">
                 <div class="flex items-center justify-between mb-2">
-                    <h2 class="text-lg font-bold text-gray-900">📊 Audit Trails & Logs</h2>
+                    <h2 class="text-lg font-bold text-gray-900">📊 Schedule Preventive</h2>
                     <span class="text-sm bg-gray-800 text-white px-2 py-1 rounded-full">Module</span>
                 </div>
                 <p class="text-gray-600 mb-3">Track system access and changes for accountability.</p>
                 <div class="text-sm">
-                    <span class="block text-lg font-bold text-gray-800">Villanueva, Marx Joma M.</span>
+                    <span class="block text-lg font-bold text-gray-800">Loria, Raymon G.</span>
                     <span class="text-gray-500">Administrator in Charge</span>
                 </div>
             </div>
 
-            <!-- Archiving Management -->
             <div class="bg-gray-50 rounded-2xl shadow-lg border-l-4 border-gray-900 p-6 hover:shadow-xl transition">
                 <div class="flex items-center justify-between mb-2">
-                    <h2 class="text-lg font-bold text-gray-900">🗄️ Archiving Management</h2>
+                    <h2 class="text-lg font-bold text-gray-900">🗄️ Contract & Permit </h2>
                     <span class="text-sm bg-gray-800 text-white px-2 py-1 rounded-full">Module</span>
                 </div>
                 <p class="text-gray-600 mb-3">Store, retrieve, and preserve critical records.</p>
                 <div class="text-sm">
-                    <span class="block text-lg font-bold text-gray-800">Estorba, Mark John M.</span>
+                    <span class="block text-lg font-bold text-gray-800">Magpili, John Christian C.</span>
                     <span class="text-gray-500">Administrator in Charge</span>
                 </div>
             </div>
 
-            <!-- Document and File Manager -->
             <div class="bg-gray-50 rounded-2xl shadow-lg border-l-4 border-gray-900 p-6 hover:shadow-xl transition">
-                <div class="flex items-center justify-between mb-2">
-                    <h2 class="text-lg font-bold text-gray-900">📁 Document & File Manager</h2>
-                    <span class="text-sm bg-gray-800 text-white px-2 py-1 rounded-full">Module</span>
-                </div>
-                <p class="text-gray-600 mb-3">Organize and manage digital documents securely.</p>
-                <div class="text-sm">
-                    <span class="block text-lg font-bold text-gray-800">Sy, Makhiyo Trish T.</span>
-                    <span class="text-gray-500">Administrator in Charge</span>
-                </div>
-            </div>
+              <div class="flex items-center justify-between mb-2">
+              <h2 class="text-base font-bold text-gray-900 flex items-center space-x-2 leading-tight whitespace-nowrap">
+                <span class="inline-block align-middle">📁</span>
+                <span>Reporting & Analytics</span>
+              </h2>
+                <span class="text-sm bg-gray-800 text-white px-2 py-1 rounded-full">Module</span>
+           </div>
+              <p class="text-gray-600 mb-3">Manage reporting documents securely.</p>
+              <div class="text-sm">
+                <span class="block text-lg font-bold text-gray-800">Salas, Marcus Miguel</span>
+                <span class="text-gray-500">Administrator in Charge</span>
+          </div>
+          </div>
 
         </div>
-        <!-- Main Content -->    
+        <!-- Main Content --> 
+            
     </div>
 </div>
 
 </body>
 
-<footer class=" bg-[#111111] text-white fixed bottom-0 w-full w-52 p-3 shadow-lg sm:ml-30 flex justify-center items-center ">
+<footer class="bg-[#1f1f1f] text-white fixed bottom-0 w-full p-3 shadow-lg flex justify-center items-center">
     <div class="flex gap-5 items-center justify-center">
         <img class="rounded-full w-10 h-10" src="{{ asset('images/logo.png') }}" alt="">
         <p class="text-sm text-gray-300">© 2025 CaliCrane All rights reserved.</p>
@@ -444,7 +432,6 @@
 <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
 <script>
     function displayPhilippineTime() {
-        // Create a date object for Philippine time (UTC+8)
         const options = {
             timeZone: 'Asia/Manila',
             weekday: 'long',
@@ -457,23 +444,17 @@
             hour12: true
         };
 
-        // Get the formatted date and time string
         const philippineDateTime = new Date().toLocaleString('en-PH', options);
 
-        // Update the element with the current time
         const timeElement = document.getElementById('philippineTime');
         if (timeElement) {
             timeElement.textContent = philippineDateTime;
         }
     }
 
-    // Initial call to display the time
     displayPhilippineTime();
 
-    // Update the time every second
     setInterval(displayPhilippineTime, 1000);
-
-    // Add event listener to ensure the function runs after DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
     displayPhilippineTime();
     });
