@@ -20,6 +20,7 @@ jobs:
 
       - name: Copy project to VPS via rsync
         run: |
+          ssh -i ~/.ssh/id_ed25519 -p 2298 corec2322@23.94.230.146
           rsync -avz --exclude='.env' \
             -e "ssh -o StrictHostKeyChecking=no -p 2298" \
             ./ corec2322@23.94.230.146:public_html
