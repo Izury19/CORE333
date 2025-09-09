@@ -66,7 +66,7 @@ a.no-underline {
             <div class="flex items-center justify-start rtl:justify-end">
                 <a href="#" class="flex items-center ms-2 md:me-24 no-underline">
                     <img src="{{ asset('images/logo.png') }}" class="h-8 me-2" alt="Logo">
-                    <span class="self-center text-xl font-extrabold sm:text-2xl whitespace-nowrap text-white">CaliCraneTest ITO BA GAMIT MO? OR YUNG 2? dalawa yan</span>
+                    <span class="self-center text-xl font-extrabold sm:text-2xl whitespace-nowrap text-white">CaliCrane</span>
                 </a>
             </div>
 
