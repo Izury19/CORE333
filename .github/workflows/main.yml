@@ -13,6 +13,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Test SSH
+        run: ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 -p 2298 corec2322@23.94.230.146 "echo 'Connected!'" 
+
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
