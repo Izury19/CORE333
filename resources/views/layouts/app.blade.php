@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>{{ $title ?? 'Cali Test' }}</title>
+  <title>{{ $title ?? 'Cali Tests' }}</title>
   <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
 
   {{-- Tailwind and Flowbite --}}
