@@ -1,33 +1,37 @@
-name: Publish Website to InfinityFree Panel
+name: Deploy to Domain
+
 on:
   push:
     branches:
       - main
+
 jobs:
-  FTP-Deploy-Action:
-    name: FTP-Deploy-Action
+  deploy:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v2.1.0
-      with:
-        fetch-depth: 2 
-    - name: Build assets
-      run: npm install && npm run build
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Install PHP and Composer
-      uses: shivammathur/setup-php@v2
-      with:
-          php-version: '8.2' # Adjust to match the PHP version used by your Laravel project
-          tools: 'composer'
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Install PHP dependencies
-      run: composer install --no-dev --optimize-autoloader
-        
-    - name: FTP-Deploy-Action
-      uses: SamKirkland/FTP-Deploy-Action@4.3.3
-      with:
-        server: ${{ secrets.SERVER }}
-        username: ${{ secrets.USERNAME }}
-        password: ${{ secrets.PASSWORD }}
-        server-dir: /htdocs/          # <- remote folder
-        local-dir: ./                 # <- your Laravel project folder
+      - name: Copy project to VPS via rsync
+        run: |
+          rsync -avz --exclude='.env' \
+            -e "ssh -o StrictHostKeyChecking=no -p 2298" \
+            ./ corec2322@23.94.230.146:public_html
+
+      - name: SSH into VPS and run deployment commands
+        run: |
+          ssh -p 2298 corec2322@23.94.230.146 << 'EOF'
+            set -e
+            cd public_html
+            git pull origin main
+            composer install --no-interaction --prefer-dist --optimize-autoloader
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+          EOF
