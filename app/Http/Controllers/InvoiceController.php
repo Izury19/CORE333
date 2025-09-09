@@ -59,6 +59,10 @@ class InvoiceController extends Controller
                 'description' => $item['description'],
                 'qty' => $item['qty'],
                 'price' => $item['price'],
+                'client_name' => $validated['client_name'],
+                'client_email' => $validated['client_email'], 
+                'invoice_date' => $validated['invoice_date'],
+                'due_date' => $validated['due_date'],
             ]);
         }
 

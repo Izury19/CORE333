@@ -2,6 +2,61 @@
 a.no-underline {
   text-decoration: none !important;
 }
+
+/* 📌 This class must be relative so dropdown can be placed correctly */
+.ms-3 {
+  position: relative;
+}
+
+/* 📦 Dropdown positioning */
+#dropdown-user {
+  width: 14rem;
+  position: absolute !important;
+  top: calc(100% + 10px); /* appear below with spacing */
+  right: 0; /* align sa kanan ng profile icon */
+  z-index: 999;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  padding-top: 0.5rem;
+}
+
+/* 🖼️ Image inside dropdown */
+#dropdown-user img {
+  width: 64px;
+  height: 64px;
+  border-radius: 9999px;
+  object-fit: cover;
+}
+
+/* 📄 Text spacing inside dropdown */
+#dropdown-user .text-center {
+  padding: 0.5rem 1rem;
+}
+
+#dropdown-user .text-center p {
+  margin: 2px 0;
+}
+
+/* 🔘 Links inside dropdown */
+#dropdown-user a,
+#dropdown-user button {
+  padding: 0.5rem 1rem;
+  width: 100%;
+  display: block;
+  text-align: left;
+  font-size: 14px;
+  color: #374151;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+#dropdown-user a:hover,
+#dropdown-user button:hover {
+  background-color: #f3f4f6;
+}
 </style>
 
  <!-- nav bar -->
@@ -34,7 +89,7 @@ a.no-underline {
                         </button>
                     </div>
 
-                    <div class="z-50 hidden my-4 text-base list-none divide-y divide-gray-100 rounded-sm shadow-sm bg-white shadow" id="dropdown-user">
+                    <div class="z-50 hidden mt-1 text-base list-none divide-y divide-gray-100 rounded-sm shadow-sm bg-white shadow" id="dropdown-user">
                         <!-- Profile Image in dropdown -->
                         <div class="flex justify-center items-center p-2">
                             <img class="w-20 h-20 rounded-full shadow-lg object-cover"

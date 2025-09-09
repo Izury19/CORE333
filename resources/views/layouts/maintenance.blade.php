@@ -16,6 +16,15 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
 
   @stack('styles')
+  <style>
+  .modal-backdrop.show {
+    z-index: 1040 !important;
+  }
+  .modal.show {
+    z-index: 1050 !important;
+  }
+</style>
+
 </head>
 <body x-data="{ sidebarOpen: false }">
 

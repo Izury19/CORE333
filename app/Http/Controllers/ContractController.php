@@ -10,28 +10,30 @@ class ContractController extends Controller
     public function create()
     {
         return view('Contract and Permit.make-contract');
-
     }
 
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'contract_title' => 'required|string|max:255',
-        'client_name' => 'required|string|max:255',
-        'start_date' => 'required|date',
-        'end_date' => 'required|date|after_or_equal:start_date',
-        'equipment_type' => 'required|string',
-        'payment_type' => 'required|string',
-        'contract_details' => 'nullable|string',
-    ]);
+    {
+        // ✅ Validate request
+        $validated = $request->validate([
+            'company_name'     => 'required|string|max:255',
+            'client_name'      => 'required|string|max:255',
+            'client_email'     => 'required|email|max:255',
+            'client_number'    => 'required|string|max:20',
+            'start_date'       => 'required|date',
+            'end_date'         => 'required|date|after_or_equal:start_date',
+            'equipment_type'   => 'required|string',
+            'payment_type'     => 'required|string',
+            'contract_details' => 'nullable|string',
+        ]);
 
-    // 🔵 Save the contract
-    $contract = Contract::create($validated);
+        // ✅ Save to database
+        $contract = Contract::create($validated);
 
-    // 🔵 Redirect with session data
-    return redirect()
-        ->route('make-contract')
-        ->with('success', 'Contract saved successfully!')
-        ->with('new_contract', $contract);
-}
+        // ✅ Redirect with success message
+        return redirect()
+            ->route('make-contract')
+            ->with('success', 'Contract saved successfully!')
+            ->with('new_contract', $contract);
+    }
 }

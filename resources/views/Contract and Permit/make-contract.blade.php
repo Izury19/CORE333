@@ -113,6 +113,57 @@
     .new-contract strong {
         color: #1e40af; /* blue-800 */
     }
+    .new-contract {
+    margin-top: 40px;
+    background-color: #f9fafb;
+    border: 1px solid #e2e8f0;
+    padding: 30px 35px;
+    border-radius: 14px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+    color: #1f2937;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: box-shadow 0.3s ease;
+}
+
+.new-contract:hover {
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); /* Blue glow on hover */
+}
+
+.new-contract h3 {
+    color: #2563eb; /* Tailwind Blue-600 */
+    font-weight: 700;
+    margin-bottom: 25px;
+    font-size: 26px;
+    letter-spacing: 0.03em;
+    text-shadow: 1px 1px 2px rgba(37, 99, 235, 0.3);
+}
+
+.contract-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 18px 40px;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.contract-details-grid strong {
+    display: block;
+    color: #1e40af; /* Tailwind Blue-800 */
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.contract-details-grid span {
+    color: #374151;
+}
+
+.contract-details-grid .full-row {
+    grid-column: 1 / -1;
+    margin-top: 10px;
+    font-style: italic;
+    color: #4b5563;
+}
+
 
 </style>
 
@@ -145,16 +196,28 @@
             @csrf
 
             <div class="form-grid">
-                <!-- Contract Title -->
+                <!-- Company Name -->
                 <div class="form-group">
-                    <label for="contract_title">Contract Title</label>
-                    <input type="text" id="contract_title" name="contract_title" value="{{ old('contract_title') }}" placeholder="e.g., Monthly Crane Lease Contract">
+                    <label for="company_name">Company Name</label>
+                    <input type="text" id="company_name" name="company_name" value="{{ old('company_name') }}" placeholder="e.g., ABC Construction Ltd.">
                 </div>
 
                 <!-- Client Name -->
                 <div class="form-group">
                     <label for="client_name">Client Name</label>
-                    <input type="text" id="client_name" name="client_name" value="{{ old('client_name') }}" placeholder="e.g., ABC Construction Ltd.">
+                    <input type="text" id="client_name" name="client_name" value="{{ old('client_name') }}" placeholder="e.g., Juan Dela Cruz">
+                </div>
+
+                <!-- Client Email -->
+                <div class="form-group">
+                    <label for="client_email">Client Email</label>
+                    <input type="email" id="client_email" name="client_email" value="{{ old('client_email') }}" placeholder="e.g., client@example.com">
+                </div>
+
+                <!-- Client Number -->
+                <div class="form-group">
+                    <label for="client_number">Client Number</label>
+                    <input type="text" id="client_number" name="client_number" value="{{ old('client_number') }}" placeholder="e.g., 09171234567">
                 </div>
 
                 <!-- Start Date -->
@@ -185,9 +248,9 @@
                     <label for="payment_type">Payment Type</label>
                     <select id="payment_type" name="payment_type">
                         <option value="">Select Payment Type</option>
-                        <option value="per_hour" {{ old('payment_type') == 'per_hour' ? 'selected' : '' }}>Per Hour</option>
-                        <option value="daily" {{ old('payment_type') == 'daily' ? 'selected' : '' }}>Daily</option>
-                        <option value="monthly" {{ old('payment_type') == 'monthly' ? 'selected' : '' }}>Monthly</option>
+                        <option value="cash" {{ old('payment_type') == 'cash' ? 'selected' : '' }}>Cash</option>
+                        <option value="bank transfer" {{ old('payment_type') == 'bank transfer' ? 'selected' : '' }}>Bank Transfer</option>
+                        <option value="gcash" {{ old('payment_type') == 'gcash' ? 'selected' : '' }}>Gcash</option>
                     </select>
                 </div>
             </div>
@@ -203,21 +266,28 @@
                 <button type="submit" class="btn-save">💾 Save Contract</button>
             </div>
         </form>
+
     </div>
 
-    @if(session('new_contract'))
-    @php $c = session('new_contract'); @endphp
-    <div class="new-contract">
-        <h3>📌 Newly Created Contract</h3>
-        <p><strong>Title:</strong> {{ $c['contract_title'] }}</p>
-        <p><strong>Client:</strong> {{ $c['client_name'] }}</p>
-        <p><strong>Start Date:</strong> {{ \Carbon\Carbon::parse($c['start_date'])->toFormattedDateString() }}</p>
-        <p><strong>End Date:</strong> {{ \Carbon\Carbon::parse($c['end_date'])->toFormattedDateString() }}</p>
-        <p><strong>Equipment Type:</strong> {{ ucfirst($c['equipment_type']) }}</p>
-        <p><strong>Payment Type:</strong> {{ ucfirst(str_replace('_', ' ', $c['payment_type'])) }}</p>
-        <p><strong>Details:</strong> {{ $c['contract_details'] ?: 'N/A' }}</p>
-    </div>
-    @endif
+        @if(session('new_contract'))
+        @php $c = session('new_contract'); @endphp
+        <div class="new-contract">
+            <h3>📌 Newly Created Contract</h3>
+            <div class="contract-details-grid">
+                <div><strong>Company Name:</strong> <span>{{ $c['company_name'] }}</span></div>
+                <div><strong>Client Name:</strong> <span>{{ $c['client_name'] }}</span></div>
+                <div><strong>Client Email:</strong> <span>{{ $c['client_email'] ?? 'N/A' }}</span></div>
+                <div><strong>Client Number:</strong> <span>{{ $c['client_number'] ?? 'N/A' }}</span></div>
+                <div><strong>Start Date:</strong> <span>{{ \Carbon\Carbon::parse($c['start_date'])->toFormattedDateString() }}</span></div>
+                <div><strong>End Date:</strong> <span>{{ \Carbon\Carbon::parse($c['end_date'])->toFormattedDateString() }}</span></div>
+                <div><strong>Equipment Type:</strong> <span>{{ ucfirst($c['equipment_type']) }}</span></div>
+                <div><strong>Payment Type:</strong> <span>{{ ucfirst(str_replace('_', ' ', $c['payment_type'])) }}</span></div>
+                <div class="full-row"><strong>Details:</strong> <span>{{ $c['contract_details'] ?: 'N/A' }}</span></div>
+            </div>
+        </div>
+        @endif
+
+
 
 </div>
 

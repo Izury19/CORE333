@@ -154,3 +154,6 @@ Route::get('/maintenance-sched', [MaintenanceController::class, 'index'])->name(
 Route::get('/make-contract', [ContractController::class, 'create'])->name('make-contract');
 Route::post('/make-contract', [ContractController::class, 'store'])->name('contracts.store');
 
+// For FullCalendar to fetch the maintenance schedules as events
+Route::get('/calendar/events', [MaintenanceController::class, 'calendarEvents'])->name('calendar.events');
+

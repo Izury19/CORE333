@@ -127,8 +127,15 @@
         </div>
 
         <div class="form-group">
-            <label for="type">Maintenance Type</label>
-            <input type="text" class="form-control" id="type" name="type" value="{{ $schedule->type }}" required>
+            <label for="maintenance_type_id">Maintenance Type</label>
+            <select name="maintenance_type_id" class="form-select" id="maintenance_type_id" required>
+                <option value="">-- Select Maintenance Type --</option>
+                @foreach ($maintenanceTypes as $type)
+                    <option value="{{ $type->id }}" {{ $schedule->maintenance_type_id == $type->id ? 'selected' : '' }}>
+                        {{ $type->name }}
+                    </option>
+                @endforeach
+            </select>
         </div>
 
         <div class="form-group">
@@ -145,19 +152,17 @@
         </div>
 
         <div class="form-group">
-    <label for="technician_name">Assigned Technician</label>
-    
-    {{-- Dropdown para piliin ang technician (dynamic from DB) --}}
-    <select name="technician_name" class="form-select" id="technician_name" required>
-        <option value="">-- Select Technician --</option>
-        @foreach ($technicians as $technician)
-            <option value="{{ $technician->name }}"
-                {{ $schedule->technician_name == $technician->name ? 'selected' : '' }}>
-                {{ $technician->name }}
-            </option>
-        @endforeach
-    </select>
-</div>
+            <label for="technician_name">Assigned Technician</label>
+            <select name="technician_name" class="form-select" id="technician_name" required>
+                <option value="">-- Select Technician --</option>
+                @foreach ($technicians as $technician)
+                    <option value="{{ $technician->name }}" {{ $schedule->technician_name == $technician->name ? 'selected' : '' }}>
+                        {{ $technician->name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
 
         <div class="btn-group">
             <button type="submit" class="btn btn-success">Update Schedule</button>

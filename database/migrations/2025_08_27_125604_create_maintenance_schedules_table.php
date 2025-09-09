@@ -14,12 +14,13 @@ return new class extends Migration
     Schema::create('maintenance_schedules', function (Blueprint $table) {
         $table->id();
         $table->string('equipment_name');
-        $table->string('type');
+        $table->foreignId('maintenance_type_id')->constrained('maintenance_types');
         $table->date('scheduled_date');
         $table->enum('status', ['pending', 'completed'])->default('pending');
         $table->string('technician_name');
         $table->timestamps();
     });
+
 }
 
 
