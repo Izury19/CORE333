@@ -16,7 +16,8 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
     body {
-      padding-bottom: 60px;
+      padding-bottom: 100px;
+      overflow-x: hidden;
     }
     footer {
       position: fixed;
@@ -27,7 +28,8 @@
       color: white;
       text-align: center;
       line-height: 60px;
-      z-index: 1000;
+      z-index: 10;
+
     }
     .fc-day-today {
       background: none !important;
