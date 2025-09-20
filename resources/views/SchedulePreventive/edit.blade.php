@@ -117,7 +117,7 @@
 <div class="container">
     <h2>Edit Maintenance Schedule</h2>
 
-    <form action="{{ route('maintenance.update', $schedule->id) }}" method="POST">
+    <form action="{{ route('maintenance.update', $schedule->maintenance_sched_id) }}" method="POST"></form>
         @csrf
         @method('PUT')
 
@@ -171,3 +171,15 @@
     </form>
 </div>
 @endsection
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let alertBox = document.querySelector(".alert-success");
+        if (alertBox) {
+            setTimeout(() => {
+                alertBox.style.transition = "opacity 0.5s ease";
+                alertBox.style.opacity = "0";
+                setTimeout(() => alertBox.remove(), 500);
+            }, 3000); // 3 seconds
+        }
+    });
+</script>

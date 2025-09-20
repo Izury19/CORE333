@@ -157,3 +157,5 @@ Route::post('/make-contract', [ContractController::class, 'store'])->name('contr
 // For FullCalendar to fetch the maintenance schedules as events
 Route::get('/calendar/events', [MaintenanceController::class, 'calendarEvents'])->name('calendar.events');
 
+Route::get('/maintenance/{id}/edit', [MaintenanceController::class, 'edit'])->name('maintenance.edit');
+Route::resource('invoices', InvoiceController::class);

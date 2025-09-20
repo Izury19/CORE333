@@ -9,6 +9,8 @@ class MaintenanceType extends Model
 {
     use HasFactory;
 
-    // Optional: fillable properties
-    protected $fillable = ['name']; // depende sa structure ng table mo
+    protected $fillable = ['name'];
+
+    protected $primaryKey = 'maintenance_types_id'; // ← ADD THIS
 }
+

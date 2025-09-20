@@ -396,10 +396,10 @@ input.form-control:focus, select.form-select:focus, input[list]:focus {
                             @endif
                         </td>
 <td class="d-flex align-items-center">
-    <a href="{{ route('maintenance.edit', $schedule->id) }}" class="btn btn-sm btn-info me-1">
-        <i class="fas fa-edit"></i> Edit
-    </a>
-    <form action="{{ route('maintenance.destroy', $schedule->id) }}" method="POST" class="d-inline">
+    <a href="{{ route('maintenance.edit', ['id' => $schedule->maintenance_sched_id]) }}" class="btn btn-sm btn-info me-1">
+    <i class="fas fa-edit"></i> Edit
+</a>
+    <form action="{{ route('maintenance.destroy', $schedule->maintenance_sched_id) }}" method="POST" class="d-inline"> 
         @csrf
         @method('DELETE')
         <button type="submit" class="btn btn-sm btn-danger px-2 py-1 delete-btn">

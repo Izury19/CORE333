@@ -9,15 +9,18 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+public function up()
 {
     Schema::table('invoice_items', function (Blueprint $table) {
-        $table->unsignedBigInteger('invoice_id')->after('id');
+        if (!Schema::hasColumn('invoice_items', 'invoice_id')) {
+            $table->unsignedBigInteger('invoice_id')->after('id');
 
-        // Foreign key constraint (optional pero recommended)
-        $table->foreign('invoice_id')->references('id')->on('invoices')->onDelete('cascade');
+            // Foreign key constraint
+            $table->foreign('invoice_id')->references('id')->on('invoices')->onDelete('cascade');
+        }
     });
 }
+
 
 public function down()
 {
