@@ -24,7 +24,7 @@
                 </button>
                 <a href="#" class="flex items-center ms-2 md:me-24">
                     <img src="{{ asset('images/logo.png') }}" class="h-8 me-2" alt="Logo">
-                    <span class="self-center text-xl font-extrabold sm:text-2xl whitespace-nowrap text-white">CaliCrane TEST</span>
+                    <span class="self-center text-xl font-extrabold sm:text-2xl whitespace-nowrap text-white">CaliCrane</span>
                 </a>
             </div>
 
@@ -103,7 +103,7 @@
        
     <!-- Title -->
         <div class="flex justify-center items-center mb-6">
-            <h1 class="text-3xl font-bold text-white tracking-wide">Core 3</h1>
+            <h1 class="text-3xl font-bold text-white tracking-wide">Core 33</h1>
         </div>
 
         <!-- Navigation Links -->
