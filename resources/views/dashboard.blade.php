@@ -103,7 +103,7 @@
        
     <!-- Title -->
         <div class="flex justify-center items-center mb-6">
-            <h1 class="text-3xl font-bold text-white tracking-wide">Core 33</h1>
+            <h1 class="text-3xl font-bold text-white tracking-wide">Core 3</h1>
         </div>
 
         <!-- Navigation Links -->
