@@ -12,7 +12,7 @@
         padding: 2.5rem 3rem;
         border-radius: 12px;
         box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-        max-width: 1200px; /* Palaki */
+        max-width: 1200px;
         margin-top: 50px;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
@@ -48,7 +48,7 @@
         border: 1.5px solid #ccc;
         border-radius: 6px;
         padding: 0.5rem 0.75rem;
-        font-size: 1rem;
+        font-size: 0.8rem;
         transition: border-color 0.3s ease;
     }
 
@@ -60,7 +60,7 @@
     }
 
     .btn-group {
-        grid-column: span 5; /* Full width sa ilalim */
+        grid-column: span 5;
         margin-top: 1.5rem;
         display: flex;
         gap: 1rem;
@@ -101,7 +101,6 @@
         color: white;
     }
 
-    /* Responsive */
     @media (max-width: 768px) {
         form {
             grid-template-columns: 1fr;
@@ -117,7 +116,14 @@
 <div class="container">
     <h2>Edit Maintenance Schedule</h2>
 
-    <form action="{{ route('maintenance.update', $schedule->maintenance_sched_id) }}" method="POST"></form>
+    {{-- ✅ Success alert (auto-fade) --}}
+    @if(session('success'))
+        <div class="alert alert-success" role="alert" id="success-alert">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    <form action="{{ route('maintenance.update', $schedule->maintenance_sched_id) }}" method="POST">
         @csrf
         @method('PUT')
 
@@ -131,7 +137,7 @@
             <select name="maintenance_type_id" class="form-select" id="maintenance_type_id" required>
                 <option value="">-- Select Maintenance Type --</option>
                 @foreach ($maintenanceTypes as $type)
-                    <option value="{{ $type->id }}" {{ $schedule->maintenance_type_id == $type->id ? 'selected' : '' }}>
+                    <option value="{{ $type->maintenance_types_id }}" {{ $schedule->maintenance_type_id == $type->maintenance_types_id ? 'selected' : '' }}>
                         {{ $type->name }}
                     </option>
                 @endforeach
@@ -163,7 +169,6 @@
             </select>
         </div>
 
-
         <div class="btn-group">
             <button type="submit" class="btn btn-success">Update Schedule</button>
             <a href="{{ route('maintenance.index') }}" class="btn btn-secondary">Back</a>
@@ -171,9 +176,11 @@
     </form>
 </div>
 @endsection
+
+{{-- ✅ Auto fade script --}}
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        let alertBox = document.querySelector(".alert-success");
+        let alertBox = document.getElementById("success-alert");
         if (alertBox) {
             setTimeout(() => {
                 alertBox.style.transition = "opacity 0.5s ease";

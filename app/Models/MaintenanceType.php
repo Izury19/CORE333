@@ -9,8 +9,9 @@ class MaintenanceType extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name'];
+    protected $table = 'maintenance_types';
+    protected $primaryKey = 'maintenance_types_id';
 
-    protected $primaryKey = 'maintenance_types_id'; // ← ADD THIS
+    protected $fillable = ['name', 'frequency'];
 }
 

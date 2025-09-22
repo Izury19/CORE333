@@ -29,6 +29,10 @@ class InvoiceController extends Controller
             'items.*.description' => 'required|string',
             'items.*.qty' => 'required|numeric|min:1',
             'items.*.price' => 'required|numeric|min:0',
+            'note' => 'nullable|string',
+            'client_address' => 'nullable|string',
+            'terms_of_payment' => 'nullable|string',
+
         ]);
 
         $items = $validated['items'];
@@ -49,10 +53,14 @@ class InvoiceController extends Controller
             'client_email' => $validated['client_email'],
             'invoice_date' => $validated['invoice_date'],
             'due_date' => $validated['due_date'],
+            'terms_of_payment' => $request->input('terms_of_payment'), // from select
+            'note' => $request->input('note'), // from textarea
+            'client_address' => $request->input('client_address'), // make sure field exists in the DB
             'subtotal' => $subtotal,
             'tax' => $tax,
             'total' => $total,
         ]);
+
 
         // Save items to `invoice_items` table
         foreach ($items as $item) {
@@ -71,13 +79,19 @@ class InvoiceController extends Controller
         // Email data
         $invoiceData = [
             'client_name' => $invoice->client_name,
+            'client_email' => $invoice->client_email,
+            'client_address' => $invoice->client_address,
             'invoice_date' => $invoice->invoice_date,
             'due_date' => $invoice->due_date,
-            'items' => $items,
-            'subtotal' => $subtotal,
-            'tax' => $tax,
-            'total' => $total,
+            'terms_of_payment' => $invoice->terms_of_payment,
+            'note' => $invoice->note,
+
+            'items' => $invoice->items, // Assuming this is an array
+            'subtotal' => $invoice->subtotal,
+            'tax' => $invoice->tax,
+            'total' => $invoice->total,
         ];
+
 
         // Send email
         Mail::to($invoice->client_email)->send(new InvoiceCreatedMail($invoiceData));
@@ -138,15 +152,19 @@ public function update(Request $request, $invoice_id)
     $total = $subtotal + $tax;
 
     // ✅ Update invoice
-    $invoice->update([
-        'client_name'   => $validated['client_name'],
-        'client_email'  => $validated['client_email'],
-        'invoice_date'  => $validated['invoice_date'],
-        'due_date'      => $validated['due_date'],
-        'subtotal'      => $subtotal,
-        'tax'           => $tax,
-        'total'         => $total,
+   $invoice->update([
+        'client_name' => $validated['client_name'],
+        'client_email' => $validated['client_email'],
+        'invoice_date' => $validated['invoice_date'],
+        'due_date' => $validated['due_date'],
+        'terms_of_payment' => $request->input('terms_of_payment'),
+        'note' => $request->input('note'),
+        'client_address' => $request->input('client_address'),
+        'subtotal' => $subtotal,
+        'tax' => $tax,
+        'total' => $total,
     ]);
+
 
     // ✅ Delete old items
     $invoice->items()->delete();
@@ -180,9 +198,24 @@ public function destroy($invoice_id)
     return redirect()->route('invoices.index')
                      ->with('success', 'Invoice deleted successfully.');
 }
-public function index()
+
+public function index(Request $request)
 {
-    $invoices = Invoice::with('items')->get(); // kunin lahat ng invoices kasama ang items
-    return view('Billing and Invoicing.delivery', compact('invoices'));
+    $search = $request->input('search');
+    $month = $request->input('month');
+    $year = $request->input('year');
+
+    $invoices = Invoice::with('items')
+        ->when($search, fn($q) => $q->where('client_name', 'LIKE', "%{$search}%"))
+        ->when($month, fn($q) => $q->whereMonth('invoice_date', $month))
+        ->when($year, fn($q) => $q->whereYear('invoice_date', $year))
+        ->orderBy('invoice_date', 'desc')
+        ->paginate(10)
+        ->withQueryString();
+
+    return view('Billing and Invoicing.delivery', compact('invoices', 'search', 'month', 'year'));
 }
+
+
+
 }

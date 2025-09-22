@@ -39,33 +39,27 @@ h2.mb-4 {
     box-shadow: 0 3px 6px rgba(13, 110, 253, 0.4);
     transition: all 0.3s ease;
 }
-
 .btn-primary:hover, .btn-primary:focus {
     background-color: #0b5ed7;
     border-color: #0a58ca;
     box-shadow: 0 5px 12px rgba(11, 94, 215, 0.6);
     transform: translateY(-2px);
 }
-
 .btn-sm {
     margin-right: 6px;
     transition: background-color 0.2s ease;
 }
-
 .btn-sm.btn-info:hover {
     background-color: #0a58ca;
 }
-
 .btn-sm.btn-danger:hover {
     background-color: #c82333;
 }
-
 form.mb-4 input.form-control {
     border-radius: 10px;
     border: 1.5px solid #ced4da;
     transition: border-color 0.3s ease;
 }
-
 form.mb-4 input.form-control:focus {
     border-color: #0d6efd;
     box-shadow: 0 0 8px rgba(13, 110, 253, 0.4);
@@ -75,20 +69,20 @@ form.mb-4 input.form-control:focus {
     margin-top: 15px;
     border-radius: 10px;
     font-weight: 600;
+    transition: opacity 0.6s ease, transform 0.6s ease, max-height 0.6s ease;
+    overflow: hidden;
 }
 
+/* Table styles */
 .table-responsive {
     margin-top: 35px;
     overflow-x: auto;
 }
-
-/* ===== UPDATED TABLE STYLES ===== */
 table {
-    table-layout: fixed; /* para fixed width ng columns */
+    table-layout: fixed;
     width: 100%;
-    border-collapse: collapse; /* para walang gaps */
+    border-collapse: collapse;
 }
-
 table th {
     background-color: #0d6efd;
     color: white;
@@ -97,39 +91,16 @@ table th {
     letter-spacing: 0.05em;
     padding: 15px 12px;
     user-select: none;
-    white-space: nowrap; /* para hindi mag-wrap yung words sa header */
+    white-space: nowrap;
     overflow: hidden;
 }
-
-/* Controlled column widths */
-table th:nth-child(1), table td:nth-child(1) {
-    width: 12%; /* Equipment */
-}
-
-table th:nth-child(2), table td:nth-child(2) {
-    width: 18%; /* Maintenance Type */
-}
-
-table th:nth-child(3), table td:nth-child(3) {
-    width: 16%; /* Scheduled Date */
-}
-
-table th:nth-child(4), table td:nth-child(4) {
-    width: 14%; /* Status */
-}
-
-table th:nth-child(5), table td:nth-child(5) {
-    width: 20%; /* Assigned Technician */
-}
-
-table th:nth-child(6), table td:nth-child(6) {
-    width: 10%; /* Days Left */
-}
-
-table th:nth-child(7), table td:nth-child(7) {
-    width: 13%; /* Actions */
-}
-
+table th:nth-child(1), table td:nth-child(1) { width: 12%; }
+table th:nth-child(2), table td:nth-child(2) { width: 18%; }
+table th:nth-child(3), table td:nth-child(3) { width: 16%; }
+table th:nth-child(4), table td:nth-child(4) { width: 14%; }
+table th:nth-child(5), table td:nth-child(5) { width: 20%; }
+table th:nth-child(6), table td:nth-child(6) { width: 10%; }
+table th:nth-child(7), table td:nth-child(7) { width: 13%; }
 table td {
     vertical-align: middle;
     padding: 12px 10px;
@@ -137,24 +108,20 @@ table td {
     font-size: 0.95rem;
     color: #333;
     word-wrap: break-word;
-    overflow-wrap: break-word;
-    white-space: normal; /* para mag-wrap yung text */
+    white-space: normal;
 }
-
-/* ❗ Highlight Overdue */
 .table-danger {
     background-color: #f8d7da !important;
     color: #842029;
     font-weight: 600;
 }
-
 tbody tr:hover {
     background-color: #e9f0ff;
     cursor: pointer;
     transition: background-color 0.25s ease;
 }
 
-/* 🎖 Badges */
+/* Badges */
 .badge {
     font-size: 0.9em;
     padding: 0.5em 0.8em;
@@ -163,117 +130,71 @@ tbody tr:hover {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    
 }
+.badge-pending { background-color: #f0ad4e; color: #212529; }
+.badge-completed { background-color: #87CEEB; color: #212529; }
+.badge-overdue { background-color: #e74c3c; color: #fff; }
+.badge.bg-secondary { background-color: #e2e3e5; color: #41464b; }
 
-.badge.bg-warning {
-    background-color: #fff3cd;
-    color: #856404;
-}
-
-.badge.bg-success {
-    background-color: #f0ad4e;
-    color: #212529;
-}
-
-.badge.bg-secondary {
-    background-color: #e2e3e5;
-    color: #41464b;
-}
-/* 🎯 Custom Badge Colors with Text Color */
-.badge-pending {
-    background-color: #f0ad4e; /* orange */
-    color: #212529;
-}
-
-.badge-completed {
-    background-color: #87CEEB; /* sky blue */
-    color: #212529;
-}
-
-.badge-overdue {
-    background-color: #e74c3c; /* red */
-    color: #212529;
-}
-
-/* 📝 Form Labels & Inputs */
-label.form-label {
-    font-weight: 600;
-    color: #444;
-    margin-bottom: 6px;
-}
-
-input.form-control, select.form-select, input[list] {
-    border-radius: 8px;
-    border: 1.5px solid #ced4da;
-    padding: 10px 12px;
-    font-size: 1rem;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-input.form-control:focus, select.form-select:focus, input[list]:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 8px rgba(13, 110, 253, 0.5);
-    outline: none;
-}
-
-.btn.btn-primary.mt-2 {
-    border-radius: 10px;
-    padding: 12px 24px;
-    font-size: 1.1rem;
-}
-
-/* 📱 Responsive Design */
+/* Responsive */
 @media (max-width: 767px) {
-    .container {
-        padding: 30px 20px;
-        max-width: 95%; /* Better on mobile */
-    }
+    .container { padding: 30px 20px; max-width: 95%; }
+    form.mb-4 .row.g-2 > div { flex: 100% !important; max-width: 100% !important; }
+    .btn.btn-primary.mt-2 { width: 100%; }
+}
 
-    form.mb-4 .row.g-2 > div {
-        flex: 100% !important;
-        max-width: 100% !important;
-    }
-
-    .btn.btn-primary.mt-2 {
-        width: 100%;
-    }
-
-    .table-responsive {
-        overflow-x: auto;
-    }
-}    
+/* Search Input + Clear Button */
+#searchInput {
+    height: 45px;
+    font-size: 15px;
+    padding-right: 40px; /* space para hindi dumikit ang text sa X */
+}
+#clearSearch {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    color: #888;
+    cursor: pointer;
+    display: none;
+}
+#clearSearch:hover {
+    color: #dc3545; /* red kapag hover */
+}
 </style>
 
-{{-- ===== Main Content Container ===== --}}
 <div class="container mt-4">
-    {{-- Page Title --}}
     <h2 class="mb-4" style="color: #0d6efd;">🛠 Maintenance Schedule</h2>
 
-    {{-- ===== Search Form ===== --}}
-    <form action="{{ route('maintenance.index') }}" method="GET" class="mb-4">
-        <div class="row g-2">
-            <div class="col-md-10">
-                <input type="text" name="search" class="form-control"
-                       placeholder="Search equipment, type, or technician..."
-                       value="{{ request('search') }}">
-            </div>
-            <div class="col-md-2 d-grid">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-search"></i> Search
-                </button>
-            </div>
+    {{-- Search --}}
+    <form action="{{ route('maintenance.index') }}" method="GET" class="mb-4" id="searchForm">
+        <div class="position-relative" style="width:100%; max-width:500px; margin:auto;">
+            <input type="text" name="search" id="searchInput"
+                   class="form-control rounded-pill ps-3 pe-5"
+                   placeholder="Search equipment, type, or technician..."
+                   value="{{ request('search') }}">
+
+            {{-- ❌ Clear button --}}
+            <button type="button" id="clearSearch">&times;</button>
+        </div>
+
+        <div class="text-center mt-3">
+            <button type="submit" class="btn btn-primary rounded-pill px-4">
+                <i class="fas fa-search"></i> Search
+            </button>
         </div>
     </form>
 
-    {{-- ===== Add New Schedule Card ===== --}}
+    {{-- Add Form --}}
     <div class="card mb-4 p-3">
         <h4><i class="fas fa-plus-circle"></i> Add New Schedule</h4>
 
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
-
         @if ($errors->any())
             <div class="alert alert-danger">
                 <ul class="mb-0">
@@ -284,33 +205,30 @@ input.form-control:focus, select.form-select:focus, input[list]:focus {
             </div>
         @endif
 
-        {{-- 📅 Schedule Form --}}
         <form action="{{ route('maintenance.store') }}" method="POST" class="row gy-3 gx-4 mt-1">
             @csrf
-
             <div class="col-md-6">
                 <label for="equipment_name" class="form-label">Equipment Name</label>
                 <input type="text" class="form-control" id="equipment_name" name="equipment_name"
                        value="{{ old('equipment_name') }}" required>
             </div>
-
             <div class="col-md-6">
                 <label for="maintenance_type_id" class="form-label">Maintenance Type</label>
                 <select class="form-control" id="maintenance_type_id" name="maintenance_type_id" required>
                     <option value="">-- Select Maintenance Type --</option>
                     @foreach ($maintenanceTypes as $type)
-                        <option value="{{ $type->id }}">{{ $type->name }}</option>
+                        <option value="{{ $type->maintenance_types_id }}" 
+                            {{ old('maintenance_type_id') == $type->maintenance_types_id ? 'selected' : '' }}>
+                            {{ $type->name }}
+                        </option>
                     @endforeach
                 </select>
             </div>
-
-
             <div class="col-md-6">
                 <label for="scheduled_date" class="form-label">Scheduled Date</label>
                 <input type="date" class="form-control" id="scheduled_date" name="scheduled_date"
                        value="{{ old('scheduled_date') }}" required>
             </div>
-
             <div class="col-md-6">
                 <label for="status" class="form-label">Status</label>
                 <select class="form-select" id="status" name="status" required>
@@ -318,7 +236,6 @@ input.form-control:focus, select.form-select:focus, input[list]:focus {
                     <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Completed</option>
                 </select>
             </div>
-
             <div class="col-md-12">
                 <label for="technician_name" class="form-label">Assigned Technician</label>
                 <input list="technicians" class="form-control" id="technician_name" name="technician_name"
@@ -329,7 +246,6 @@ input.form-control:focus, select.form-select:focus, input[list]:focus {
                     @endforeach
                 </datalist>
             </div>
-
             <div class="col-12">
                 <button type="submit" class="btn btn-primary mt-2 rounded-pill">
                     <i class="fas fa-plus"></i> Add Schedule
@@ -338,7 +254,7 @@ input.form-control:focus, select.form-select:focus, input[list]:focus {
         </form>
     </div>
 
-    {{-- 📋 Existing Schedules Table --}}
+    {{-- Table --}}
     <div class="table-responsive">
         <table class="table table-bordered table-striped">
             <thead class="table-primary">
@@ -359,34 +275,24 @@ input.form-control:focus, select.form-select:focus, input[list]:focus {
                         $daysLeft = now()->diffInDays($scheduledDate, false);
                         $isOverdue = $daysLeft < 0 && $schedule->status == 'pending';
                     @endphp
-
                     <tr class="{{ $isOverdue ? 'table-danger' : '' }}">
                         <td>{{ $schedule->equipment_name }}</td>
                         <td>{{ $schedule->maintenanceType->name ?? 'N/A' }}</td>
                         <td>{{ $scheduledDate->format('F d, Y') }}</td>
                         <td>
                             @if($schedule->status == 'pending')
-                                <span class="badge badge-pending">
-                                    <i class="fas fa-clock me-1"></i> Pending
-                                </span>
+                                <span class="badge badge-pending"><i class="fas fa-clock me-1"></i> Pending</span>
                             @elseif($schedule->status == 'completed')
-                                <span class="badge badge-completed">
-                                    <i class="fas fa-check-circle me-1"></i> Completed
-                                </span>
+                                <span class="badge badge-completed"><i class="fas fa-check-circle me-1"></i> Completed</span>
                             @elseif($schedule->status == 'overdue')
-                                <span class="badge badge-overdue">
-                                    <i class="fas fa-exclamation-triangle me-1"></i> Overdue
-                                </span>
+                                <span class="badge badge-overdue"><i class="fas fa-exclamation-triangle me-1"></i> Overdue</span>
                             @else
                                 <span class="badge bg-secondary">Unknown</span>
                             @endif
                         </td>
                         <td>{{ $schedule->technician_name }}</td>
                         <td>
-                            @php
-                                $daysLeftInt = (int) round($daysLeft);
-                            @endphp
-
+                            @php $daysLeftInt = (int) round($daysLeft); @endphp
                             @if($daysLeftInt > 0)
                                 <span class="text-primary">{{ $daysLeftInt }} day(s)</span>
                             @elseif($daysLeftInt == 0)
@@ -395,23 +301,20 @@ input.form-control:focus, select.form-select:focus, input[list]:focus {
                                 <span class="text-danger">{{ abs($daysLeftInt) }} day(s) overdue</span>
                             @endif
                         </td>
-<td class="d-flex align-items-center">
-    <a href="{{ route('maintenance.edit', ['id' => $schedule->maintenance_sched_id]) }}" class="btn btn-sm btn-info me-1">
-    <i class="fas fa-edit"></i> Edit
-</a>
-    <form action="{{ route('maintenance.destroy', $schedule->maintenance_sched_id) }}" method="POST" class="d-inline"> 
-        @csrf
-        @method('DELETE')
-        <button type="submit" class="btn btn-sm btn-danger px-2 py-1 delete-btn">
-            <i class="fas fa-trash-alt"></i> Delete
-        </button>
-    </form>
-</td>
-
-
+                        <td class="d-flex align-items-center">
+                            <a href="{{ route('maintenance.edit', $schedule->maintenance_sched_id) }}" class="btn btn-sm btn-info me-1">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <form action="{{ route('maintenance.destroy', $schedule->maintenance_sched_id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger px-2 py-1 delete-btn">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                 @endforeach
-
                 @if($schedules->isEmpty())
                     <tr>
                         <td colspan="7" class="text-center text-muted">No maintenance schedules found.</td>
@@ -419,44 +322,72 @@ input.form-control:focus, select.form-select:focus, input[list]:focus {
                 @endif
             </tbody>
         </table>
-
-        {{-- 🔄 Pagination --}}
         <div class="d-flex justify-content-center mt-3">
             {{ $schedules->withQueryString()->links() }}
         </div>
     </div>
 </div>
 
-{{-- 📦 Font Awesome --}}
+{{-- Font Awesome --}}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+{{-- Scripts --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    let deleteForm; // store the form to submit on confirm
-
+    let deleteForm;
     const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 
-    // Target all delete buttons
     document.querySelectorAll('.delete-btn').forEach(button => {
         button.addEventListener('click', function(event) {
-            event.preventDefault(); // Prevent form submit immediately
-            deleteForm = this.closest('form'); // Get the form related to this button
-            deleteModal.show(); // Show modal
+            event.preventDefault();
+            deleteForm = this.closest('form');
+            deleteModal.show();
         });
     });
 
-    // When user clicks confirm in modal, submit the stored form
     confirmDeleteBtn.addEventListener('click', function() {
-        if (deleteForm) {
-            deleteForm.submit();
-        }
+        if (deleteForm) deleteForm.submit();
     });
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    let alerts = document.querySelectorAll(".alert-success, .alert-danger");
+    alerts.forEach(alertBox => {
+        setTimeout(() => {
+            alertBox.style.maxHeight = alertBox.scrollHeight + "px";
+            alertBox.style.opacity = "1";
+            setTimeout(() => {
+                alertBox.style.opacity = "0";
+                alertBox.style.transform = "translateY(-20px)";
+                alertBox.style.maxHeight = "0";
+                setTimeout(() => alertBox.remove(), 600);
+            }, 4000);
+        }, 100);
+    });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("searchInput");
+    const clearBtn = document.getElementById("clearSearch");
+    const searchForm = document.getElementById("searchForm");
+
+    function toggleClearBtn() {
+        clearBtn.style.display = searchInput.value ? "block" : "none";
+    }
+
+    clearBtn.addEventListener("click", function () {
+        searchInput.value = "";
+        searchForm.submit(); // balik sa default
+    });
+
+    searchInput.addEventListener("input", toggleClearBtn);
+
+    toggleClearBtn();
 });
 </script>
 
-@endsection
-<!-- Delete Confirmation Modal -->
+{{-- Delete Confirmation Modal --}}
 <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -474,3 +405,5 @@ document.addEventListener('DOMContentLoaded', function () {
     </div>
   </div>
 </div>
+
+@endsection

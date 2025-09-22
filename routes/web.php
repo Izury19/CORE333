@@ -9,6 +9,7 @@ use App\Http\Controllers\LandingController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\ContractController;
+use App\Http\Controllers\PaymentController;
 
 Route::get('/', [LandingController::class, 'main'])->name('landing');
 
@@ -64,9 +65,9 @@ Route::get('/delivery', function () {
 })->name('delivery');
 */
 
-Route::get('/payment', function () {
-    return view('Billing and Invoicing.payment');
-})->name('payment');
+//Route::get('/payment', function () {
+//   return view('Billing and Invoicing.payment');
+//})->name('payment');
 
 Route::get('/record', function () {
     return view('Billing and Invoicing.record');
@@ -159,3 +160,8 @@ Route::get('/calendar/events', [MaintenanceController::class, 'calendarEvents'])
 
 Route::get('/maintenance/{id}/edit', [MaintenanceController::class, 'edit'])->name('maintenance.edit');
 Route::resource('invoices', InvoiceController::class);
+
+Route::resource('payments', PaymentController::class);
+Route::post('payments/{id}/mark-paid', [PaymentController::class, 'markPaid'])->name('payments.markPaid');
+Route::get('/payment', [PaymentController::class, 'index'])->name('payment');
+Route::post('/invoices', [InvoiceController::class, 'store'])->name('invoices.store');

@@ -3,105 +3,132 @@
 @section('content')
 <style>
     body {
-        background-color: #2e2e2e;
+        background-color: #f4f6f8;
         font-family: 'Segoe UI', sans-serif;
+        margin: 0;
         padding: 0;
     }
-    .invoice-box {
-    width: 100%;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 40px;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-    }
+
     .invoice-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: calc(100vh - 100px); /* adjust height, minus navbar/footer */
-    padding: 40px 20px;
-    padding-right: 250px;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: calc(100vh - 80px);
+        padding: 40px 20px;
+        margin-left: -200px;
     }
 
-    h2, h3 {
+    .invoice-box {
+        width: 100%;
+        max-width: 850px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        padding: 40px;
+        transition: transform 0.2s;
+    }
+
+    .invoice-box:hover {
+        transform: translateY(-2px);
+    }
+
+    h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 25px;
+    }
+
+    h3 {
+        font-size: 1.5rem;
         font-weight: 600;
         margin-bottom: 20px;
+        color: #34495e;
     }
 
-    /* Flex container for side-by-side inputs */
+    /* Flex rows */
     .flex-row {
         display: flex;
         gap: 20px;
-        margin-bottom: 15px;
+        margin-bottom: 20px;
     }
 
     .flex-row > div {
         flex: 1;
     }
 
+    label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 5px;
+        color: #34495e;
+    }
+
     .form-control {
-        border-radius: 6px;
-        padding: 10px;
-        border: 1px solid #ccc;
         width: 100%;
-        box-sizing: border-box;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #d1d8e0;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 6px rgba(0, 123, 255, 0.2);
     }
 
     table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 20px;
-        font-size: 15px;
+        margin-top: 25px;
+        font-size: 14px;
     }
 
     table th {
-        background-color: #007bff;
+        background: linear-gradient(90deg, #007bff, #0056b3);
         color: #fff;
         text-align: left;
         padding: 12px;
         border: none;
+        border-radius: 6px 6px 0 0;
     }
 
     table td {
-        padding: 8px 10px;
-        border: 1px solid #ddd;
+        padding: 10px;
+        border-bottom: 1px solid #e0e0e0;
         vertical-align: middle;
     }
 
-    /* Smaller inputs in table for Qty, Price, Total */
     #items-table input.form-control {
         padding: 6px 8px;
         font-size: 13px;
     }
 
-    #items-table td:nth-child(1) input.form-control {
-        width: 100%; /* Description full width */
-    }
-
-    #items-table td:nth-child(2) input.form-control,
-    #items-table td:nth-child(3) input.form-control,
-    #items-table td:nth-child(4) input.form-control {
-        width: 80px; /* Qty, Price, Total */
+    #items-table td:nth-child(2),
+    #items-table td:nth-child(3),
+    #items-table td:nth-child(4) {
+        width: 90px;
     }
 
     .btn {
-        border-radius: 6px;
-        padding: 8px 14px;
+        border-radius: 8px;
+        padding: 10px 18px;
         font-size: 14px;
+        cursor: pointer;
         transition: all 0.2s ease-in-out;
+        border: none;
     }
 
     .btn-primary {
         background-color: #007bff;
-        border: none;
         color: #fff;
     }
 
     .btn-primary:hover {
         background-color: #0056b3;
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
     }
 
     .btn-outline-primary {
@@ -113,38 +140,46 @@
     .btn-outline-primary:hover {
         background-color: #007bff;
         color: #fff;
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2);
     }
 
     .btn-danger {
         background-color: #dc3545;
         color: #fff;
-        border: none;
     }
 
     .btn-danger:hover {
         background-color: #c82333;
+        box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
     }
 
     input[readonly] {
-        background-color: #f8f9fa;
+        background-color: #f1f3f6;
     }
 
     .alert {
-        padding: 15px;
-        border-radius: 6px;
+        padding: 15px 20px;
+        border-radius: 8px;
         margin-bottom: 20px;
+        font-weight: 500;
     }
 
     .alert-success {
         background-color: #d4edda;
         color: #155724;
+        border-left: 6px solid #28a745;
     }
 
     .text-end {
         text-align: right;
     }
 
+    /* Responsive */
     @media (max-width: 768px) {
+        .flex-row {
+            flex-direction: column;
+        }
+
         .invoice-box {
             padding: 20px;
         }
@@ -153,17 +188,29 @@
             font-size: 13px;
         }
 
-        .flex-row {
-            flex-direction: column;
+        #items-table td:nth-child(2),
+        #items-table td:nth-child(3),
+        #items-table td:nth-child(4) {
+            width: 70px;
         }
     }
+    #payment-details {
+    background-color: #eef4fb;
+    border-left: 4px solid #007bff;
+    padding: 10px;
+    font-size: 13.5px;
+    color: #333;
+    margin-top: 5px;
+    }
+
 </style>
+
 <!-- breadcrumb -->
         <div class="flex mb-5" aria-label="Breadcrumb" style="justify-content: flex-start; padding-left: 17.5rem;">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
-                    <a href="#" class="inline-flex items-center text-sm font-medium text-white hover:text-blue-600">
-                        <svg class="w-3 h-3 mr-2.5 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <a href="#" class="inline-flex items-center text-sm font-medium text-black hover:text-blue-600">
+                        <svg class="w-3 h-3 mr-2.5 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                             <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"/>
                         </svg>
                             Core 3
@@ -171,10 +218,10 @@
                 </li>
                 <li>
                 <div class="flex items-center">
-                    <svg class="w-3 h-3 text-white mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                    <svg class="w-3 h-3 text-black mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
                     </svg>
-                    <a href="#" class="ml-1 text-sm font-medium text-black text-white hover:text-blue-900 md:ml-2">Invoice Creation</a>
+                    <a href="#" class="ml-1 text-sm font-medium text-black text-black hover:text-blue-900 md:ml-2">Invoice Creation</a>
                 </div>
                 </li>   
             </ol>
@@ -184,12 +231,13 @@
 <div class="invoice-wrapper">
 <div class="invoice-box" style="margin-top: -40px;">
     @if (session('success'))
-        <div class="alert alert-success mt-4">
+        <div id="success-alert" class="alert alert-success mt-4">
             {{ session('success') }}
         </div>
     @endif
 
-    <form action="{{ route('invoice.store') }}" method="POST">
+
+    <form action="{{ route('invoices.store') }}" method="POST">
         @csrf
 
         <h2 class="text-4xl font-bold">Invoice Creation</h2>
@@ -216,11 +264,44 @@
                 <input type="date" class="form-control" name="due_date" required>
             </div>
         </div>
+        <!-- New fields: Address, Terms of Payment, Note -->
+        <div class="flex-row">
+            <div>
+                <label>Terms of Payment</label>
+                <select name="terms_of_payment" class="form-control" id="terms-select" required>
+                    <option value="">Select Payment Method</option>
+                    <option value="Bank Transfer">Bank Transfer</option>
+                    <option value="GCash">GCash</option>
+                    <option value="Paypal">Paypal</option>
+                    <option value="Cash">Cash</option>
+                </select>
+            </div>
+            <div>
+                <label>Payment Details</label>
+                <div id="payment-details" class="form-control" style="background-color: #eef4fb; border-left: 4px solid #007bff; color: #333; font-size: 13.5px;">
+                    Select a payment method to see details.
+                </div>
+            </div>
+            
+        </div>
+
+        <div>
+            <label>Address</label>
+            <textarea name="client_address" rows="4" placeholder="Enter address here..." class="form-control">Address: 134 Magsaysay Ext, Dona Faustina, San Bartolome, Novaliches, Quezon City</textarea>
+        </div>
+
+        <div class="flex-row">
+            <div style="flex: 1;">
+                <label>Note</label>
+                <textarea class="form-control" name="note" rows="3" placeholder="Additional notes or instructions..."></textarea>
+            </div>
+        </div>
+
 
         <table id="items-table">
             <thead>
                 <tr>
-                    <th>Description</th>
+                    <th>Equipment</th>
                     <th>Qty</th>
                     <th>Price</th>
                     <th>Total</th>
@@ -267,7 +348,7 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>Description</th>
+                <th>Equipment</th>
                 <th>Qty</th>
                 <th>Price</th>
                 <th>Total</th>
@@ -363,5 +444,37 @@
         });
     });
 </script>
+<script>
+    // Auto hide success alert after 5 seconds
+    const successAlert = document.getElementById('success-alert');
+    if (successAlert) {
+        setTimeout(() => {
+            successAlert.style.transition = 'opacity 0.5s';
+            successAlert.style.opacity = '0';
+            setTimeout(() => successAlert.remove(), 500);
+        }, 5000); // 5000ms = 5 seconds
+    }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const paymentSelect = document.getElementById('terms-select');
+        const paymentDetailsDiv = document.getElementById('payment-details');
+
+        const paymentDetailsMap = {
+            "Bank Transfer": "Bank: BDO<br>Account Number: 1234-5678-9012<br>Account Name: Juan Dela Cruz",
+            "GCash": "GCash Number: 0917-123-4567<br>Account Name: Maria Santos",
+            "Paypal": "Paypal Email: yourname@paypal.com",
+            "Cash": "Cash payment must be settled at our office: 134 Magsaysay Ext, Quezon City"
+        };
+
+        paymentSelect.addEventListener('change', function () {
+            const selected = this.value;
+            paymentDetailsDiv.innerHTML = paymentDetailsMap[selected] || 'Select a payment method to see details.';
+        });
+    });
+</script>
+
+
 @endsection
 

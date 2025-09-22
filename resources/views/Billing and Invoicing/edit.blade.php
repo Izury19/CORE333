@@ -3,7 +3,7 @@
 @section('content')
 <style>
     body {
-        background-color: #2e2e2e;
+        background-color: #f4f6f8;
         font-family: 'Segoe UI', sans-serif;
         padding: 0;
     }
@@ -37,9 +37,7 @@
         margin-bottom: 15px;
     }
 
-    .flex-row > div {
-        flex: 1;
-    }
+    .flex-row > div { flex: 1; }
 
     .form-control {
         border-radius: 6px;
@@ -55,7 +53,6 @@
         margin-top: 20px;
         font-size: 15px;
     }
-
     table th {
         background-color: #007bff;
         color: #fff;
@@ -63,73 +60,42 @@
         padding: 12px;
         border: none;
     }
-
     table td {
         padding: 8px 10px;
         border: 1px solid #ddd;
         vertical-align: middle;
     }
 
-    #items-table input.form-control {
-        padding: 6px 8px;
-        font-size: 13px;
-    }
-
+    #items-table input.form-control { padding: 6px 8px; font-size: 13px; }
     #items-table td:nth-child(2) input,
     #items-table td:nth-child(3) input,
-    #items-table td:nth-child(4) input {
-        width: 80px;
-    }
+    #items-table td:nth-child(4) input { width: 80px; }
 
-    .btn {
-        border-radius: 6px;
-        padding: 8px 14px;
-        font-size: 14px;
-        transition: all 0.2s ease-in-out;
-    }
-
-    .btn-primary {
-        background-color: #007bff;
-        border: none;
-        color: #fff;
-    }
+    .btn { border-radius: 6px; padding: 8px 14px; font-size: 14px; transition: all 0.2s ease-in-out; }
+    .btn-primary { background-color: #007bff; border: none; color: #fff; }
     .btn-primary:hover { background-color: #0056b3; }
-
-    .btn-outline-primary {
-        border: 1px solid #007bff;
-        background: transparent;
-        color: #007bff;
-    }
+    .btn-outline-primary { border: 1px solid #007bff; background: transparent; color: #007bff; }
     .btn-outline-primary:hover { background-color: #007bff; color: #fff; }
-
-    .btn-outline-secondary {
-        border: 1px solid #6c757d;
-        background: transparent;
-        color: #6c757d;
-    }
-    .btn-outline-secondary:hover { background-color: #6c757d; color: #fff; }
-
-    .btn-danger {
-        background-color: #dc3545;
-        color: #fff;
-        border: none;
-    }
+    .btn-outline-secondary { background-color: #007bff; border: none; color: #fff; }
+    .btn-outline-secondary:hover { background-color: #0056b3; }
+    .btn-danger { background-color: #dc3545; color: #fff; border: none; }
     .btn-danger:hover { background-color: #c82333; }
 
     input[readonly] { background-color: #f8f9fa; }
 
-    .alert {
-        padding: 15px;
-        border-radius: 6px;
-        margin-bottom: 20px;
-    }
-
-    .alert-success {
-        background-color: #d4edda;
-        color: #155724;
-    }
+    .alert { padding: 15px; border-radius: 6px; margin-bottom: 20px; }
+    .alert-success { background-color: #d4edda; color: #155724; }
 
     .text-end { text-align: right; }
+
+    #payment-details {
+        background-color: #eef4fb;
+        border-left: 4px solid #007bff;
+        padding: 10px;
+        font-size: 13.5px;
+        color: #333;
+        margin-top: 5px;
+    }
 
     @media (max-width: 768px) {
         .invoice-box { padding: 20px; }
@@ -171,6 +137,36 @@
                 <div>
                     <label>Due Date</label>
                     <input type="date" class="form-control" name="due_date" value="{{ $invoice->due_date }}" required>
+                </div>
+            </div>
+
+            <!-- New fields -->
+            <div class="flex-row">
+                <div>
+                    <label>Terms of Payment</label>
+                    <select name="terms_of_payment" class="form-control" id="terms-select" required>
+                        <option value="">Select Payment Method</option>
+                        <option value="Bank Transfer" {{ $invoice->terms_of_payment == 'Bank Transfer' ? 'selected' : '' }}>Bank Transfer</option>
+                        <option value="GCash" {{ $invoice->terms_of_payment == 'GCash' ? 'selected' : '' }}>GCash</option>
+                        <option value="Paypal" {{ $invoice->terms_of_payment == 'Paypal' ? 'selected' : '' }}>Paypal</option>
+                        <option value="Cash" {{ $invoice->terms_of_payment == 'Cash' ? 'selected' : '' }}>Cash</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Payment Details</label>
+                    <div id="payment-details" class="form-control">{!! $invoice->payment_details ?? 'Select a payment method to see details.' !!}</div>
+                </div>
+            </div>
+
+            <div>
+                <label>Address</label>
+                <textarea name="client_address" rows="3" class="form-control">{{ $invoice->client_address }}</textarea>
+            </div>
+
+            <div class="flex-row">
+                <div style="flex:1;">
+                    <label>Note</label>
+                    <textarea class="form-control" name="note" rows="3">{{ $invoice->note }}</textarea>
                 </div>
             </div>
 
@@ -275,6 +271,7 @@
         });
     });
 </script>
+
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         let alertBox = document.querySelector(".alert-success");
@@ -283,8 +280,24 @@
                 alertBox.style.transition = "opacity 0.5s ease";
                 alertBox.style.opacity = "0";
                 setTimeout(() => alertBox.remove(), 500);
-            }, 3000); // 3 seconds
+            }, 3000);
         }
+
+        // Payment details dynamic
+        const paymentDetails = {
+            "Bank Transfer": "Bank: BDO<br>Account Number: 1234-5678-9012<br>Account Name: Juan Dela Cruz",
+            "GCash": "GCash Number: 0917-123-4567<br>Account Name: Maria Santos",
+            "Paypal": "Paypal Email: yourname@paypal.com",
+            "Cash": "Please prepare exact amount upon delivery or pickup."
+        };
+
+        const termsSelect = document.getElementById('terms-select');
+        const paymentDetailsDiv = document.getElementById('payment-details');
+
+        termsSelect.addEventListener('change', function () {
+            const selected = this.value;
+            paymentDetailsDiv.innerHTML = paymentDetails[selected] || 'Select a payment method to see details.';
+        });
     });
 </script>
 @endsection

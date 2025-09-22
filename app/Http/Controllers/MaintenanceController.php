@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Response;
 use App\Models\MaintenanceSchedule;
 use App\Models\Technician;
 use App\Models\MaintenanceType;
@@ -13,18 +12,28 @@ class MaintenanceController extends Controller
     /**
      * Display paginated list of maintenance schedules.
      */
-    public function index()
-    {
-        $schedules = MaintenanceSchedule::with('maintenanceType')
-                      ->orderBy('scheduled_date', 'asc')
-                      ->paginate(10)
-                      ->withQueryString();
+public function index(Request $request)
+{
+    $search = $request->input('search');
 
-        $technicians = Technician::all();
-        $maintenanceTypes = MaintenanceType::all(); 
+    $schedules = MaintenanceSchedule::with('maintenanceType')
+        ->when($search, function ($query, $search) {
+            $query->where('equipment_name', 'like', "%{$search}%")
+                  ->orWhereHas('maintenanceType', function ($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  })
+                  ->orWhere('technician_name', 'like', "%{$search}%");
+        })
+        ->orderBy('scheduled_date', 'asc')
+        ->paginate(10)
+        ->withQueryString();
 
-        return view('SchedulePreventive.maintenance-sched', compact('schedules', 'technicians', 'maintenanceTypes'));
-    }
+    $technicians = Technician::all();
+    $maintenanceTypes = MaintenanceType::all(); 
+
+    return view('SchedulePreventive.maintenance-sched', compact('schedules', 'technicians', 'maintenanceTypes', 'search'));
+}
+
 
     /**
      * Show form to create a new maintenance schedule.
@@ -44,7 +53,7 @@ class MaintenanceController extends Controller
     {
         $request->validate([
             'equipment_name' => 'required|string|max:255',
-            'maintenance_type_id' => 'required|exists:maintenance_types,id',
+            'maintenance_type_id' => 'required|exists:maintenance_types,maintenance_types_id',
             'scheduled_date' => 'required|date',
             'status' => 'required|in:pending,completed',
             'technician_name' => 'required|string|max:255',
@@ -52,7 +61,7 @@ class MaintenanceController extends Controller
 
         MaintenanceSchedule::create([
             'equipment_name' => $request->equipment_name,
-            'maintenance_type_id' => $request->maintenance_type_id,
+            'maintenance_type_id' => $request->maintenance_type_id, // 👉 tama sa DB column
             'scheduled_date' => $request->scheduled_date,
             'status' => $request->status,
             'technician_name' => $request->technician_name,
@@ -76,27 +85,31 @@ class MaintenanceController extends Controller
     /**
      * Update an existing maintenance schedule.
      */
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'equipment_name' => 'required|string|max:255',
-            'maintenance_type_id' => 'required|exists:maintenance_types,id',
-            'scheduled_date' => 'required|date',
-            'status' => 'required|in:pending,completed',
-            'technician_name' => 'required|string|exists:technicians,name',
-        ]);
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'equipment_name' => 'required|string|max:255',
+        'maintenance_type_id' => 'required|exists:maintenance_types,maintenance_types_id',
+        'scheduled_date' => 'required|date',
+        'status' => 'required|in:pending,completed',
+        'technician_name' => 'required|string|max:255',
+    ]);
 
-        $schedule = MaintenanceSchedule::findOrFail($id);
-        $schedule->update([
-            'equipment_name' => $request->equipment_name,
-            'maintenance_type_id' => $request->maintenance_type_id,
-            'scheduled_date' => $request->scheduled_date,
-            'status' => $request->status,
-            'technician_name' => $request->technician_name,
-        ]);
+    $schedule = MaintenanceSchedule::findOrFail($id);
 
-        return redirect()->route('maintenance.index')->with('success', 'Maintenance schedule updated successfully.');
-    }
+    $schedule->update([
+        'equipment_name' => $request->equipment_name,
+        'maintenance_type_id' => $request->maintenance_type_id,
+        'scheduled_date' => $request->scheduled_date,
+        'status' => $request->status,
+        'technician_name' => $request->technician_name,
+    ]);
+
+return redirect()
+    ->route('maintenance.edit', $schedule)
+    ->with('success', 'Maintenance schedule updated successfully.');
+}
+
 
     /**
      * Delete a maintenance schedule.
@@ -111,7 +124,6 @@ class MaintenanceController extends Controller
 
     /**
      * Provide maintenance schedule data for FullCalendar in JSON format.
-     * This will be called by the frontend calendar to display events.
      */
     public function calendarEvents()
     {
@@ -119,7 +131,7 @@ class MaintenanceController extends Controller
 
         $events = $schedules->map(function ($schedule) {
             return [
-                'id' => $schedule->id,
+                'id' => $schedule->maintenance_sched_id, // 👉 tamang PK
                 'title' => $schedule->equipment_name . ' (' . optional($schedule->maintenanceType)->name . ')',
                 'start' => $schedule->scheduled_date,
                 'status' => $schedule->status,

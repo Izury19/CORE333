@@ -20,11 +20,14 @@ class Invoice extends Model
         'client_email',
         'invoice_date',
         'due_date',
+        'terms_of_payment',  // add this
+        'client_address',    // add this
+        'note',              // add this
         'subtotal',
         'tax',
         'total',
-        'status', // <-- important
     ];
+
 
     protected $casts = [
         'invoice_date' => 'datetime',
