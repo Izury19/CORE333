@@ -49,7 +49,7 @@
         class="pl-10 mt-2 space-y-1 text-sm font-medium text-white overflow-hidden">
         <li>
             <a href="{{ route ('order') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
-                Customer and Order Data Preparation
+                Client and Job Data Preparation
             </a>
         </li>
         <li>

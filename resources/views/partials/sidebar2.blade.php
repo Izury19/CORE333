@@ -63,7 +63,7 @@
                         'title' => 'Billing and Invoicing',
                         'icon' => 'billing.svg',
                         'routes' => [
-                            ['name' => 'order', 'label' => 'Customer and Order Data Preparation'],
+                            ['name' => 'order', 'label' => 'Client and Job Data Preparation'],
                             ['name' => 'invoice', 'label' => 'Invoice Creation'],
                             ['name' => 'delivery', 'label' => 'Invoice Delivery'],
                             ['name' => 'payment', 'label' => 'Payment Processing'],

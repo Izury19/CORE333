@@ -28,4 +28,8 @@ class MaintenanceSchedule extends Model
     {
         return $this->belongsTo(MaintenanceType::class, 'maintenance_type_id', 'maintenance_types_id');
     }
+    public function technician()
+    {
+        return $this->belongsTo(Technician::class, 'technician_id');
+    }
 }

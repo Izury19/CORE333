@@ -26,6 +26,7 @@ class Invoice extends Model
         'subtotal',
         'tax',
         'total',
+        'status', 
     ];
 
 

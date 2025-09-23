@@ -4,7 +4,7 @@
 
 <style>
 body {
-    background-color: #2e2e2e;
+    background-color: #f4f6f8;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding: 0;
     margin: 0;
@@ -166,27 +166,28 @@ tbody tr:hover {
 }
 </style>
 
+
 <div class="container mt-4">
     <h2 class="mb-4" style="color: #0d6efd;">🛠 Maintenance Schedule</h2>
 
     {{-- Search --}}
     <form action="{{ route('maintenance.index') }}" method="GET" class="mb-4" id="searchForm">
-        <div class="position-relative" style="width:100%; max-width:500px; margin:auto;">
-            <input type="text" name="search" id="searchInput"
-                   class="form-control rounded-pill ps-3 pe-5"
-                   placeholder="Search equipment, type, or technician..."
-                   value="{{ request('search') }}">
+        <div class="d-flex justify-content-center mt-3 flex-wrap gap-2 align-items-center">
+            <div class="position-relative" style="flex: 1; max-width: 400px;">
+                <input type="text" name="search" id="searchInput"
+                    class="form-control rounded-pill ps-3 pe-5"
+                    placeholder="Search equipment, type, or technician..."
+                    value="{{ request('search') }}">
 
-            {{-- ❌ Clear button --}}
-            <button type="button" id="clearSearch">&times;</button>
-        </div>
+                <button type="button" id="clearSearch">&times;</button>
+            </div>
 
-        <div class="text-center mt-3">
             <button type="submit" class="btn btn-primary rounded-pill px-4">
                 <i class="fas fa-search"></i> Search
             </button>
         </div>
     </form>
+
 
     {{-- Add Form --}}
     <div class="card mb-4 p-3">

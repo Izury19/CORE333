@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Carbon;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\GoogleController;
@@ -10,16 +9,30 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\PaymentApiController;
+use App\Http\Controllers\JobController;
 
+
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
 Route::get('/', [LandingController::class, 'main'])->name('landing');
 
-Route::get('/sendotp', function () {
-    // You can load a view or redirect elsewhere
-    return view('auth.otp');
-});
+Route::view('/sendotp', 'auth.otp');
+Route::view('/success', 'auth.success')->name('auth.success');
 
+/*
+|--------------------------------------------------------------------------
+| Authentication
+|--------------------------------------------------------------------------
+*/
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/register', [RegisterController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register'])->name('register.submit');
@@ -27,120 +40,79 @@ Route::post('/register', [RegisterController::class, 'register'])->name('registe
 Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
 Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 
+/*
+|--------------------------------------------------------------------------
+| Dashboard & User
+|--------------------------------------------------------------------------
+*/
 Route::get('/dashboard', [AuthController::class, 'showMainPage'])->name('dashboard');
-
-// Profile route
 Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
-
-// Settings route
 Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
 
-// Logout (must be POST)
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-// For Successfully registered users
-Route::get('/success', function () {
-    return view('auth.success');
-})->name('auth.success');
+/*
+|--------------------------------------------------------------------------
+| Billing & Invoicing (Views Only)
+|--------------------------------------------------------------------------
+*/
+Route::get('/order', [JobController::class, 'index'])->name('order');
+Route::view('/invoice', 'Billing and Invoicing.invoice')->name('invoice');
+Route::view('/record', 'Billing and Invoicing.record')->name('record');
 
 /*
-// Commented out duplicate dashboard route
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
+|--------------------------------------------------------------------------
+| Record & Payment (Views Only)
+|--------------------------------------------------------------------------
 */
-
-Route::get('/order', function () {
-    return view('Billing and Invoicing.order');
-})->name('order');
-
-Route::get('/invoice', function () {
-    return view('Billing and Invoicing.invoice');
-})->name('invoice');
+Route::view('/invoice-tracking', 'Record and Payment.invoice-tracking')->name('invoice-tracking');
+Route::view('/manage-payment', 'Record and Payment.manage-payment')->name('manage-payment');
+Route::view('/ledger-viewer', 'Record and Payment.ledger-viewer')->name('ledger-viewer');
+Route::view('/payment-reminders', 'Record and Payment.payment-reminders')->name('payment-reminders');
 
 /*
-// Commented out duplicate delivery route (closure)
-Route::get('/delivery', function () {
-    return view('Billing and Invoicing.delivery');
-})->name('delivery');
+|--------------------------------------------------------------------------
+| Schedule Preventive (Views Only)
+|--------------------------------------------------------------------------
 */
+Route::view('/maintenance-notif', 'SchedulePreventive.maintenance-notif')->name('maintenance-notif');
+Route::view('/maintenance-history', 'SchedulePreventive.maintenance-history')->name('maintenance-history');
+Route::view('/assign-tech', 'SchedulePreventive.assign-tech')->name('assign-tech');
 
-//Route::get('/payment', function () {
-//   return view('Billing and Invoicing.payment');
-//})->name('payment');
+/*
+|--------------------------------------------------------------------------
+| Contract & Permit (Views Only)
+|--------------------------------------------------------------------------
+*/
+Route::view('/make-contract', 'Contract and Permit.make-contract')->name('make-contract');
+Route::view('/manage-permits', 'Contract and Permit.manage-permits')->name('manage-permits');
+Route::view('/renewal-req', 'Contract and Permit.renewal-req')->name('renewal-req');
+Route::view('/expiry-notif', 'Contract and Permit.expiry-notif')->name('expiry-notif');
 
-Route::get('/record', function () {
-    return view('Billing and Invoicing.record');
-})->name('record');
+/*
+|--------------------------------------------------------------------------
+| Reporting & Analytics (Views Only)
+|--------------------------------------------------------------------------
+*/
+Route::view('/financial-report', 'Reporting and Analytics.financial-report')->name('financial-report');
+Route::view('/maintenance-report', 'Reporting and Analytics.maintenance-report')->name('maintenance-report');
+Route::view('/contractpermit-report', 'Reporting and Analytics.contractpermit-report')->name('contractpermit-report');
+Route::view('/ai-report', 'Reporting and Analytics.ai-report')->name('ai-report');
 
-Route::get('/invoice-tracking', function () {
-    return view('Record and Payment.invoice-tracking');
-})->name('invoice-tracking');
-
-Route::get('/manage-payment', function () {
-    return view('Record and Payment.manage-payment');
-})->name('manage-payment');
-
-Route::get('/ledger-viewer', function () {
-    return view('Record and Payment.ledger-viewer');
-})->name('ledger-viewer');
-
-Route::get('/payment-reminders', function () {
-    return view('Record and Payment.payment-reminders');
-})->name('payment-reminders');
-
-Route::get('/maintenance-notif', function () {
-    return view('SchedulePreventive.maintenance-notif');
-})->name('maintenance-notif');
-
-Route::get('/maintenance-history', function () {
-    return view('SchedulePreventive.maintenance-history');
-})->name('maintenance-history');
-
-Route::get('/assign-tech', function () {
-    return view('SchedulePreventive.assign-tech');
-})->name('assign-tech');
-
-
-// Commented out duplicate make-contract closure route
-Route::get('/make-contract', function () {
-    return view('Contract and Permit.make-contract');
-})->name('make-contract');
-
-
-Route::get('/manage-permits', function () {
-    return view('Contract and Permit.manage-permits');
-})->name('manage-permits');
-
-Route::get('/renewal-req', function () {
-    return view('Contract and Permit.renewal-req');
-})->name('renewal-req');
-
-Route::get('/expiry-notif', function () {
-    return view('Contract and Permit.expiry-notif');
-})->name('expiry-notif');
-
-Route::get('/financial-report', function () {
-    return view('Reporting and Analytics.financial-report');
-})->name('financial-report');
-
-Route::get('/maintenance-report', function () {
-    return view('Reporting and Analytics.maintenance-report');
-})->name('maintenance-report');
-
-Route::get('/contractpermit-report', function () {
-    return view('Reporting and Analytics.contractpermit-report');
-})->name('contractpermit-report');
-
-Route::get('/ai-report', function () {
-    return view('Reporting and Analytics.ai-report');
-})->name('ai-report');
-
+/*
+|--------------------------------------------------------------------------
+| Invoice & Delivery
+|--------------------------------------------------------------------------
+*/
 Route::get('/invoice/create', [InvoiceController::class, 'create'])->name('invoice.create');
 Route::post('/invoice/store', [InvoiceController::class, 'store'])->name('invoice.store');
-
 Route::get('/delivery', [InvoiceController::class, 'delivery'])->name('delivery');
 
+Route::resource('invoices', InvoiceController::class);
+
+/*
+|--------------------------------------------------------------------------
+| Maintenance
+|--------------------------------------------------------------------------
+*/
 Route::prefix('maintenance')->name('maintenance.')->group(function () {
     Route::get('/', [MaintenanceController::class, 'index'])->name('index');
     Route::get('/create', [MaintenanceController::class, 'create'])->name('create');
@@ -149,19 +121,48 @@ Route::prefix('maintenance')->name('maintenance.')->group(function () {
     Route::put('/{id}', [MaintenanceController::class, 'update'])->name('update');
     Route::delete('/{id}', [MaintenanceController::class, 'destroy'])->name('destroy');
 });
-
 Route::get('/maintenance-sched', [MaintenanceController::class, 'index'])->name('maintenance-sched');
-
-Route::get('/make-contract', [ContractController::class, 'create'])->name('make-contract');
-Route::post('/make-contract', [ContractController::class, 'store'])->name('contracts.store');
-
-// For FullCalendar to fetch the maintenance schedules as events
 Route::get('/calendar/events', [MaintenanceController::class, 'calendarEvents'])->name('calendar.events');
 
-Route::get('/maintenance/{id}/edit', [MaintenanceController::class, 'edit'])->name('maintenance.edit');
-Route::resource('invoices', InvoiceController::class);
+/*
+|--------------------------------------------------------------------------
+| Contract
+|--------------------------------------------------------------------------
+*/
+Route::post('/make-contract', [ContractController::class, 'store'])->name('contracts.store');
 
+/*
+|--------------------------------------------------------------------------
+| Payments
+|--------------------------------------------------------------------------
+*/
 Route::resource('payments', PaymentController::class);
 Route::post('payments/{id}/mark-paid', [PaymentController::class, 'markPaid'])->name('payments.markPaid');
 Route::get('/payment', [PaymentController::class, 'index'])->name('payment');
-Route::post('/invoices', [InvoiceController::class, 'store'])->name('invoices.store');
+
+// Payment routes
+
+Route::prefix('dashboard/payments')->as('dashboard.payments.')->group(function () {
+    Route::get('/', [PaymentApiController::class, 'index'])->name('index');
+    Route::get('/summary', [PaymentApiController::class, 'summary'])->name('summary');
+    Route::put('/{id}/status', [PaymentApiController::class, 'updateStatus'])->name('updateStatus');
+    Route::post('/{id}/reminder', [PaymentApiController::class, 'sendReminder'])->name('sendReminder');
+});
+/*
+|--------------------------------------------------------------------------
+| Dashboard - Payment Management (AJAX)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('dashboard')->name('dashboard.')->group(function () {
+    Route::get('/payments', [PaymentApiController::class, 'fetchInvoices'])->name('payments.fetch');
+    Route::put('/payments/{id}/status', [PaymentApiController::class, 'updateStatus'])->name('payments.updateStatus');
+    Route::post('/payments/{id}/reminder', [PaymentApiController::class, 'sendReminder'])->name('payments.sendReminder');
+});
+
+Route::get('/dashboard/jobs', [JobController::class, 'index'])->name('jobs.index');
+Route::put('/dashboard/jobs/{job}/status', [JobController::class, 'updateStatus'])->name('jobs.updateStatus');
+
+Route::post('/send-email-notification', [App\Http\Controllers\MaintenanceController::class, 'sendEmailNotification']);
+
+Route::post('/maintenance/{id}/upload-proof', [MaintenanceController::class, 'markCompleted'])->name('maintenance.complete');
+
