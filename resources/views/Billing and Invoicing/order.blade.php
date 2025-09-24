@@ -41,74 +41,89 @@
         </div>
     </div>
 
-    {{-- Jobs Table --}}
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-        <table class="w-full text-left border-collapse">
+{{-- Jobs Table --}}
+<div class="bg-white rounded-xl shadow-lg overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="min-w-full text-sm border-collapse">
             <thead>
-                <tr class="bg-gray-900 text-white text-sm uppercase tracking-wider">
-                    <th class="p-4">ID</th>
-                    <th class="p-4">Client</th>
-                    <th class="p-4">Service</th>
-                    <th class="p-4">Hours</th>
-                    <th class="p-4">Rate/Hour</th>
-                    <th class="p-4">Status</th>
-                    <th class="p-4 text-center">Action</th>
+                <tr class="bg-gray-900 text-white text-xs uppercase tracking-wider">
+                    <th class="p-3 w-12 text-center">ID</th>
+                    <th class="p-3 w-32 text-left">Client</th>
+                    <th class="p-3 w-48 text-left">Email</th>
+                    <th class="p-3 w-28 text-center">Service</th>
+                    <th class="p-3 w-20 text-center">Hours</th>
+                    <th class="p-3 w-28 text-center">Rate/Hour</th>
+                    <th class="p-3 w-28 text-center">Status</th>
+                    <th class="p-3 w-40 text-center">Action</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($jobs as $job)
-                    <tr class="border-b hover:bg-gray-100 transition">
-                        <td class="p-4 font-medium">{{ $job->id }}</td>
-                        <td class="p-4">{{ $job->client_name }}</td>
-                        <td class="p-4">
+                    <tr class="border-b hover:bg-gray-100 transition text-sm">
+                        <td class="p-3 text-center font-medium">{{ $job->id }}</td>
+                        <td class="p-3 text-left">{{ $job->client_name }}</td>
+                        <td class="p-3 text-left">
+                            <a href="mailto:{{ $job->email }}" class="text-blue-600 hover:underline">
+                                {{ $job->email }}
+                            </a>
+                        </td>
+                        <td class="p-3 text-center">
                             @if($job->service_type === 'crane')
-                                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-semibold">
-                                    🏗️ Crane Service
+                                <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-xs font-medium">
+                                    🏗️ Crane
                                 </span>
                             @elseif($job->service_type === 'trucking')
-                                <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-xs font-semibold">
-                                    🚚 Trucking Service
+                                <span class="inline-block bg-purple-100 text-purple-800 px-2 py-1 rounded-md text-xs font-medium">
+                                    🚚 Trucking
                                 </span>
                             @else
-                                <span class="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-xs font-semibold">
+                                <span class="inline-block bg-gray-200 text-gray-800 px-2 py-1 rounded-md text-xs font-medium">
                                     Other
                                 </span>
                             @endif
                         </td>
-                        <td class="p-4">{{ $job->hours }}</td>
-                        <td class="p-4">₱{{ number_format($job->rate_per_hour, 2) }}</td>
-                        <td class="p-4">
+                        <td class="p-3 text-center">{{ number_format($job->hours, 2) }}</td>
+                        <td class="p-3 text-center">₱{{ number_format($job->rate_per_hour, 2) }}</td>
+                        <td class="p-3 text-center">
                             @if($job->status === 'completed')
-                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">Completed</span>
+                                <span class="inline-block bg-green-100 text-green-800 px-2 py-1 rounded-md text-xs font-medium">Completed</span>
                             @elseif($job->status === 'in_progress')
-                                <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-semibold">In Progress</span>
+                                <span class="inline-block bg-yellow-100 text-yellow-800 px-2 py-1 rounded-md text-xs font-medium">In Progress</span>
                             @else
-                                <span class="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-xs font-semibold">Pending</span>
+                                <span class="inline-block bg-gray-200 text-gray-800 px-2 py-1 rounded-md text-xs font-medium">Pending</span>
                             @endif
                         </td>
-                        <td class="p-4 text-center">
-                            <form action="{{ route('jobs.updateStatus', $job) }}" method="POST" class="flex flex-col sm:flex-row items-center gap-2 justify-center">
+                        <td class="p-3 text-center">
+                            <form action="{{ route('jobs.updateStatus', $job) }}" method="POST" class="flex items-center justify-center gap-2">
                                 @csrf
                                 @method('PUT')
-                                <select name="status" class="border rounded-lg px-2 py-1 text-sm focus:ring focus:ring-blue-300 w-32">
-                                    <option value="pending" @selected($job->status == 'pending')>Pending</option>
-                                    <option value="in_progress" @selected($job->status == 'in_progress')>In Progress</option>
-                                    <option value="completed" @selected($job->status == 'completed')>Completed</option>
-                                </select>
-                                <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-blue-700 transition w-full sm:w-auto">
-                                    Update
-                                </button>
+                                <div class="flex items-center border rounded-lg overflow-hidden">
+                                    <select name="status"
+                                        class="px-2 py-1 text-xs border-0 focus:ring-0 focus:outline-none">
+                                        <option value="pending" @selected($job->status == 'pending')>Pending</option>
+                                        <option value="in_progress" @selected($job->status == 'in_progress')>In Progress</option>
+                                        <option value="completed" @selected($job->status == 'completed')>Completed</option>
+                                    </select>
+                                    <button type="submit"
+                                        class="bg-blue-600 text-white px-3 py-1 text-xs hover:bg-blue-700 transition">
+                                        Update
+                                    </button>
+                                </div>
                             </form>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="text-center p-6 text-gray-500">No jobs found 🚧</td>
+                        <td colspan="8" class="text-center p-6 text-gray-500">No jobs found 🚧</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
+</div>
+
+
+
 
     {{-- Pagination --}}
     <div class="mt-6">

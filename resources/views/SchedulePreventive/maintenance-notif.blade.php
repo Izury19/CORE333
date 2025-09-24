@@ -60,8 +60,8 @@
         center: 'title',
         right: 'dayGridMonth,listWeek'
       },
-      showNonCurrentDates: false,  // 🔥 dagdag
-      fixedWeekCount: false,       // 🔥 dagdag
+      showNonCurrentDates: false,  
+      fixedWeekCount: false,      
 
       events: function(fetchInfo, successCallback, failureCallback) {
         fetch('{{ route("calendar.events") }}')
