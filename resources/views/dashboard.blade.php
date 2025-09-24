@@ -158,7 +158,7 @@
         </li>
                 <li>
             <a href="{{ route ('record') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
-                Reporting & Record Keeping
+                Biling Record
             </a>
         </li>
     </ul>
@@ -193,7 +193,7 @@
     </li>
     <li>
       <a href="{{ route('ledger-viewer') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
-        Ledger Viewer
+        Payment History
       </a>
     </li>
     <li>

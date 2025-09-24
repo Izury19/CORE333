@@ -7,10 +7,13 @@
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;     /* Firefox */
 }
-  #logo-sidebar a[role="link"] {
+#logo-sidebar a[role="link"] {
     text-decoration: none !important;
-  }
-  
+}
+#logo-sidebar a {
+    text-decoration: none !important;
+}
+ 
 </style>
 
 <!-- Sidebar -->
@@ -67,7 +70,7 @@
                             ['name' => 'invoice', 'label' => 'Invoice Creation'],
                             ['name' => 'delivery', 'label' => 'Invoice Delivery'],
                             ['name' => 'payment', 'label' => 'Payment Processing'],
-                            ['name' => 'record', 'label' => 'Reporting & Record Keeping'],
+                            ['name' => 'record', 'label' => 'Billing Record'],
                         ],
                     ],
                     [
@@ -76,7 +79,7 @@
                         'routes' => [
                             ['name' => 'invoice-tracking', 'label' => 'Invoice Tracking'],
                             ['name' => 'manage-payment', 'label' => 'Manage Payments'],
-                            ['name' => 'ledger-viewer', 'label' => 'Ledger Viewer'],
+                            ['name' => 'ledger-viewer', 'label' => 'Payment History'],
                             ['name' => 'payment-reminders', 'label' => 'Payment Reminders'],
                         ],
                     ],
