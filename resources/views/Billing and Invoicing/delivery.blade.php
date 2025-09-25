@@ -179,8 +179,17 @@ th.actions, td.actions { width: 160px; white-space: nowrap; text-align: center; 
                     <td class="status {{ $statusClass }}">{{ ucfirst($status) }}</td>
                     <td class="actions">
                         <a href="{{ route('invoices.edit',$invoice->invoice_id) }}" class="btn btn-warning">Edit</a>
-                        <button type="button" class="btn btn-danger btn-delete" data-invoice-id="{{ $invoice->invoice_id }}" data-client-name="{{ $invoice->client_name }}">Delete</button>
+                        <button type="button" class="btn btn-danger btn-delete" 
+                            data-invoice-id="{{ $invoice->invoice_id }}" 
+                            data-client-name="{{ $invoice->client_name }}">
+                            Delete
+                        </button>
+                        <form action="{{ route('invoices.generateReceipt', $invoice->invoice_id) }}" method="POST" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-primary">Make Receipt</button>
+                        </form>
                     </td>
+
                 </tr>
                 @endforeach
             </tbody>

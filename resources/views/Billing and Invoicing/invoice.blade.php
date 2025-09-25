@@ -174,59 +174,53 @@
         text-align: right;
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-        .flex-row {
-            flex-direction: column;
-        }
-
-        .invoice-box {
-            padding: 20px;
-        }
-
-        table th, table td {
-            font-size: 13px;
-        }
-
-        #items-table td:nth-child(2),
-        #items-table td:nth-child(3),
-        #items-table td:nth-child(4) {
-            width: 70px;
-        }
+    /* Receipt / Invoice Preview Styling */
+    .receipt-box {
+        max-width: 400px;
+        margin: auto;
+        background: #fff;
+        padding: 25px 20px;
+        border: 1px dashed #aaa;
+        font-size: 14px;
+        line-height: 1.5;
+        font-family: monospace;
     }
-    #payment-details {
-    background-color: #eef4fb;
-    border-left: 4px solid #007bff;
-    padding: 10px;
-    font-size: 13.5px;
-    color: #333;
-    margin-top: 5px;
+    .receipt-box h3 {
+        text-align: center;
+        font-size: 18px;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        border-bottom: 1px dashed #aaa;
+        padding-bottom: 5px;
     }
-
+    .receipt-box .info {
+        margin-bottom: 10px;
+    }
+    .receipt-box table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 10px 0;
+        font-size: 13px;
+    }
+    .receipt-box table th,
+    .receipt-box table td {
+        padding: 4px 0;
+        border-bottom: 1px dashed #ddd;
+    }
+    .receipt-box table th {
+        text-align: left;
+    }
+    .receipt-box tfoot td {
+        font-weight: bold;
+    }
+    .receipt-box .text-center {
+        text-align: center;
+        margin-top: 10px;
+        font-size: 12px;
+        color: #555;
+    }
 </style>
 
-<!-- breadcrumb -->
-        <div class="flex mb-5" aria-label="Breadcrumb" style="justify-content: flex-start; padding-left: 17.5rem;">
-            <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                <li class="inline-flex items-center">
-                    <a href="#" class="inline-flex items-center text-sm font-medium text-black hover:text-blue-600">
-                        <svg class="w-3 h-3 mr-2.5 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"/>
-                        </svg>
-                            Core 3
-                    </a>
-                </li>
-                <li>
-                <div class="flex items-center">
-                    <svg class="w-3 h-3 text-black mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
-                    </svg>
-                    <a href="#" class="ml-1 text-sm font-medium text-black text-black hover:text-blue-900 md:ml-2">Invoice Creation</a>
-                </div>
-                </li>   
-            </ol>
-        </div>
-        <!-- breadcrumb -->
 
 <div class="invoice-wrapper">
 <div class="invoice-box" style="margin-top: -40px;">
@@ -236,12 +230,10 @@
         </div>
     @endif
 
-
     <form action="{{ route('invoices.store') }}" method="POST">
         @csrf
 
         <h2 class="text-4xl font-bold">Invoice Creation</h2>
-
 
         <div class="flex-row">
             <div>
@@ -282,7 +274,6 @@
                     Select a payment method to see details.
                 </div>
             </div>
-            
         </div>
 
         <div>
@@ -297,11 +288,10 @@
             </div>
         </div>
 
-
         <table id="items-table">
             <thead>
                 <tr>
-                    <th>Equipment</th>
+                    <th>Service / Equipment Details</th>
                     <th>Qty</th>
                     <th>Price</th>
                     <th>Total</th>
@@ -336,53 +326,73 @@
     </form>
 </div>
 </div>
+
 @if (session('invoice'))
 <div class="invoice-box mt-5" style="margin-top: 60px; margin-right: 250px;">
-    <h3 class="mb-3">🧾 Invoice Preview</h3>
+    <div class="receipt-box">
 
-    <p><strong>Client:</strong> {{ session('invoice')['client_name'] }}</p>
-    <p><strong>Invoice Date:</strong> {{ session('invoice')['invoice_date'] }}</p>
-    <p><strong>Due Date:</strong> {{ session('invoice')['due_date'] }}</p>
+        {{-- Company Header --}}
+        <div style="text-align:center; margin-bottom:15px;">
+            <h3 style="margin:0; font-size:16px;">Cali-CMS</h3>
+            <p style="margin:0; font-size:12px;">134 Magsaysay Ext, Quezon City<br>📞 (02) 123-4567 | ✉ support@calicms.com</p>
+        </div>
 
-    <table class="mt-3">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Equipment</th>
-                <th>Qty</th>
-                <th>Price</th>
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (session('invoice')['items'] as $index => $item)
+        <h3>Invoice Receipt</h3>
+
+        <div class="info">
+            <p><strong>Invoice #:</strong> {{ session('invoice')['invoice_id'] ?? '1' }}</p>
+            <p><strong>Client:</strong> {{ session('invoice')['client_name'] }}</p>
+            <p><strong>Email:</strong> {{ session('invoice')['client_email'] }}</p>
+            <p><strong>Address:</strong> {{ session('invoice')['client_address'] ?? 'N/A' }}</p>
+            <p><strong>Date:</strong> {{ session('invoice')['invoice_date'] }}</p>
+            <p><strong>Due:</strong> {{ session('invoice')['due_date'] }}</p>
+            <p><strong>Payment Terms:</strong> {{ session('invoice')['terms_of_payment'] }}</p>
+            <p><strong>Payment:</strong> {!! session('invoice')['payment_details'] ?? 'N/A' !!}</p>
+        </div>
+
+        <table>
+            <thead>
                 <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $item['description'] }}</td>
-                    <td>{{ $item['qty'] }}</td>
-                    <td>₱{{ number_format($item['price'], 2) }}</td>
-                    <td>₱{{ number_format($item['qty'] * $item['price'], 2) }}</td>
+                    <th>#</th>
+                    <th>Item</th>
+                    <th>Qty</th>
+                    <th>₱</th>
                 </tr>
-            @endforeach
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="4" class="text-end"><strong>Subtotal</strong></td>
-                <td>₱{{ number_format(session('invoice')['subtotal'], 2) }}</td>
-            </tr>
-            <tr>
-                <td colspan="4" class="text-end"><strong>Tax (15%)</strong></td>
-                <td>₱{{ number_format(session('invoice')['tax'], 2) }}</td>
-            </tr>
-            <tr>
-                <td colspan="4" class="text-end"><strong>Total</strong></td>
-                <td><strong>₱{{ number_format(session('invoice')['total'], 2) }}</strong></td>
-            </tr>
-        </tfoot>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (session('invoice')['items'] as $index => $item)
+                    <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $item['description'] }}</td>
+                        <td>{{ $item['qty'] }}</td>
+                        <td>{{ number_format($item['qty'] * $item['price'], 2) }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3">Subtotal</td>
+                    <td>₱{{ number_format(session('invoice')['subtotal'], 2) }}</td>
+                </tr>
+                <tr>
+                    <td colspan="3">Tax (15%)</td>
+                    <td>₱{{ number_format(session('invoice')['tax'], 2) }}</td>
+                </tr>
+                <tr>
+                    <td colspan="3">Total</td>
+                    <td><strong>₱{{ number_format(session('invoice')['total'], 2) }}</strong></td>
+                </tr>
+            </tfoot>
+        </table>
 
-    <div class="mt-3 text-end">
-        <button class="btn btn-outline-primary" onclick="window.print()">🖨 Print Invoice</button>
+        @if (!empty(session('invoice')['note']))
+        <p><strong>Note:</strong> {{ session('invoice')['note'] }}</p>
+        @endif
+
+        <div class="text-center">
+            Thank you for your business!<br>
+            <button class="btn btn-outline-primary mt-2" onclick="window.print()">🖨 Print</button>
+        </div>
     </div>
 </div>
 @endif
@@ -452,7 +462,7 @@
             successAlert.style.transition = 'opacity 0.5s';
             successAlert.style.opacity = '0';
             setTimeout(() => successAlert.remove(), 500);
-        }, 5000); // 5000ms = 5 seconds
+        }, 5000);
     }
 </script>
 
@@ -475,6 +485,4 @@
     });
 </script>
 
-
 @endsection
-

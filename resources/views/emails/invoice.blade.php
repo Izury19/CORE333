@@ -63,4 +63,7 @@ Here’s a summary of your invoice:
 Thanks again!  
 **– {{ config('app.name') }}**
 
+<p style="font-size: 12px; color: gray; text-align: center;">
+Generated automatically by Admin of Cali-CMS
+</p>
 @endcomponent

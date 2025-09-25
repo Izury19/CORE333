@@ -13,7 +13,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\PaymentApiController;
 use App\Http\Controllers\JobController;
-
+use App\Http\Controllers\RecordController;
+use App\Http\Controllers\ReceiptController;
 
 /*
 |--------------------------------------------------------------------------
@@ -56,7 +57,8 @@ Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
 */
 Route::get('/order', [JobController::class, 'index'])->name('order');
 Route::view('/invoice', 'Billing and Invoicing.invoice')->name('invoice');
-Route::view('/record', 'Billing and Invoicing.record')->name('record');
+Route::get('/record', [RecordController::class, 'record'])->name('record');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -165,4 +167,15 @@ Route::put('/dashboard/jobs/{job}/status', [JobController::class, 'updateStatus'
 Route::post('/send-email-notification', [App\Http\Controllers\MaintenanceController::class, 'sendEmailNotification']);
 
 Route::post('/maintenance/{id}/upload-proof', [MaintenanceController::class, 'markCompleted'])->name('maintenance.complete');
+
+Route::get('/billing/record', [InvoiceController::class, 'record'])->name('billing.record');
+Route::get('/billing/record/{id}', [InvoiceController::class, 'show'])->name('billing.show');
+
+Route::post('/invoices/{id}/generate-receipt', [RecordController::class, 'generateReceipt'])
+    ->name('invoices.generateReceipt');
+
+Route::get('/record', [RecordController::class, 'index'])->name('record');
+
+Route::resource('receipts', ReceiptController::class);
+
 

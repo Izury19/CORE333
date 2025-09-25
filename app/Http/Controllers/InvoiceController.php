@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Models\Invoice;
 use App\Mail\InvoiceUpdated;
 use App\Models\InvoiceItem;
-use Illuminate\Support\Facades\DB;  // <- import DB facade
+use Illuminate\Support\Facades\DB;
 
 class InvoiceController extends Controller
 {
@@ -19,7 +19,7 @@ class InvoiceController extends Controller
 
     public function store(Request $request)
     {
-        // Validate input
+        // ✅ Validate input
         $validated = $request->validate([
             'client_name' => 'required|string|max:255',
             'client_email' => 'required|email',
@@ -32,71 +32,65 @@ class InvoiceController extends Controller
             'note' => 'nullable|string',
             'client_address' => 'nullable|string',
             'terms_of_payment' => 'nullable|string',
-
         ]);
 
         $items = $validated['items'];
 
-        // Compute subtotal
+        // ✅ Compute subtotal, tax, total
         $subtotal = 0;
         foreach ($items as $item) {
             $subtotal += $item['qty'] * $item['price'];
         }
-
-        // Tax and total
         $tax = $subtotal * 0.15;
         $total = $subtotal + $tax;
 
-        // Save to `invoices` table
+        // ✅ Save invoice
         $invoice = Invoice::create([
-            'client_name' => $validated['client_name'],
-            'client_email' => $validated['client_email'],
-            'invoice_date' => $validated['invoice_date'],
-            'due_date' => $validated['due_date'],
-            'terms_of_payment' => $request->input('terms_of_payment'), // from select
-            'note' => $request->input('note'), // from textarea
-            'client_address' => $request->input('client_address'), // make sure field exists in the DB
-            'subtotal' => $subtotal,
-            'tax' => $tax,
-            'total' => $total,
+            'client_name'      => $validated['client_name'],
+            'client_email'     => $validated['client_email'],
+            'invoice_date'     => $validated['invoice_date'],
+            'due_date'         => $validated['due_date'],
+            'terms_of_payment' => $request->input('terms_of_payment'),
+            'note'             => $request->input('note'),
+            'client_address'   => $request->input('client_address'),
+            'subtotal'         => $subtotal,
+            'tax'              => $tax,
+            'total'            => $total,
         ]);
 
-
-        // Save items to `invoice_items` table
+        // ✅ Save invoice items
         foreach ($items as $item) {
             $invoice->items()->create([
-                'description' => $item['description'],
-                'qty' => $item['qty'],
-                'price' => $item['price'],
-                'total' => $item['qty'] * $item['price'],
-                'client_name' => $validated['client_name'],
-                'client_email' => $validated['client_email'], 
-                'invoice_date' => $validated['invoice_date'],
-                'due_date' => $validated['due_date'],
+                'description'   => $item['description'],
+                'qty'           => $item['qty'],
+                'price'         => $item['price'],
+                'total'         => $item['qty'] * $item['price'],
+                'client_name'   => $validated['client_name'],
+                'client_email'  => $validated['client_email'],
+                'invoice_date'  => $validated['invoice_date'],
+                'due_date'      => $validated['due_date'],
             ]);
         }
 
-        // Email data
+        // ✅ Prepare email data
         $invoiceData = [
-            'client_name' => $invoice->client_name,
-            'client_email' => $invoice->client_email,
-            'client_address' => $invoice->client_address,
-            'invoice_date' => $invoice->invoice_date,
-            'due_date' => $invoice->due_date,
+            'client_name'      => $invoice->client_name,
+            'client_email'     => $invoice->client_email,
+            'client_address'   => $invoice->client_address,
+            'invoice_date'     => $invoice->invoice_date,
+            'due_date'         => $invoice->due_date,
             'terms_of_payment' => $invoice->terms_of_payment,
-            'note' => $invoice->note,
-
-            'items' => $invoice->items, // Assuming this is an array
-            'subtotal' => $invoice->subtotal,
-            'tax' => $invoice->tax,
-            'total' => $invoice->total,
+            'note'             => $invoice->note,
+            'items'            => $invoice->items,
+            'subtotal'         => $invoice->subtotal,
+            'tax'              => $invoice->tax,
+            'total'            => $invoice->total,
         ];
 
-
-        // Send email
+        // ✅ Send email
         Mail::to($invoice->client_email)->send(new InvoiceCreatedMail($invoiceData));
 
-        // Redirect back with flash message
+        // ✅ Return to invoice creation page with preview
         return redirect()
             ->route('invoice.create')
             ->with('success', 'Invoice Created, Saved, and Email Sent Successfully!')
@@ -105,11 +99,26 @@ class InvoiceController extends Controller
 
     public function delivery()
     {
-        $invoices = Invoice::with('items')->get(); // Load items
+        $invoices = Invoice::with('items')->get();
         return view('Billing and Invoicing.delivery', compact('invoices'));
     }
 
-    // New method for grouped invoice list
+    // 🔥 Billing Records page (lahat ng invoices)
+    public function record()
+    {
+        $invoices = Invoice::all(); // kunin lahat ng invoices
+
+        return view('Billing and Invoicing.record', ['invoices' => $invoices]);
+
+    }
+
+    // 🔥 Single invoice receipt view
+    public function show($id)
+    {
+        $invoice = Invoice::with('items')->findOrFail($id);
+        return view('Billing and Invoicing.receipt', compact('invoice'));
+    }
+
     public function indexGrouped()
     {
         $invoices = DB::table('invoice_items')
@@ -119,103 +128,97 @@ class InvoiceController extends Controller
 
         return view('Billing and Invoicing.invoices_grouped', compact('invoices'));
     }
-   public function edit($invoice_id)
-{
-    $invoice = Invoice::findOrFail($invoice_id);
-    return view('Billing and Invoicing.edit', compact('invoice'));
-}
 
-public function update(Request $request, $invoice_id)
-{
-    $invoice = Invoice::findOrFail($invoice_id);
-
-    $validated = $request->validate([
-        'client_name'   => 'required|string|max:255',
-        'client_email'  => 'required|email',
-        'invoice_date'  => 'required|date',
-        'due_date'      => 'required|date|after_or_equal:invoice_date',
-        'items'         => 'required|array|min:1',
-        'items.*.description' => 'required|string',
-        'items.*.qty' => 'required|numeric|min:1',
-        'items.*.price' => 'required|numeric|min:0',
-        'items.*.total' => 'required|numeric|min:0',
-        'total'         => 'required|numeric',
-    ]);
-
-    // ✅ Recompute subtotal & tax (in case user tampers)
-    $subtotal = 0;
-    foreach ($validated['items'] as $item) {
-        $subtotal += $item['qty'] * $item['price'];
+    public function edit($invoice_id)
+    {
+        $invoice = Invoice::findOrFail($invoice_id);
+        return view('Billing and Invoicing.edit', compact('invoice'));
     }
 
-    $tax = $subtotal * 0.15;
-    $total = $subtotal + $tax;
+    public function update(Request $request, $invoice_id)
+    {
+        $invoice = Invoice::findOrFail($invoice_id);
 
-    // ✅ Update invoice
-   $invoice->update([
-        'client_name' => $validated['client_name'],
-        'client_email' => $validated['client_email'],
-        'invoice_date' => $validated['invoice_date'],
-        'due_date' => $validated['due_date'],
-        'terms_of_payment' => $request->input('terms_of_payment'),
-        'note' => $request->input('note'),
-        'client_address' => $request->input('client_address'),
-        'subtotal' => $subtotal,
-        'tax' => $tax,
-        'total' => $total,
-    ]);
-
-
-    // ✅ Delete old items
-    $invoice->items()->delete();
-
-    // ✅ Create new items
-    foreach ($validated['items'] as $item) {
-        $invoice->items()->create([
-            'description'   => $item['description'],
-            'qty'           => $item['qty'],
-            'price'         => $item['price'],
-            'total'         => $item['total'],
-            'client_name'   => $validated['client_name'],
-            'client_email'  => $validated['client_email'],
-            'invoice_date'  => $validated['invoice_date'],
-            'due_date'      => $validated['due_date'],
+        $validated = $request->validate([
+            'client_name' => 'required|string|max:255',
+            'client_email' => 'required|email',
+            'invoice_date' => 'required|date',
+            'due_date' => 'required|date|after_or_equal:invoice_date',
+            'items' => 'required|array|min:1',
+            'items.*.description' => 'required|string',
+            'items.*.qty' => 'required|numeric|min:1',
+            'items.*.price' => 'required|numeric|min:0',
+            'items.*.total' => 'required|numeric|min:0',
+            'total' => 'required|numeric',
         ]);
+
+        // ✅ Recompute totals
+        $subtotal = 0;
+        foreach ($validated['items'] as $item) {
+            $subtotal += $item['qty'] * $item['price'];
+        }
+        $tax = $subtotal * 0.15;
+        $total = $subtotal + $tax;
+
+        // ✅ Update invoice
+        $invoice->update([
+            'client_name'      => $validated['client_name'],
+            'client_email'     => $validated['client_email'],
+            'invoice_date'     => $validated['invoice_date'],
+            'due_date'         => $validated['due_date'],
+            'terms_of_payment' => $request->input('terms_of_payment'),
+            'note'             => $request->input('note'),
+            'client_address'   => $request->input('client_address'),
+            'subtotal'         => $subtotal,
+            'tax'              => $tax,
+            'total'            => $total,
+        ]);
+
+        // ✅ Replace items
+        $invoice->items()->delete();
+        foreach ($validated['items'] as $item) {
+            $invoice->items()->create([
+                'description'   => $item['description'],
+                'qty'           => $item['qty'],
+                'price'         => $item['price'],
+                'total'         => $item['total'],
+                'client_name'   => $validated['client_name'],
+                'client_email'  => $validated['client_email'],
+                'invoice_date'  => $validated['invoice_date'],
+                'due_date'      => $validated['due_date'],
+            ]);
+        }
+
+        // ✅ Send updated invoice
+        Mail::to($invoice->client_email)->send(new InvoiceUpdated($invoice));
+
+        return redirect()->route('invoices.edit', $invoice_id)
+                         ->with('success', 'Invoice updated and re-sent to client successfully.');
     }
 
-    // ✅ Send updated invoice via email
-    Mail::to($invoice->client_email)->send(new InvoiceUpdated($invoice));
+    public function destroy($invoice_id)
+    {
+        $invoice = Invoice::findOrFail($invoice_id);
+        $invoice->delete();
 
-    return redirect()->route('invoices.edit', $invoice_id)
-                     ->with('success', 'Invoice updated and re-sent to client successfully.');
-}
+        return redirect()->route('invoices.index')
+                         ->with('success', 'Invoice deleted successfully.');
+    }
 
-public function destroy($invoice_id)
-{
-    $invoice = Invoice::findOrFail($invoice_id);
-    $invoice->delete();
+    public function index(Request $request)
+    {
+        $search = $request->input('search');
+        $month = $request->input('month');
+        $year = $request->input('year');
 
-    return redirect()->route('invoices.index')
-                     ->with('success', 'Invoice deleted successfully.');
-}
+        $invoices = Invoice::with('items')
+            ->when($search, fn($q) => $q->where('client_name', 'LIKE', "%{$search}%"))
+            ->when($month, fn($q) => $q->whereMonth('invoice_date', $month))
+            ->when($year, fn($q) => $q->whereYear('invoice_date', $year))
+            ->orderBy('invoice_date', 'desc')
+            ->paginate(10)
+            ->withQueryString();
 
-public function index(Request $request)
-{
-    $search = $request->input('search');
-    $month = $request->input('month');
-    $year = $request->input('year');
-
-    $invoices = Invoice::with('items')
-        ->when($search, fn($q) => $q->where('client_name', 'LIKE', "%{$search}%"))
-        ->when($month, fn($q) => $q->whereMonth('invoice_date', $month))
-        ->when($year, fn($q) => $q->whereYear('invoice_date', $year))
-        ->orderBy('invoice_date', 'desc')
-        ->paginate(10)
-        ->withQueryString();
-
-    return view('Billing and Invoicing.delivery', compact('invoices', 'search', 'month', 'year'));
-}
-
-
-
+        return view('Billing and Invoicing.delivery', compact('invoices', 'search', 'month', 'year'));
+    }
 }
