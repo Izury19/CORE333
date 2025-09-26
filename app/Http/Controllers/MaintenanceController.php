@@ -230,29 +230,24 @@ class MaintenanceController extends Controller
      * Display the maintenance history log.
      */
     public function showHistoryLog(Request $request)
-{
-    $search = $request->input('search');
+    {
+        $search = $request->input('search');
 
-    $historyLogs = MaintenanceSchedule::with('maintenanceType')
-        ->when($search, function ($query, $search) {
-            $query->where('equipment_name', 'like', "%{$search}%")
-                ->orWhere('technician_name', 'like', "%{$search}%")
-                ->orWhereHas('maintenanceType', function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%");
-                })
-                // ✅ Search exact or partial numeric date
-                ->orWhereDate('scheduled_date', $search)
-                ->orWhere('scheduled_date', 'like', "%{$search}%")
-                // ✅ Search month name or day name (e.g. September, Sep, Monday)
-                ->orWhereRaw("DATE_FORMAT(scheduled_date, '%M') like ?", ["%{$search}%"])
-                ->orWhereRaw("DATE_FORMAT(scheduled_date, '%b') like ?", ["%{$search}%"])
-                ->orWhereRaw("DATE_FORMAT(scheduled_date, '%W') like ?", ["%{$search}%"]);
-        })
-        ->orderBy('scheduled_date', 'desc')
-        ->paginate(10)
-        ->withQueryString();
+        $historyLogs = MaintenanceSchedule::with('maintenanceType')
+            ->when($search, function ($query, $search) {
+                $query->where('equipment_name', 'like', "%{$search}%")
+                    ->orWhere('technician_name', 'like', "%{$search}%")
+                    ->orWhereHas('maintenanceType', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    })
+                    // 🔎 Search by schedule ID (# column)
+                    ->orWhere('maintenance_sched_id', 'like', "%{$search}%");
+            })
+            ->orderBy('scheduled_date', 'desc')
+            ->paginate(10)
+            ->withQueryString();
 
-    return view('SchedulePreventive.maintenance-history', compact('historyLogs', 'search'));
-}
+        return view('SchedulePreventive.maintenance-history', compact('historyLogs', 'search'));
+    }
 
 }

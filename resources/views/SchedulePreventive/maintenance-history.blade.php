@@ -129,10 +129,16 @@
 
     // Show or hide the X button depende sa laman ng input
     searchInput.addEventListener('input', () => {
-        clearBtn.style.display = searchInput.value.length > 0 ? 'block' : 'none';
+        if (searchInput.value.length > 0) {
+            clearBtn.style.display = 'block';
+        } else {
+            clearBtn.style.display = 'none';
+            // 🔄 Redirect pabalik sa maintenance-history kapag na-clear (backspace)
+            window.location.href = "{{ route('maintenance-history') }}";
+        }
     });
 
-    // Clear input + redirect back to dashboard
+    // Clear input + redirect back to maintenance-history
     clearBtn.addEventListener('click', () => {
         window.location.href = "{{ route('maintenance-history') }}";
     });
