@@ -9,5 +9,8 @@ class Technician extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'email'];
+    protected $table = 'technicians';           // table name
+    protected $primaryKey = 'technicians_id';   // custom primary key
+    protected $fillable = ['name', 'email', 'image'];
+
 }

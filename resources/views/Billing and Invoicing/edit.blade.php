@@ -140,7 +140,7 @@
                 </div>
             </div>
 
-            <!-- New fields -->
+            <!-- Payment -->
             <div class="flex-row">
                 <div>
                     <label>Terms of Payment</label>
@@ -235,10 +235,7 @@
         document.getElementById('grand-total').value = grandTotal.toFixed(2);
     }
 
-    document.querySelectorAll('.qty, .price').forEach(input => {
-        input.addEventListener('input', updateTotals);
-    });
-
+    // Add row
     document.querySelector('.btn-add-row').addEventListener('click', () => {
         const table = document.querySelector('#items-table tbody');
         const newRow = document.createElement('tr');
@@ -264,15 +261,20 @@
         });
     });
 
+    // Remove row
     document.querySelectorAll('.remove-row').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.target.closest('tr').remove();
             updateTotals();
         });
     });
-</script>
 
-<script>
+    // Update totals when qty/price change
+    document.querySelectorAll('.qty, .price').forEach(input => {
+        input.addEventListener('input', updateTotals);
+    });
+
+    // Alert auto-hide
     document.addEventListener("DOMContentLoaded", function() {
         let alertBox = document.querySelector(".alert-success");
         if (alertBox) {

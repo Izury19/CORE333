@@ -15,6 +15,7 @@ use App\Http\Controllers\PaymentApiController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\RecordController;
 use App\Http\Controllers\ReceiptController;
+use App\Http\Controllers\TechnicianController;
 
 /*
 |--------------------------------------------------------------------------
@@ -76,8 +77,13 @@ Route::view('/payment-reminders', 'Record and Payment.payment-reminders')->name(
 |--------------------------------------------------------------------------
 */
 Route::view('/maintenance-notif', 'SchedulePreventive.maintenance-notif')->name('maintenance-notif');
-Route::view('/maintenance-history', 'SchedulePreventive.maintenance-history')->name('maintenance-history');
-Route::view('/assign-tech', 'SchedulePreventive.assign-tech')->name('assign-tech');
+Route::get('/maintenance-history', [MaintenanceController::class, 'showHistoryLog'])->name('maintenance-history');
+
+
+Route::get('/assign-tech', [TechnicianController::class, 'index'])->name('assign-tech');
+
+Route::post('/technicians/{technician}/upload-image', [TechnicianController::class, 'uploadImage'])
+     ->name('technicians.uploadImage');
 
 /*
 |--------------------------------------------------------------------------
@@ -177,5 +183,8 @@ Route::post('/invoices/{id}/generate-receipt', [RecordController::class, 'genera
 Route::get('/record', [RecordController::class, 'index'])->name('record');
 
 Route::resource('receipts', ReceiptController::class);
+
+Route::resource('technicians', TechnicianController::class);
+
 
 

@@ -8,6 +8,7 @@ use App\Models\Technician;
 use App\Models\MaintenanceType;
 use App\Mail\MaintenanceScheduleMail;
 use Illuminate\Support\Facades\Mail;
+use App\Models\MaintenanceHistoryLog;
 
 class MaintenanceController extends Controller
 {
@@ -31,7 +32,7 @@ class MaintenanceController extends Controller
             ->withQueryString();
 
         $technicians = Technician::all();
-        $maintenanceTypes = MaintenanceType::all(); 
+        $maintenanceTypes = MaintenanceType::all();
 
         return view('SchedulePreventive.maintenance-sched', compact(
             'schedules',
@@ -87,7 +88,7 @@ class MaintenanceController extends Controller
         $maintenanceTypes = MaintenanceType::all();
 
         return view('SchedulePreventive.edit', compact('schedule', 'technicians', 'maintenanceTypes'));
-    } 
+    }
 
     /**
      * Update an existing maintenance schedule.
@@ -146,8 +147,8 @@ class MaintenanceController extends Controller
                 'status' => $schedule->status,
                 'technician' => $schedule->technician_name,
                 'email' => $technician ? $technician->email : null,
-                'proof_image' => $schedule->proof_image, // ✅ kasama proof image
-                'completed_at' => $schedule->completed_at, // ✅ kasama completion time
+                'proof_image' => $schedule->proof_image,
+                'completed_at' => $schedule->completed_at,
             ];
         });
 
@@ -210,10 +211,48 @@ class MaintenanceController extends Controller
         $schedule->completed_at = now();
         $schedule->save();
 
+        // ✅ Insert into maintenance_history_log
+        MaintenanceHistoryLog::create([
+            'schedule_id'      => $schedule->maintenance_sched_id,
+            'maintenance_date' => now()->toDateString(),
+            'technician_id'    => Technician::where('name', $schedule->technician_name)->value('id') ?? 0,
+            'status'           => 'completed',
+        ]);
+
         return response()->json([
             'success' => true,
-            'message' => 'Maintenance marked as completed!',
+            'message' => 'Maintenance marked as completed and logged!',
             'data' => $schedule
         ]);
     }
+
+    /**
+     * Display the maintenance history log.
+     */
+    public function showHistoryLog(Request $request)
+{
+    $search = $request->input('search');
+
+    $historyLogs = MaintenanceSchedule::with('maintenanceType')
+        ->when($search, function ($query, $search) {
+            $query->where('equipment_name', 'like', "%{$search}%")
+                ->orWhere('technician_name', 'like', "%{$search}%")
+                ->orWhereHas('maintenanceType', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                })
+                // ✅ Search exact or partial numeric date
+                ->orWhereDate('scheduled_date', $search)
+                ->orWhere('scheduled_date', 'like', "%{$search}%")
+                // ✅ Search month name or day name (e.g. September, Sep, Monday)
+                ->orWhereRaw("DATE_FORMAT(scheduled_date, '%M') like ?", ["%{$search}%"])
+                ->orWhereRaw("DATE_FORMAT(scheduled_date, '%b') like ?", ["%{$search}%"])
+                ->orWhereRaw("DATE_FORMAT(scheduled_date, '%W') like ?", ["%{$search}%"]);
+        })
+        ->orderBy('scheduled_date', 'desc')
+        ->paginate(10)
+        ->withQueryString();
+
+    return view('SchedulePreventive.maintenance-history', compact('historyLogs', 'search'));
+}
+
 }

@@ -223,7 +223,7 @@
     </li>
     <li>
       <a href="{{ route('assign-tech') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
-        Assign Technician or Team
+        Technicians Dashboard
       </a>
     </li>
     <li>
