@@ -4,13 +4,6 @@
 <div class="container mt-4">
     <h2 class="mb-4">💳 Manage Payments</h2>
 
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-    @if(session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
-    @endif
-
     <table class="table table-bordered table-striped">
         <thead class="table-dark">
             <tr>
@@ -27,19 +20,10 @@
         <tbody>
             @forelse($payments as $payment)
                 <tr>
-                    {{-- Payment ID (primary key) --}}
-                    <td>{{ $payment->payment_id }}</td>
-
-                    {{-- Invoice ID (foreign key) --}}
+                    <td>{{ $payment->payments_id }}</td>
                     <td>#{{ $payment->invoice?->invoice_id ?? 'N/A' }}</td>
-
-                    {{-- Amount --}}
                     <td>₱{{ number_format($payment->amount, 2) }}</td>
-
-                    {{-- Payment Method --}}
                     <td>{{ ucfirst($payment->payment_method ?? 'N/A') }}</td>
-
-                    {{-- Status --}}
                     <td>
                         @if($payment->status == 'pending')
                             <span class="badge bg-warning text-dark">Pending</span>
@@ -49,11 +33,7 @@
                             <span class="badge bg-danger">Rejected</span>
                         @endif
                     </td>
-
-                    {{-- Date Paid --}}
                     <td>{{ $payment->payment_date ?? '-' }}</td>
-
-                    {{-- Proof link --}}
                     <td>
                         @if($payment->proof)
                             <a href="{{ asset('storage/' . $payment->proof) }}" target="_blank" class="btn btn-sm btn-info">
@@ -63,20 +43,11 @@
                             <span class="text-muted">No proof</span>
                         @endif
                     </td>
-
-                    {{-- Actions --}}
                     <td>
                         @if($payment->status == 'pending')
-                            <form action="{{ route('payments.approve', $payment->payment_id) }}" method="POST" style="display:inline-block">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" class="btn btn-sm btn-success">Approve</button>
-                            </form>
-                            <form action="{{ route('payments.reject', $payment->payment_id) }}" method="POST" style="display:inline-block">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" class="btn btn-sm btn-danger">Reject</button>
-                            </form>
+                            <button onclick="confirmAction('{{ route('payments.approve', ['id' => $payment->payments_id]) }}', 'approve')" class="btn btn-sm btn-success">Approve</button>
+
+                            <button onclick="confirmAction('{{ route('payments.reject', ['id' => $payment->payments_id]) }}', 'reject')" class="btn btn-sm btn-danger">Reject</button>
                         @else
                             <em>No actions</em>
                         @endif
@@ -90,4 +61,55 @@
         </tbody>
     </table>
 </div>
+
+<!-- SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function confirmAction(url, actionType) {
+    let title = actionType === 'approve' ? "Approve Payment?" : "Reject Payment?";
+    let confirmButtonText = actionType === 'approve' ? "Yes, approve it!" : "Yes, reject it!";
+    let method = "PATCH";
+
+    Swal.fire({
+        title: title,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: confirmButtonText,
+        cancelButtonText: "Cancel"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            let form = document.createElement('form');
+            form.method = "POST";
+            form.action = url;
+            form.innerHTML = `
+                @csrf
+                @method('${method}')
+            `;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+}
+
+// Show SweetAlert success or error after action
+@if(session('success'))
+Swal.fire({
+    icon: 'success',
+    title: 'Success!',
+    text: "{{ session('success') }}",
+    timer: 2000,
+    showConfirmButton: false
+});
+@endif
+
+@if(session('error'))
+Swal.fire({
+    icon: 'error',
+    title: 'Error!',
+    text: "{{ session('error') }}",
+    timer: 2000,
+    showConfirmButton: false
+});
+@endif
+</script>
 @endsection
