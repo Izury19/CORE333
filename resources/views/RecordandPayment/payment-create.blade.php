@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mt-4">
-    <h2 class="mb-4">📤 Upload Proof of Payment</h2>
+    <h2 class="mb-4">📤 Upload Proof of Payments</h2>
 
     <div class="card shadow-sm">
         <div class="card-body">
