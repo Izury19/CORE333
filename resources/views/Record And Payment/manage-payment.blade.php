@@ -18,48 +18,54 @@
             </tr>
         </thead>
         <tbody>
-            @forelse($payments as $payment)
-                <tr>
-                    <td>{{ $payment->payments_id }}</td>
-                    <td>#{{ $payment->invoice?->invoice_id ?? 'N/A' }}</td>
-                    <td>₱{{ number_format($payment->amount, 2) }}</td>
-                    <td>{{ ucfirst($payment->payment_method ?? 'N/A') }}</td>
-                    <td>
-                        @if($payment->status == 'pending')
-                            <span class="badge bg-warning text-dark">Pending</span>
-                        @elseif($payment->status == 'approved')
-                            <span class="badge bg-success">Approved</span>
-                        @else
-                            <span class="badge bg-danger">Rejected</span>
-                        @endif
-                    </td>
-                    <td>{{ $payment->payment_date ?? '-' }}</td>
-                    <td>
-                        @if($payment->proof)
-                            <a href="{{ asset('storage/' . $payment->proof) }}" target="_blank" class="btn btn-sm btn-info">
-                                View Proof
-                            </a>
-                        @else
-                            <span class="text-muted">No proof</span>
-                        @endif
-                    </td>
-                    <td>
-                        @if($payment->status == 'pending')
-                            <button onclick="confirmAction('{{ route('payments.approve', ['id' => $payment->payments_id]) }}', 'approve')" class="btn btn-sm btn-success">Approve</button>
-                            <button onclick="confirmAction('{{ route('payments.reject', ['id' => $payment->payments_id]) }}', 'reject')" class="btn btn-sm btn-danger">Reject</button>
-                        @elseif($payment->status == 'approved')
-                            <button onclick="confirmAction('{{ route('payments.cancel', ['id' => $payment->payments_id]) }}', 'cancel')" class="btn btn-sm btn-warning">Cancel</button>
-                        @else
-                            <em>No actions</em>
-                        @endif
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="8" class="text-center">No payments yet.</td>
-                </tr>
-            @endforelse
-        </tbody>
+        @forelse($payments as $payment)
+            <tr>
+                <td>{{ $payment->payments_id }}</td>
+                <td>#{{ $payment->invoice?->invoice_id ?? 'N/A' }}</td>
+                
+                <!-- New Columns for Client Info -->
+                <td>{{ $payment->invoice?->client?->name ?? 'N/A' }}</td>
+                <td>{{ $payment->invoice?->client?->email ?? 'N/A' }}</td>
+                
+                <td>₱{{ number_format($payment->amount, 2) }}</td>
+                <td>{{ ucfirst($payment->payment_method ?? 'N/A') }}</td>
+                <td>
+                    @if($payment->status == 'pending')
+                        <span class="badge bg-warning text-dark">Pending</span>
+                    @elseif($payment->status == 'approved')
+                        <span class="badge bg-success">Approved</span>
+                    @else
+                        <span class="badge bg-danger">Rejected</span>
+                    @endif
+                </td>
+                <td>{{ $payment->payment_date ?? '-' }}</td>
+                <td>
+                    @if($payment->proof)
+                        <a href="{{ asset('storage/' . $payment->proof) }}" target="_blank" class="btn btn-sm btn-info">
+                            View Proof
+                        </a>
+                    @else
+                        <span class="text-muted">No proof</span>
+                    @endif
+                </td>
+                <td>
+                    @if($payment->status == 'pending')
+                        <button onclick="confirmAction('{{ route('payments.approve', ['id' => $payment->payments_id]) }}', 'approve')" class="btn btn-sm btn-success">Approve</button>
+                        <button onclick="confirmAction('{{ route('payments.reject', ['id' => $payment->payments_id]) }}', 'reject')" class="btn btn-sm btn-danger">Reject</button>
+                    @elseif($payment->status == 'approved')
+                        <button onclick="confirmAction('{{ route('payments.cancel', ['id' => $payment->payments_id]) }}', 'cancel')" class="btn btn-sm btn-warning">Cancel</button>
+                    @else
+                        <em>No actions</em>
+                    @endif
+                </td>
+            </tr>
+        @empty
+            <tr>
+                <td colspan="10" class="text-center">No payments yet.</td>
+            </tr>
+        @endforelse
+    </tbody>
+
     </table>
 </div>
 
