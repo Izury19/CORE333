@@ -58,20 +58,25 @@
                                     <button onclick="confirmAction('{{ route('payments.approve', ['id' => $payment->payments_id]) }}', 'approve')" class="btn btn-sm btn-success me-1 mb-1">
                                         <i class="bi bi-check-circle"></i> Approve
                                     </button>
-                                    <button onclick="confirmAction('{{ route('payments.reject', ['id' => $payment->payments_id]) }}', 'reject')" class="btn btn-sm btn-danger mb-1">
+                                    <button onclick="confirmAction('{{ route('payments.reject', ['id' => $payment->payments_id]) }}', 'reject')" class="btn btn-sm btn-danger me-1 mb-1">
                                         <i class="bi bi-x-circle"></i> Reject
                                     </button>
                                 @elseif($payment->status === 'approved')
-                                    <button onclick="confirmAction('{{ route('payments.cancel', ['id' => $payment->payments_id]) }}', 'cancel')" class="btn btn-sm btn-warning">
+                                    <button onclick="confirmAction('{{ route('payments.cancel', ['id' => $payment->payments_id]) }}', 'cancel')" class="btn btn-sm btn-warning me-1 mb-1">
                                         <i class="bi bi-arrow-counterclockwise"></i> Cancel
                                     </button>
                                 @elseif($payment->status === 'rejected')
-                                    <button onclick="confirmAction('{{ route('payments.cancel', ['id' => $payment->payments_id]) }}', 'cancel')" class="btn btn-sm btn-secondary">
+                                    <button onclick="confirmAction('{{ route('payments.cancel', ['id' => $payment->payments_id]) }}', 'cancel')" class="btn btn-sm btn-secondary me-1 mb-1">
                                         <i class="bi bi-arrow-counterclockwise"></i> Undo
                                     </button>
                                 @else
                                     <em>No actions</em>
                                 @endif
+
+                                <!-- DELETE BUTTON -->
+                                <button onclick="confirmAction('{{ route('payments.destroy', ['id' => $payment->payments_id]) }}', 'delete')" class="btn btn-sm btn-outline-danger mb-1">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
                             </td>
                         </tr>
                     @empty
@@ -96,6 +101,7 @@ function confirmAction(url, actionType) {
     let title = '';
     let confirmButtonText = '';
     let method = "PATCH";
+    let icon = 'question';
 
     if (actionType === 'approve') {
         title = "Approve Payment?";
@@ -106,16 +112,21 @@ function confirmAction(url, actionType) {
     } else if (actionType === 'cancel') {
         title = "Revert Status to Pending?";
         confirmButtonText = "Yes, revert it!";
+    } else if (actionType === 'delete') {
+        title = "Delete Payment Record?";
+        confirmButtonText = "Yes, delete it!";
+        method = "DELETE";
+        icon = 'warning';
     }
 
     Swal.fire({
         title: title,
-        icon: 'question',
+        icon: icon,
         showCancelButton: true,
         confirmButtonText: confirmButtonText,
         cancelButtonText: "Cancel",
         customClass: {
-            confirmButton: 'btn btn-primary me-2',
+            confirmButton: actionType === 'delete' ? 'btn btn-danger me-2' : 'btn btn-primary me-2',
             cancelButton: 'btn btn-secondary'
         },
         buttonsStyling: false
