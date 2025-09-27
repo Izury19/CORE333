@@ -18,7 +18,7 @@ class PaymentController extends Controller
     // Show upload form for client
     public function create($invoiceId)
     {
-        $invoice = Invoice::findOrFail($invoiceId);
+        $invoice = Invoice::findOrFail($invoiceId); // works if Invoice model has primaryKey = 'invoice_id'
         return view('Record And Payment.payment-create', compact('invoice'));
     }
 
@@ -47,7 +47,7 @@ class PaymentController extends Controller
     // Mark a payment as approved (for admin)
     public function markApproved($id)
     {
-        $payment = Payment::findOrFail($id);
+        $payment = Payment::findOrFail($id); // works if Payment model has primaryKey = 'payment_id'
         $payment->status = 'approved';
         $payment->save();
 
@@ -57,7 +57,7 @@ class PaymentController extends Controller
     // Mark a payment as rejected (for admin)
     public function markRejected($id)
     {
-        $payment = Payment::findOrFail($id);
+        $payment = Payment::findOrFail($id); // works if Payment model has primaryKey = 'payment_id'
         $payment->status = 'rejected';
         $payment->save();
 

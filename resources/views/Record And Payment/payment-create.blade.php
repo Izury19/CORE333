@@ -6,11 +6,11 @@
 
     <div class="card shadow-sm">
         <div class="card-body">
-            <p><strong>Invoice #{{ $invoice->id }}</strong></p>
+            <p><strong>Invoice #{{ $invoice->invoice_id }}</strong></p>
             <p><strong>Client:</strong> {{ $invoice->client_name }}</p>
             <p><strong>Total Amount:</strong> ₱{{ number_format($invoice->total, 2) }}</p>
 
-            <form action="{{ route('payments.store', $invoice->id) }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('payments.store', $invoice->invoice_id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
                 <div class="mb-3">

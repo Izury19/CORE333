@@ -75,8 +75,8 @@ Route::view('/payment-reminders', 'Record And Payment.payment-reminders')->name(
 Route::get('/payments/{invoiceId}/upload', [PaymentController::class, 'create'])
     ->name('payments.upload'); // show form
 
-Route::post('/payments/{invoiceId}/upload', [PaymentController::class, 'uploadStore'])
-    ->name('payments.upload.store'); // handle form submission
+Route::post('/payments/{invoiceId}', [PaymentController::class, 'store'])
+    ->name('payments.store');
 
 // Payment approval/rejection (admin side, siguro)
 Route::patch('/payments/{id}/approve', [PaymentController::class, 'markApproved'])

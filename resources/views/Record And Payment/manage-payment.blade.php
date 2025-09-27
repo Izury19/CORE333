@@ -14,7 +14,7 @@
     <table class="table table-bordered table-striped">
         <thead class="table-dark">
             <tr>
-                <th>ID</th>
+                <th>Payment ID</th>
                 <th>Invoice</th>
                 <th>Amount</th>
                 <th>Status</th>
@@ -26,9 +26,16 @@
         <tbody>
             @forelse($payments as $payment)
                 <tr>
-                    <td>{{ $payment->id }}</td>
-                    <td>#{{ $payment->invoice->id ?? 'N/A' }}</td>
+                    {{-- Payment ID (primary key) --}}
+                    <td>{{ $payment->payment_id }}</td>
+
+                    {{-- Invoice ID (foreign key) --}}
+                    <td>#{{ $payment->invoice?->invoice_id ?? 'N/A' }}</td>
+
+                    {{-- Amount --}}
                     <td>₱{{ number_format($payment->amount, 2) }}</td>
+
+                    {{-- Status --}}
                     <td>
                         @if($payment->status == 'pending')
                             <span class="badge bg-warning text-dark">Pending</span>
@@ -38,7 +45,11 @@
                             <span class="badge bg-danger">Rejected</span>
                         @endif
                     </td>
+
+                    {{-- Date Paid --}}
                     <td>{{ $payment->date_paid ?? '-' }}</td>
+
+                    {{-- Proof link --}}
                     <td>
                         @if($payment->proof)
                             <a href="{{ asset('storage/' . $payment->proof) }}" target="_blank" class="btn btn-sm btn-info">
@@ -48,14 +59,16 @@
                             <span class="text-muted">No proof</span>
                         @endif
                     </td>
+
+                    {{-- Actions --}}
                     <td>
                         @if($payment->status == 'pending')
-                            <form action="{{ route('payments.approve', $payment->id) }}" method="POST" style="display:inline-block">
+                            <form action="{{ route('payments.approve', $payment->payment_id) }}" method="POST" style="display:inline-block">
                                 @csrf
                                 @method('PATCH')
                                 <button type="submit" class="btn btn-sm btn-success">Approve</button>
                             </form>
-                            <form action="{{ route('payments.reject', $payment->id) }}" method="POST" style="display:inline-block">
+                            <form action="{{ route('payments.reject', $payment->payment_id) }}" method="POST" style="display:inline-block">
                                 @csrf
                                 @method('PATCH')
                                 <button type="submit" class="btn btn-sm btn-danger">Reject</button>
