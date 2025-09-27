@@ -76,9 +76,9 @@ Route::get('/payments/{invoiceId}/upload', [PaymentController::class, 'create'])
     ->name('payments.upload'); // show form
 
 Route::post('/payments/{invoiceId}', [PaymentController::class, 'store'])
-    ->name('payments.store');
+    ->name('payments.upload.store'); // handle form submission
 
-// Payment approval/rejection (admin side, siguro)
+// Payment approval/rejection (admin side)
 Route::patch('/payments/{id}/approve', [PaymentController::class, 'markApproved'])
     ->name('payments.approve');
 
