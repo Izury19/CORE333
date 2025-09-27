@@ -7,7 +7,6 @@ use App\Mail\InvoiceCreatedMail;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Invoice;
 use App\Mail\InvoiceUpdated;
-use App\Models\InvoiceItem;
 use Illuminate\Support\Facades\DB;
 
 class InvoiceController extends Controller
@@ -72,29 +71,14 @@ class InvoiceController extends Controller
             ]);
         }
 
-        // ✅ Prepare email data
-        $invoiceData = [
-            'client_name'      => $invoice->client_name,
-            'client_email'     => $invoice->client_email,
-            'client_address'   => $invoice->client_address,
-            'invoice_date'     => $invoice->invoice_date,
-            'due_date'         => $invoice->due_date,
-            'terms_of_payment' => $invoice->terms_of_payment,
-            'note'             => $invoice->note,
-            'items'            => $invoice->items,
-            'subtotal'         => $invoice->subtotal,
-            'tax'              => $invoice->tax,
-            'total'            => $invoice->total,
-        ];
+        // ✅ Send email with invoice model
+        Mail::to($invoice->client_email)->send(new InvoiceCreatedMail($invoice));
 
-        // ✅ Send email
-        Mail::to($invoice->client_email)->send(new InvoiceCreatedMail($invoiceData));
-
-        // ✅ Return to invoice creation page with preview
+        // ✅ Redirect with preview
         return redirect()
             ->route('invoice.create')
             ->with('success', 'Invoice Created, Saved, and Email Sent Successfully!')
-            ->with('invoice', $invoiceData);
+            ->with('invoice', $invoice->load('items')); // include items sa session
     }
 
     public function delivery()
@@ -106,10 +90,8 @@ class InvoiceController extends Controller
     // 🔥 Billing Records page (lahat ng invoices)
     public function record()
     {
-        $invoices = Invoice::all(); // kunin lahat ng invoices
-
+        $invoices = Invoice::all();
         return view('Billing and Invoicing.record', ['invoices' => $invoices]);
-
     }
 
     // 🔥 Single invoice receipt view
@@ -131,7 +113,7 @@ class InvoiceController extends Controller
 
     public function edit($invoice_id)
     {
-        $invoice = Invoice::findOrFail($invoice_id);
+        $invoice = Invoice::with('items')->findOrFail($invoice_id);
         return view('Billing and Invoicing.edit', compact('invoice'));
     }
 

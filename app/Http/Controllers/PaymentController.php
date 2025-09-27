@@ -4,57 +4,63 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Payment;
-use App\Models\Invoice; // optional, if gagamitin mo for dropdown
+use App\Models\Invoice;
 
 class PaymentController extends Controller
 {
-    // Show list of payments
+    // Show list of payments (for admin checking)
     public function index()
     {
-        // eager load 'invoice' relationship if you have it
         $payments = Payment::with('invoice')->orderBy('created_at', 'desc')->get();
-        return view('Billing and Invoicing.payment', compact('payments'));
+        return view('RecordAndPayment.manage-payment', compact('payments'));
     }
 
-    // Show the form to create a new payment
-    public function create()
+    // Show upload form for client
+    public function create($invoiceId)
     {
-        // Optionally, load invoices to select from
-        // $invoices = Invoice::orderBy('id', 'desc')->get();
-        return view('payments.create'); // point to the Blade file for the form
+        $invoice = Invoice::findOrFail($invoiceId);
+        return view('RecordAndPayment.payment-create', compact('invoice'));
     }
 
-    // Process and store the new payment
-    public function store(Request $request)
+    // Store uploaded proof of payment
+    public function store(Request $request, $invoiceId)
     {
         $validated = $request->validate([
-            'order_id' => 'required|integer',
             'amount' => 'required|numeric|min:0',
-            'payment_method' => 'required|in:BankTransfer,GCash,PayPal,Cash',
-            'payment_date' => 'required|date',
+            'proof' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
+
+        // Upload proof file
+        $proofPath = $request->file('proof')->store('proofs', 'public');
 
         Payment::create([
-            'order_id' => $validated['order_id'],
+            'invoice_id' => $invoiceId,
             'amount' => $validated['amount'],
-            'payment_method' => $validated['payment_method'],
-            'payment_date' => $validated['payment_date'],
-            'status' => 'Paid',  // since processing now
-            'created_at' => now(),
-            'updated_at' => now(),
+            'proof' => $proofPath,
+            'status' => 'pending',
+            'date_paid' => now(),
         ]);
 
-        return redirect()->route('payments.create')->with('success', 'Payment processed successfully!');
+        return redirect()->back()->with('success', 'Proof of payment uploaded successfully! Please wait for verification.');
     }
 
-    // Mark a payment as Paid
-    public function markPaid($id)
+    // Mark a payment as approved (for admin)
+    public function markApproved($id)
     {
         $payment = Payment::findOrFail($id);
-        $payment->status = 'Paid';
-        $payment->date_paid = now();
+        $payment->status = 'approved';
         $payment->save();
 
-        return redirect()->back()->with('success', 'Payment marked as Paid!');
+        return redirect()->back()->with('success', 'Payment marked as Approved!');
+    }
+
+    // Mark a payment as rejected (for admin)
+    public function markRejected($id)
+    {
+        $payment = Payment::findOrFail($id);
+        $payment->status = 'rejected';
+        $payment->save();
+
+        return redirect()->back()->with('error', 'Payment has been Rejected!');
     }
 }

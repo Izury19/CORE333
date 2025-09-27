@@ -66,10 +66,20 @@ Route::get('/record', [RecordController::class, 'record'])->name('record');
 | Record & Payment (Views Only)
 |--------------------------------------------------------------------------
 */
-Route::view('/invoice-tracking', 'Record and Payment.invoice-tracking')->name('invoice-tracking');
-Route::view('/manage-payment', 'Record and Payment.manage-payment')->name('manage-payment');
-Route::view('/ledger-viewer', 'Record and Payment.ledger-viewer')->name('ledger-viewer');
-Route::view('/payment-reminders', 'Record and Payment.payment-reminders')->name('payment-reminders');
+Route::view('/invoice-tracking', 'RecordandPayment.invoice-tracking')->name('invoice-tracking');
+Route::get('/manage-payment', [PaymentController::class, 'index'])->name('manage-payment');
+Route::view('/ledger-viewer', 'RecordandPayment.ledger-viewer')->name('ledger-viewer');
+Route::view('/payment-reminders', 'RecordandPayment.payment-reminders')->name('payment-reminders');
+
+// Upload proof of payment (client side)
+Route::get('/payments/{invoiceId}/upload', [PaymentController::class, 'create'])->name('payments.upload');
+Route::post('/payments/{invoiceId}/upload', [PaymentController::class, 'store'])->name('payments.store');
+
+// Admin Payments
+Route::get('/admin/payments', [PaymentController::class, 'index'])->name('payments.index');
+Route::patch('/payments/{id}/approve', [PaymentController::class, 'markApproved'])->name('payments.approve');
+Route::patch('/payments/{id}/reject', [PaymentController::class, 'markRejected'])->name('payments.reject');
+
 
 /*
 |--------------------------------------------------------------------------

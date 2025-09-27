@@ -3,7 +3,7 @@
 @section('content')
 <style>
     body {
-        background-color: #2e2e2e;
+        background-color: #f4f6f8;
         font-family: 'Segoe UI', sans-serif;
         padding: 20px;
     }

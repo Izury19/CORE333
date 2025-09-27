@@ -60,6 +60,10 @@ Here’s a summary of your invoice:
 {{ $invoice['note'] }}
 @endif
 
+@component('mail::button', ['url' => route('payments.upload', $invoice->invoice_id)])
+Upload Proof of Payment
+@endcomponent
+
 Thanks again!  
 **– {{ config('app.name') }}**
 

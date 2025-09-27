@@ -1,1 +1,0 @@
-dito manage payment
