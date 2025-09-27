@@ -46,8 +46,9 @@
                     <td>
                         @if($payment->status == 'pending')
                             <button onclick="confirmAction('{{ route('payments.approve', ['id' => $payment->payments_id]) }}', 'approve')" class="btn btn-sm btn-success">Approve</button>
-
                             <button onclick="confirmAction('{{ route('payments.reject', ['id' => $payment->payments_id]) }}', 'reject')" class="btn btn-sm btn-danger">Reject</button>
+                        @elseif($payment->status == 'approved')
+                            <button onclick="confirmAction('{{ route('payments.cancel', ['id' => $payment->payments_id]) }}', 'cancel')" class="btn btn-sm btn-warning">Cancel</button>
                         @else
                             <em>No actions</em>
                         @endif
@@ -66,9 +67,20 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 function confirmAction(url, actionType) {
-    let title = actionType === 'approve' ? "Approve Payment?" : "Reject Payment?";
-    let confirmButtonText = actionType === 'approve' ? "Yes, approve it!" : "Yes, reject it!";
+    let title = '';
+    let confirmButtonText = '';
     let method = "PATCH";
+
+    if(actionType === 'approve') {
+        title = "Approve Payment?";
+        confirmButtonText = "Yes, approve it!";
+    } else if(actionType === 'reject') {
+        title = "Reject Payment?";
+        confirmButtonText = "Yes, reject it!";
+    } else if(actionType === 'cancel') {
+        title = "Cancel Approval?";
+        confirmButtonText = "Yes, cancel it!";
+    }
 
     Swal.fire({
         title: title,
@@ -91,7 +103,6 @@ function confirmAction(url, actionType) {
     });
 }
 
-// Show SweetAlert success or error after action
 @if(session('success'))
 Swal.fire({
     icon: 'success',

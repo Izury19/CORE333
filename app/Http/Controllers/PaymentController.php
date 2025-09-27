@@ -66,4 +66,12 @@ public function store(Request $request, $invoiceId)
 
         return redirect()->back()->with('error', 'Payment has been Rejected!');
     }
+    public function markCancelled($id)
+    {
+        $payment = Payment::findOrFail($id);
+        $payment->status = 'pending';
+        $payment->save();
+
+        return redirect()->back()->with('success', 'Payment approval has been cancelled.');
+    }
 }

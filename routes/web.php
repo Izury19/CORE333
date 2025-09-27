@@ -84,6 +84,8 @@ Route::patch('/payments/{id}/approve', [PaymentController::class, 'markApproved'
 
 Route::patch('/payments/{id}/reject', [PaymentController::class, 'markRejected'])
     ->name('payments.reject');
+Route::patch('/payments/{id}/cancel', [PaymentController::class, 'markCancelled'])
+    ->name('payments.cancel');
 
 /*
 |--------------------------------------------------------------------------
