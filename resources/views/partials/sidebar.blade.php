@@ -202,7 +202,7 @@
 
   <ul x-show="open" x-transition class="pl-10 mt-2 space-y-1 text-sm font-medium text-white overflow-hidden">
     <li>
-      <a href="{{ route('financial-report') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition"> Financial Reports </a>
+      <a href="{{ route('financial-report') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">Billing Summary Report</a>
     </li>
     <li>
       <a href="{{ route('maintenance-report') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition"> Maintenance Reports </a>

@@ -112,7 +112,7 @@
                             <td><span class="badge bg-danger">Overdue</span></td>
                             <td>2025-08-15</td>
                             <td>2025-08-30</td>
-                            <td>gcash</td>
+                            <td>GCash</td>
                             <td>
                                 <button class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i> View</button>
                             </td>
@@ -134,18 +134,9 @@
                 </table>
             </div>
 
-            <!-- Pagination -->
-            <div class="d-flex justify-content-between mt-3">
+            <!-- Info Text Only (No Pagination Links) -->
+            <div class="mt-3">
                 <small class="text-muted">Showing 1 to 4 of 120 invoices</small>
-                <nav>
-                    <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                    </ul>
-                </nav>
             </div>
         </div>
     </div>

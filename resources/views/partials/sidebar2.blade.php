@@ -105,7 +105,7 @@
                         'title' => 'Reporting and Analytics',
                         'icon' => 'reporting.svg',
                         'routes' => [
-                            ['name' => 'financial-report', 'label' => 'Financial Reports'],
+                            ['name' => 'financial-report', 'label' => 'Billing Summary Report'],
                             ['name' => 'maintenance-report', 'label' => 'Maintenance Reports'],
                             ['name' => 'contractpermit-report', 'label' => 'Contract & Permit Reports'],
                             ['name' => 'ai-report', 'label' => 'AI-Powered Predictive Analytics'],

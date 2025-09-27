@@ -11,7 +11,7 @@
         <!-- Tab Navigation -->
         <div class="flex flex-wrap gap-2">
             <button class="tab-btn active px-4 py-2 rounded-lg text-sm font-medium bg-blue-500 text-white" data-tab="financial">
-                Financial Reports
+                Billing Summary Report
             </button>
             <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300" data-tab="maintenance">
                 Maintenance Reports
