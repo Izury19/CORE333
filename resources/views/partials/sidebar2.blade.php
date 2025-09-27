@@ -87,7 +87,6 @@
                         'icon' => 'schedule.svg',
                         'routes' => [
                             ['name' => 'maintenance-sched', 'label' => 'Maintenance Schedule'],
-                            ['name' => 'assign-tech', 'label' => 'Technicians Dashboard'],
                             ['name' => 'maintenance-notif', 'label' => 'Maintenance Notifications'],
                             ['name' => 'maintenance-history', 'label' => 'Maintenance History Log'],
                         ],

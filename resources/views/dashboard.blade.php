@@ -222,11 +222,6 @@
       </a>
     </li>
     <li>
-      <a href="{{ route('assign-tech') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
-        Technicians Dashboard
-      </a>
-    </li>
-    <li>
       <a href="{{ route('maintenance-notif') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
         Maintenance Notifications
       </a>
