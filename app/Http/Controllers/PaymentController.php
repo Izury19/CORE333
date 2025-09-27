@@ -19,7 +19,7 @@ class PaymentController extends Controller
     public function create($invoiceId)
     {
         $invoice = Invoice::findOrFail($invoiceId);
-        return view('RecordAndPayment.payment-create', compact('invoice'));
+        return view('Record And Payment.payment-create', compact('invoice'));
     }
 
     // Store uploaded proof of payment
