@@ -12,7 +12,7 @@ class PaymentController extends Controller
     public function index()
     {
         $payments = Payment::with('invoice')->orderBy('created_at', 'desc')->get();
-        return view('RecordAndPayment.manage-payment', compact('payments'));
+        return view('Record And Payment.manage-payment', compact('payments'));
     }
 
     // Show upload form for client

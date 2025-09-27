@@ -66,10 +66,10 @@ Route::get('/record', [RecordController::class, 'record'])->name('record');
 | Record & Payment (Views Only)
 |--------------------------------------------------------------------------
 */
-Route::view('/invoice-tracking', 'RecordandPayment.invoice-tracking')->name('invoice-tracking');
+Route::view('/invoice-tracking', 'Record And Payment.invoice-tracking')->name('invoice-tracking');
 Route::get('/manage-payment', [PaymentController::class, 'index'])->name('manage-payment');
-Route::view('/ledger-viewer', 'RecordandPayment.ledger-viewer')->name('ledger-viewer');
-Route::view('/payment-reminders', 'RecordandPayment.payment-reminders')->name('payment-reminders');
+Route::view('/ledger-viewer', 'Record And Payment.ledger-viewer')->name('ledger-viewer');
+Route::view('/payment-reminders', 'Record And Payment.payment-reminders')->name('payment-reminders');
 
 // Upload proof of payment (client side)
 Route::get('/payments/{invoiceId}/upload', [PaymentController::class, 'create'])
