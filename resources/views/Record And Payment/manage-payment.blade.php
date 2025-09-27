@@ -29,30 +29,30 @@
                 <td>₱{{ number_format($payment->amount, 2) }}</td>
                 <td>{{ ucfirst($payment->payment_method ?? 'N/A') }}</td>
                 <td>
-                    @if($payment->status == 'pending')
+                    @if($payment->status === 'pending')
                         <span class="badge bg-warning text-dark">Pending</span>
-                    @elseif($payment->status == 'approved')
+                    @elseif($payment->status === 'approved')
                         <span class="badge bg-success">Approved</span>
-                    @else
+                    @elseif($payment->status === 'rejected')
                         <span class="badge bg-danger">Rejected</span>
                     @endif
                 </td>
                 <td>{{ $payment->payment_date ?? '-' }}</td>
                 <td>
                     @if($payment->proof)
-                        <a href="{{ asset('storage/' . $payment->proof) }}" target="_blank" class="btn btn-sm btn-info">
-                            View Proof
-                        </a>
+                        <a href="{{ asset('storage/' . $payment->proof) }}" target="_blank" class="btn btn-sm btn-info">View Proof</a>
                     @else
                         <span class="text-muted">No proof</span>
                     @endif
                 </td>
                 <td>
-                    @if($payment->status == 'pending')
+                    @if($payment->status === 'pending')
                         <button onclick="confirmAction('{{ route('payments.approve', ['id' => $payment->payments_id]) }}', 'approve')" class="btn btn-sm btn-success">Approve</button>
                         <button onclick="confirmAction('{{ route('payments.reject', ['id' => $payment->payments_id]) }}', 'reject')" class="btn btn-sm btn-danger">Reject</button>
-                    @elseif($payment->status == 'approved')
+                    @elseif($payment->status === 'approved')
                         <button onclick="confirmAction('{{ route('payments.cancel', ['id' => $payment->payments_id]) }}', 'cancel')" class="btn btn-sm btn-warning">Cancel</button>
+                    @elseif($payment->status === 'rejected')
+                        <button onclick="confirmAction('{{ route('payments.cancel', ['id' => $payment->payments_id]) }}', 'cancel')" class="btn btn-sm btn-secondary">Undo Reject</button>
                     @else
                         <em>No actions</em>
                     @endif
@@ -75,15 +75,15 @@ function confirmAction(url, actionType) {
     let confirmButtonText = '';
     let method = "PATCH";
 
-    if(actionType === 'approve') {
+    if (actionType === 'approve') {
         title = "Approve Payment?";
         confirmButtonText = "Yes, approve it!";
-    } else if(actionType === 'reject') {
+    } else if (actionType === 'reject') {
         title = "Reject Payment?";
         confirmButtonText = "Yes, reject it!";
-    } else if(actionType === 'cancel') {
-        title = "Cancel Approval?";
-        confirmButtonText = "Yes, cancel it!";
+    } else if (actionType === 'cancel') {
+        title = "Revert Status to Pending?";
+        confirmButtonText = "Yes, revert it!";
     }
 
     Swal.fire({
