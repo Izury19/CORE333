@@ -10,7 +10,7 @@
 
         <div class="card-body p-4">
             <div class="table-responsive">
-                <table class="table table-hover align-middle">
+                <table class="table table-hover table-bordered align-middle text-center">
                     <thead class="table-dark">
                         <tr>
                             <th>Payment ID</th>
@@ -22,7 +22,7 @@
                             <th>Status</th>
                             <th>Date Paid</th>
                             <th>Proof</th>
-                            <th class="text-center">Action</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -47,13 +47,13 @@
                             <td>
                                 @if($payment->proof)
                                     <a href="{{ asset('storage/' . $payment->proof) }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-eye"></i> View Proof
+                                        <i class="bi bi-eye"></i> View
                                     </a>
                                 @else
                                     <span class="text-muted">No proof</span>
                                 @endif
                             </td>
-                            <td class="text-center">
+                            <td>
                                 @if($payment->status === 'pending')
                                     <button onclick="confirmAction('{{ route('payments.approve', ['id' => $payment->payments_id]) }}', 'approve')" class="btn btn-sm btn-success me-1">
                                         <i class="bi bi-check-circle"></i> Approve
@@ -67,7 +67,7 @@
                                     </button>
                                 @elseif($payment->status === 'rejected')
                                     <button onclick="confirmAction('{{ route('payments.cancel', ['id' => $payment->payments_id]) }}', 'cancel')" class="btn btn-sm btn-secondary">
-                                        <i class="bi bi-arrow-counterclockwise"></i> Undo Reject
+                                        <i class="bi bi-arrow-counterclockwise"></i> Undo
                                     </button>
                                 @else
                                     <em>No actions</em>
@@ -86,7 +86,7 @@
     </div>
 </div>
 
-<!-- Bootstrap Icons CDN -->
+<!-- Bootstrap Icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
 <!-- SweetAlert -->
