@@ -1,9 +1,9 @@
 @extends('layouts.maintenance')
 
 @section('content')
-<div class="container mt-4">
+<div class="container-fluid mt-4">
 
-    <div class="card shadow-lg border-0 rounded-4">
+    <div class="card shadow-lg border-0 rounded-4 w-100">
         <div class="card-header bg-primary text-white rounded-top-4">
             <h4 class="mb-0"><i class="bi bi-credit-card me-2"></i> Manage Payments</h4>
         </div>
@@ -55,10 +55,10 @@
                             </td>
                             <td>
                                 @if($payment->status === 'pending')
-                                    <button onclick="confirmAction('{{ route('payments.approve', ['id' => $payment->payments_id]) }}', 'approve')" class="btn btn-sm btn-success me-1">
+                                    <button onclick="confirmAction('{{ route('payments.approve', ['id' => $payment->payments_id]) }}', 'approve')" class="btn btn-sm btn-success me-1 mb-1">
                                         <i class="bi bi-check-circle"></i> Approve
                                     </button>
-                                    <button onclick="confirmAction('{{ route('payments.reject', ['id' => $payment->payments_id]) }}', 'reject')" class="btn btn-sm btn-danger">
+                                    <button onclick="confirmAction('{{ route('payments.reject', ['id' => $payment->payments_id]) }}', 'reject')" class="btn btn-sm btn-danger mb-1">
                                         <i class="bi bi-x-circle"></i> Reject
                                     </button>
                                 @elseif($payment->status === 'approved')
@@ -154,4 +154,15 @@ Swal.fire({
 });
 @endif
 </script>
+
+<style>
+.table {
+    font-size: 15px;
+    white-space: nowrap;
+}
+.table th, .table td {
+    padding: 14px 12px;
+    vertical-align: middle;
+}
+</style>
 @endsection
