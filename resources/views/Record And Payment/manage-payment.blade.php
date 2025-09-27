@@ -2,70 +2,92 @@
 
 @section('content')
 <div class="container mt-4">
-    <h2 class="mb-4">💳 Manage Payments</h2>
 
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>Payment ID</th>
-                <th>Invoice</th>
-                <th>Client Name</th>
-                <th>Client Email</th>
-                <th>Amount</th>
-                <th>Method</th>
-                <th>Status</th>
-                <th>Date Paid</th>
-                <th>Proof</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-        @forelse($payments as $payment)
-            <tr>
-                <td>{{ $payment->payments_id }}</td>
-                <td>#{{ $payment->invoice?->invoice_id ?? 'N/A' }}</td>
-                <td>{{ $payment->invoice?->client_name ?? 'N/A' }}</td>
-                <td>{{ $payment->invoice?->client_email ?? 'N/A' }}</td>
-                <td>₱{{ number_format($payment->amount, 2) }}</td>
-                <td>{{ ucfirst($payment->payment_method ?? 'N/A') }}</td>
-                <td>
-                    @if($payment->status === 'pending')
-                        <span class="badge bg-warning text-dark">Pending</span>
-                    @elseif($payment->status === 'approved')
-                        <span class="badge bg-success">Approved</span>
-                    @elseif($payment->status === 'rejected')
-                        <span class="badge bg-danger">Rejected</span>
-                    @endif
-                </td>
-                <td>{{ $payment->payment_date ?? '-' }}</td>
-                <td>
-                    @if($payment->proof)
-                        <a href="{{ asset('storage/' . $payment->proof) }}" target="_blank" class="btn btn-sm btn-info">View Proof</a>
-                    @else
-                        <span class="text-muted">No proof</span>
-                    @endif
-                </td>
-                <td>
-                    @if($payment->status === 'pending')
-                        <button onclick="confirmAction('{{ route('payments.approve', ['id' => $payment->payments_id]) }}', 'approve')" class="btn btn-sm btn-success">Approve</button>
-                        <button onclick="confirmAction('{{ route('payments.reject', ['id' => $payment->payments_id]) }}', 'reject')" class="btn btn-sm btn-danger">Reject</button>
-                    @elseif($payment->status === 'approved')
-                        <button onclick="confirmAction('{{ route('payments.cancel', ['id' => $payment->payments_id]) }}', 'cancel')" class="btn btn-sm btn-warning">Cancel</button>
-                    @elseif($payment->status === 'rejected')
-                        <button onclick="confirmAction('{{ route('payments.cancel', ['id' => $payment->payments_id]) }}', 'cancel')" class="btn btn-sm btn-secondary">Undo Reject</button>
-                    @else
-                        <em>No actions</em>
-                    @endif
-                </td>
-            </tr>
-        @empty
-            <tr>
-                <td colspan="10" class="text-center">No payments yet.</td>
-            </tr>
-        @endforelse
-        </tbody>
-    </table>
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white rounded-top-4">
+            <h4 class="mb-0"><i class="bi bi-credit-card me-2"></i> Manage Payments</h4>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Payment ID</th>
+                            <th>Invoice</th>
+                            <th>Client Name</th>
+                            <th>Client Email</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                            <th>Date Paid</th>
+                            <th>Proof</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @forelse($payments as $payment)
+                        <tr>
+                            <td>{{ $payment->payments_id }}</td>
+                            <td><span class="badge bg-secondary">#{{ $payment->invoice?->invoice_id ?? 'N/A' }}</span></td>
+                            <td>{{ $payment->invoice?->client_name ?? 'N/A' }}</td>
+                            <td>{{ $payment->invoice?->client_email ?? 'N/A' }}</td>
+                            <td><strong class="text-success">₱{{ number_format($payment->amount, 2) }}</strong></td>
+                            <td><span class="badge bg-info text-dark">{{ ucfirst($payment->payment_method ?? 'N/A') }}</span></td>
+                            <td>
+                                @if($payment->status === 'pending')
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                @elseif($payment->status === 'approved')
+                                    <span class="badge bg-success">Approved</span>
+                                @elseif($payment->status === 'rejected')
+                                    <span class="badge bg-danger">Rejected</span>
+                                @endif
+                            </td>
+                            <td>{{ $payment->payment_date ?? '-' }}</td>
+                            <td>
+                                @if($payment->proof)
+                                    <a href="{{ asset('storage/' . $payment->proof) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i> View Proof
+                                    </a>
+                                @else
+                                    <span class="text-muted">No proof</span>
+                                @endif
+                            </td>
+                            <td class="text-center">
+                                @if($payment->status === 'pending')
+                                    <button onclick="confirmAction('{{ route('payments.approve', ['id' => $payment->payments_id]) }}', 'approve')" class="btn btn-sm btn-success me-1">
+                                        <i class="bi bi-check-circle"></i> Approve
+                                    </button>
+                                    <button onclick="confirmAction('{{ route('payments.reject', ['id' => $payment->payments_id]) }}', 'reject')" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-x-circle"></i> Reject
+                                    </button>
+                                @elseif($payment->status === 'approved')
+                                    <button onclick="confirmAction('{{ route('payments.cancel', ['id' => $payment->payments_id]) }}', 'cancel')" class="btn btn-sm btn-warning">
+                                        <i class="bi bi-arrow-counterclockwise"></i> Cancel
+                                    </button>
+                                @elseif($payment->status === 'rejected')
+                                    <button onclick="confirmAction('{{ route('payments.cancel', ['id' => $payment->payments_id]) }}', 'cancel')" class="btn btn-sm btn-secondary">
+                                        <i class="bi bi-arrow-counterclockwise"></i> Undo Reject
+                                    </button>
+                                @else
+                                    <em>No actions</em>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="10" class="text-center text-muted">No payments yet.</td>
+                        </tr>
+                    @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Bootstrap Icons CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
 <!-- SweetAlert -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -91,7 +113,12 @@ function confirmAction(url, actionType) {
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: confirmButtonText,
-        cancelButtonText: "Cancel"
+        cancelButtonText: "Cancel",
+        customClass: {
+            confirmButton: 'btn btn-primary me-2',
+            cancelButton: 'btn btn-secondary'
+        },
+        buttonsStyling: false
     }).then((result) => {
         if (result.isConfirmed) {
             let form = document.createElement('form');
