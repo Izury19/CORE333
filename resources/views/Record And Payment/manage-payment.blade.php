@@ -17,6 +17,7 @@
                 <th>Payment ID</th>
                 <th>Invoice</th>
                 <th>Amount</th>
+                <th>Method</th>
                 <th>Status</th>
                 <th>Date Paid</th>
                 <th>Proof</th>
@@ -35,6 +36,9 @@
                     {{-- Amount --}}
                     <td>₱{{ number_format($payment->amount, 2) }}</td>
 
+                    {{-- Payment Method --}}
+                    <td>{{ ucfirst($payment->payment_method ?? 'N/A') }}</td>
+
                     {{-- Status --}}
                     <td>
                         @if($payment->status == 'pending')
@@ -47,7 +51,7 @@
                     </td>
 
                     {{-- Date Paid --}}
-                    <td>{{ $payment->date_paid ?? '-' }}</td>
+                    <td>{{ $payment->payment_date ?? '-' }}</td>
 
                     {{-- Proof link --}}
                     <td>
@@ -80,7 +84,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="text-center">No payments yet.</td>
+                    <td colspan="8" class="text-center">No payments yet.</td>
                 </tr>
             @endforelse
         </tbody>

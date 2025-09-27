@@ -22,27 +22,30 @@ class PaymentController extends Controller
         return view('Record And Payment.payment-create', compact('invoice'));
     }
 
-    // Store uploaded proof of payment
-    public function store(Request $request, $invoiceId)
-    {
-        $validated = $request->validate([
-            'amount' => 'required|numeric|min:0',
-            'proof' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
-        ]);
+// Store uploaded proof of payment
+public function store(Request $request, $invoiceId)
+{
+    $validated = $request->validate([
+        'amount' => 'required|numeric|min:0',
+        'payment_method' => 'required|string|in:bank_transfer,gcash,paypal,cash',
+        'proof' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+    ]);
 
-        // Upload proof file
-        $proofPath = $request->file('proof')->store('proofs', 'public');
+    // Upload proof file
+    $proofPath = $request->file('proof')->store('proofs', 'public');
 
-        Payment::create([
-            'invoice_id'   => $invoiceId,
-            'amount'       => $validated['amount'],
-            'proof'        => $proofPath,
-            'status'       => 'pending',
-            'payment_date' => now(), // ✅ match sa DB column
-        ]);
+    Payment::create([
+        'invoice_id'     => $invoiceId,
+        'amount'         => $validated['amount'],
+        'proof'          => $proofPath,
+        'status'         => 'pending',
+        'payment_date'   => now(),
+        'payment_method' => $validated['payment_method'], // ✅ importante
+    ]);
 
-        return redirect()->back()->with('success', 'Proof of payment uploaded successfully! Please wait for verification.');
-    }
+    return redirect()->back()->with('success', 'Proof of payment uploaded successfully! Please wait for verification.');
+}
+
 
     // Mark a payment as approved (for admin)
     public function markApproved($id)

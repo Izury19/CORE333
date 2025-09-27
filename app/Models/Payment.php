@@ -18,7 +18,8 @@ class Payment extends Model
         'amount',
         'proof',
         'status',
-        'payment_date', // ✅ dapat same sa DB column
+        'payment_date',
+        'payment_method'
     ];
 
     public function invoice()

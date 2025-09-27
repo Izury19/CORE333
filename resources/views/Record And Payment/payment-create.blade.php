@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.maintenance')
 
 @section('content')
 <div class="container mt-4">
@@ -13,12 +13,27 @@
             <form action="{{ route('payments.upload.store', ['invoiceId' => $invoice->invoice_id]) }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
+                {{-- Amount --}}
                 <div class="mb-3">
                     <label for="amount" class="form-label">💵 Amount Paid</label>
                     <input type="number" name="amount" id="amount" step="0.01" class="form-control" required>
                     @error('amount') <small class="text-danger">{{ $message }}</small> @enderror
                 </div>
 
+                {{-- Payment Method --}}
+                <div class="mb-3">
+                    <label for="payment_method" class="form-label">🏦 Payment Method</label>
+                    <select name="payment_method" id="payment_method" class="form-select" required>
+                        <option value="">-- Select Payment Method --</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+                        <option value="gcash">GCash</option>
+                        <option value="paypal">PayPal</option>
+                        <option value="cash">Cash</option>
+                    </select>
+                    @error('payment_method') <small class="text-danger">{{ $message }}</small> @enderror
+                </div>
+
+                {{-- Proof --}}
                 <div class="mb-3">
                     <label for="proof" class="form-label">📎 Upload Proof (jpg, png, pdf)</label>
                     <input type="file" name="proof" id="proof" class="form-control" required>
