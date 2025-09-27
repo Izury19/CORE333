@@ -60,6 +60,7 @@ Route::get('/order', [JobController::class, 'index'])->name('order');
 Route::view('/invoice', 'Billing and Invoicing.invoice')->name('invoice');
 Route::get('/record', [RecordController::class, 'record'])->name('record');
 
+
 /*
 |--------------------------------------------------------------------------
 | Record & Payment (Views Only)
@@ -70,6 +71,16 @@ Route::get('/manage-payment', [PaymentController::class, 'index'])->name('manage
 Route::view('/ledger-viewer', 'RecordandPayment.ledger-viewer')->name('ledger-viewer');
 Route::view('/payment-reminders', 'RecordandPayment.payment-reminders')->name('payment-reminders');
 
+// Upload proof of payment (client side)
+Route::get('/payments/{invoiceId}/upload', [PaymentController::class, 'create'])->name('payments.upload');
+Route::post('/payments/{invoiceId}/upload', [PaymentController::class, 'uploadStore'])
+    ->name('payments.upload');
+
+
+Route::patch('/payments/{id}/approve', [PaymentController::class, 'markApproved'])->name('payments.approve');
+Route::patch('/payments/{id}/reject', [PaymentController::class, 'markRejected'])->name('payments.reject');
+
+
 /*
 |--------------------------------------------------------------------------
 | Schedule Preventive (Views Only)
@@ -78,7 +89,9 @@ Route::view('/payment-reminders', 'RecordandPayment.payment-reminders')->name('p
 Route::view('/maintenance-notif', 'SchedulePreventive.maintenance-notif')->name('maintenance-notif');
 Route::get('/maintenance-history', [MaintenanceController::class, 'showHistoryLog'])->name('maintenance-history');
 
+
 Route::get('/assign-tech', [TechnicianController::class, 'index'])->name('assign-tech');
+
 Route::post('/technicians/{technician}/upload-image', [TechnicianController::class, 'uploadImage'])
      ->name('technicians.uploadImage');
 
@@ -110,6 +123,7 @@ Route::view('/ai-report', 'Reporting and Analytics.ai-report')->name('ai-report'
 Route::get('/invoice/create', [InvoiceController::class, 'create'])->name('invoice.create');
 Route::post('/invoice/store', [InvoiceController::class, 'store'])->name('invoice.store');
 Route::get('/delivery', [InvoiceController::class, 'delivery'])->name('delivery');
+
 Route::resource('invoices', InvoiceController::class);
 
 /*
@@ -137,45 +151,24 @@ Route::post('/make-contract', [ContractController::class, 'store'])->name('contr
 
 /*
 |--------------------------------------------------------------------------
-| Payments (Grouped & Fixed)
+| Payments
 |--------------------------------------------------------------------------
 */
-Route::prefix('payments')->name('payments.')->group(function () {
+Route::resource('payments', PaymentController::class);
+Route::post('payments/{id}/mark-paid', [PaymentController::class, 'markPaid'])->name('payments.markPaid');
 
-    // Resource routes (CRUD)
-    Route::get('/', [PaymentController::class, 'index'])->name('index');
-    Route::get('/create', [PaymentController::class, 'create'])->name('create');
-    Route::post('/', [PaymentController::class, 'store'])->name('store');
-    Route::get('/{payment}', [PaymentController::class, 'show'])->name('show');
-    Route::get('/{payment}/edit', [PaymentController::class, 'edit'])->name('edit');
-    Route::put('/{payment}', [PaymentController::class, 'update'])->name('update');
-    Route::delete('/{payment}', [PaymentController::class, 'destroy'])->name('destroy');
 
-    // Custom actions
-    Route::post('{id}/mark-paid', [PaymentController::class, 'markPaid'])->name('markPaid');
-    Route::patch('{id}/approve', [PaymentController::class, 'markApproved'])->name('approve');
-    Route::patch('{id}/reject', [PaymentController::class, 'markRejected'])->name('reject');
+// Payment routes
 
-    // Upload proof of payment
-    Route::get('{invoiceId}/upload', [PaymentController::class, 'create'])->name('uploadForm');
-    Route::post('{invoiceId}/upload', [PaymentController::class, 'uploadStore'])->name('uploadStore');
-});
-
-/*
-|--------------------------------------------------------------------------
-| Dashboard - Payments API / AJAX
-|--------------------------------------------------------------------------
-*/
 Route::prefix('dashboard/payments')->as('dashboard.payments.')->group(function () {
     Route::get('/', [PaymentApiController::class, 'index'])->name('index');
     Route::get('/summary', [PaymentApiController::class, 'summary'])->name('summary');
     Route::put('/{id}/status', [PaymentApiController::class, 'updateStatus'])->name('updateStatus');
     Route::post('/{id}/reminder', [PaymentApiController::class, 'sendReminder'])->name('sendReminder');
 });
-
 /*
 |--------------------------------------------------------------------------
-| Dashboard - Payment AJAX fetch
+| Dashboard - Payment Management (AJAX)
 |--------------------------------------------------------------------------
 */
 Route::prefix('dashboard')->name('dashboard.')->group(function () {
@@ -187,15 +180,19 @@ Route::prefix('dashboard')->name('dashboard.')->group(function () {
 Route::get('/dashboard/jobs', [JobController::class, 'index'])->name('jobs.index');
 Route::put('/dashboard/jobs/{job}/status', [JobController::class, 'updateStatus'])->name('jobs.updateStatus');
 
-Route::post('/send-email-notification', [MaintenanceController::class, 'sendEmailNotification']);
+Route::post('/send-email-notification', [App\Http\Controllers\MaintenanceController::class, 'sendEmailNotification']);
+
 Route::post('/maintenance/{id}/upload-proof', [MaintenanceController::class, 'markCompleted'])->name('maintenance.complete');
 
 Route::get('/billing/record', [InvoiceController::class, 'record'])->name('billing.record');
 Route::get('/billing/record/{id}', [InvoiceController::class, 'show'])->name('billing.show');
 
-Route::post('/invoices/{id}/generate-receipt', [RecordController::class, 'generateReceipt'])->name('invoices.generateReceipt');
+Route::post('/invoices/{id}/generate-receipt', [RecordController::class, 'generateReceipt'])
+    ->name('invoices.generateReceipt');
 
 Route::get('/record', [RecordController::class, 'index'])->name('record');
 
 Route::resource('receipts', ReceiptController::class);
+
 Route::resource('technicians', TechnicianController::class);
+
