@@ -72,14 +72,18 @@ Route::view('/ledger-viewer', 'RecordandPayment.ledger-viewer')->name('ledger-vi
 Route::view('/payment-reminders', 'RecordandPayment.payment-reminders')->name('payment-reminders');
 
 // Upload proof of payment (client side)
-Route::get('/payments/{invoiceId}/upload', [PaymentController::class, 'create'])->name('payments.upload');
+Route::get('/payments/{invoiceId}/upload', [PaymentController::class, 'create'])
+    ->name('payments.upload'); // show form
+
 Route::post('/payments/{invoiceId}/upload', [PaymentController::class, 'uploadStore'])
-    ->name('payments.upload');
+    ->name('payments.upload.store'); // handle form submission
 
+// Payment approval/rejection (admin side, siguro)
+Route::patch('/payments/{id}/approve', [PaymentController::class, 'markApproved'])
+    ->name('payments.approve');
 
-Route::patch('/payments/{id}/approve', [PaymentController::class, 'markApproved'])->name('payments.approve');
-Route::patch('/payments/{id}/reject', [PaymentController::class, 'markRejected'])->name('payments.reject');
-
+Route::patch('/payments/{id}/reject', [PaymentController::class, 'markRejected'])
+    ->name('payments.reject');
 
 /*
 |--------------------------------------------------------------------------
