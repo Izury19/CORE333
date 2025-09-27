@@ -9,6 +9,8 @@
             <tr>
                 <th>Payment ID</th>
                 <th>Invoice</th>
+                <th>Client Name</th>
+                <th>Client Email</th>
                 <th>Amount</th>
                 <th>Method</th>
                 <th>Status</th>
@@ -22,11 +24,8 @@
             <tr>
                 <td>{{ $payment->payments_id }}</td>
                 <td>#{{ $payment->invoice?->invoice_id ?? 'N/A' }}</td>
-                
-                <!-- New Columns for Client Info -->
-                <td>{{ $payment->invoice?->client?->name ?? 'N/A' }}</td>
-                <td>{{ $payment->invoice?->client?->email ?? 'N/A' }}</td>
-                
+                <td>{{ $payment->invoice?->client_name ?? 'N/A' }}</td>
+                <td>{{ $payment->invoice?->client_email ?? 'N/A' }}</td>
                 <td>₱{{ number_format($payment->amount, 2) }}</td>
                 <td>{{ ucfirst($payment->payment_method ?? 'N/A') }}</td>
                 <td>
@@ -64,8 +63,7 @@
                 <td colspan="10" class="text-center">No payments yet.</td>
             </tr>
         @endforelse
-    </tbody>
-
+        </tbody>
     </table>
 </div>
 
