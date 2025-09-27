@@ -10,8 +10,7 @@
             <p><strong>Client:</strong> {{ $invoice->client_name }}</p>
             <p><strong>Total Amount:</strong> ₱{{ number_format($invoice->total, 2) }}</p>
 
-            <form action="{{ route('payments.upload.store', $invoice->id) }}" method="POST" enctype="multipart/form-data">
-
+            <form action="{{ route('payments.upload.store', ['invoiceId' => $invoice->invoice_id]) }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
                 <div class="mb-3">
