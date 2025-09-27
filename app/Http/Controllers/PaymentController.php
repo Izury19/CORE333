@@ -18,7 +18,7 @@ class PaymentController extends Controller
     // Show upload form for client
     public function create($invoiceId)
     {
-        $invoice = Invoice::findOrFail($invoiceId); // works if Invoice model has primaryKey = 'invoice_id'
+        $invoice = Invoice::findOrFail($invoiceId); 
         return view('Record And Payment.payment-create', compact('invoice'));
     }
 
@@ -34,11 +34,11 @@ class PaymentController extends Controller
         $proofPath = $request->file('proof')->store('proofs', 'public');
 
         Payment::create([
-            'invoice_id' => $invoiceId,
-            'amount' => $validated['amount'],
-            'proof' => $proofPath,
-            'status' => 'pending',
-            'date_paid' => now(),
+            'invoice_id'   => $invoiceId,
+            'amount'       => $validated['amount'],
+            'proof'        => $proofPath,
+            'status'       => 'pending',
+            'payment_date' => now(), // ✅ match sa DB column
         ]);
 
         return redirect()->back()->with('success', 'Proof of payment uploaded successfully! Please wait for verification.');
@@ -47,7 +47,7 @@ class PaymentController extends Controller
     // Mark a payment as approved (for admin)
     public function markApproved($id)
     {
-        $payment = Payment::findOrFail($id); // works if Payment model has primaryKey = 'payment_id'
+        $payment = Payment::findOrFail($id);
         $payment->status = 'approved';
         $payment->save();
 
@@ -57,7 +57,7 @@ class PaymentController extends Controller
     // Mark a payment as rejected (for admin)
     public function markRejected($id)
     {
-        $payment = Payment::findOrFail($id); // works if Payment model has primaryKey = 'payment_id'
+        $payment = Payment::findOrFail($id);
         $payment->status = 'rejected';
         $payment->save();
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -8,17 +9,16 @@ class Payment extends Model
 {
     use HasFactory;
 
-    // 👇 Ito ang fix
-    protected $primaryKey = 'payment_id';
-    public $incrementing = true; // kung auto-increment si payment_id, keep this true
-    protected $keyType = 'int';  // kung integer ang payment_id
+    protected $primaryKey = 'payments_id'; // ✅ ito yung nasa DB mo
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     protected $fillable = [
         'invoice_id',
         'amount',
         'proof',
         'status',
-        'date_paid',
+        'payment_date', // ✅ dapat same sa DB column
     ];
 
     public function invoice()
