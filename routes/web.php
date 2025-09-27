@@ -156,7 +156,7 @@ Route::post('/make-contract', [ContractController::class, 'store'])->name('contr
 */
 Route::resource('payments', PaymentController::class);
 Route::post('payments/{id}/mark-paid', [PaymentController::class, 'markPaid'])->name('payments.markPaid');
-Route::get('/payment', [PaymentController::class, 'index'])->name('payment');
+
 
 // Payment routes
 
@@ -195,6 +195,4 @@ Route::get('/record', [RecordController::class, 'index'])->name('record');
 Route::resource('receipts', ReceiptController::class);
 
 Route::resource('technicians', TechnicianController::class);
-
-
 
