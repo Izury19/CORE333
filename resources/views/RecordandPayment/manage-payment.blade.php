@@ -14,7 +14,7 @@
     <table class="table table-bordered table-striped">
         <thead class="table-dark">
             <tr>
-                <th>ID</th>
+                <th>IDs</th>
                 <th>Invoice</th>
                 <th>Amount</th>
                 <th>Status</th>
