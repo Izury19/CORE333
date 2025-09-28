@@ -329,73 +329,91 @@
 
 @if (session('invoice'))
 <div class="invoice-box mt-5" style="margin-top: 60px; margin-right: 250px;">
-    <div class="receipt-box">
+    <div style="background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.05); font-family: 'Segoe UI', sans-serif;">
+        <h2 style="margin-bottom: 10px;">🧾 Hello {{ session('invoice')['client_name'] }},</h2>
+        <p style="margin-top: 0;">Thank you for your business! Here's a summary of your invoice:</p>
 
-        {{-- Company Header --}}
-        <div style="text-align:center; margin-bottom:15px;">
-            <h3 style="margin:0; font-size:16px;">Cali-CMS</h3>
-            <p style="margin:0; font-size:12px;">134 Magsaysay Ext, Quezon City<br>📞 (02) 123-4567 | ✉ support@calicms.com</p>
-        </div>
+        <hr style="margin: 20px 0;">
 
-        <h3>Invoice Receipt</h3>
+        <p><strong>📅 Invoice Date:</strong> {{ \Carbon\Carbon::parse(session('invoice')['invoice_date'])->format('F d, Y') }}</p>
 
-        <div class="info">
-            <p><strong>Invoice #:</strong> {{ session('invoice')['invoice_id'] ?? '1' }}</p>
-            <p><strong>Client:</strong> {{ session('invoice')['client_name'] }}</p>
-            <p><strong>Email:</strong> {{ session('invoice')['client_email'] }}</p>
-            <p><strong>Address:</strong> {{ session('invoice')['client_address'] ?? 'N/A' }}</p>
-            <p><strong>Date:</strong> {{ session('invoice')['invoice_date'] }}</p>
-            <p><strong>Due:</strong> {{ session('invoice')['due_date'] }}</p>
-            <p><strong>Payment Terms:</strong> {{ session('invoice')['terms_of_payment'] }}</p>
-            <p><strong>Payment:</strong> {!! session('invoice')['payment_details'] ?? 'N/A' !!}</p>
-        </div>
+        <p><strong>📆 Due Date:</strong>
+            @if(\Carbon\Carbon::parse(session('invoice')['due_date'])->isPast())
+                <span style="color:red;">⚠️ {{ \Carbon\Carbon::parse(session('invoice')['due_date'])->format('F d, Y') }} (Overdue)</span>
+            @else
+                {{ \Carbon\Carbon::parse(session('invoice')['due_date'])->format('F d, Y') }}
+            @endif
+        </p>
 
-        <table>
+        <p><strong>🏠 Address:</strong> {{ session('invoice')['client_address'] ?? 'Not provided' }}</p>
+
+        <p><strong>💳 Payment Method:</strong> {{ session('invoice')['terms_of_payment'] }}</p>
+
+        <p><strong>📄 Payment Details:</strong><br>
+            @switch(session('invoice')['terms_of_payment'])
+                @case('Bank Transfer')
+                    🏦 BPI - Account Name: XYZ Corporation, Account No: 1234-5678-9012
+                    @break
+                @case('GCash')
+                    📱 GCash - Account Name: XYZ Corp, GCash Number: 0917-123-4567
+                    @break
+                @case('Paypal')
+                    🌐 Paypal - Email: payments@xyzcorp.com
+                    @break
+                @case('Cash')
+                    💵 Cash payment must be settled at our office: 134 Magsaysay Ext, Quezon City
+                    @break
+                @default
+                    Please contact us for payment details.
+            @endswitch
+        </p>
+
+        <hr style="margin: 20px 0;">
+
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 20px;">
             <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Item</th>
-                    <th>Qty</th>
-                    <th>₱</th>
+                <tr style="background-color: #007bff; color: white;">
+                    <th style="padding: 10px; text-align: left;">Description</th>
+                    <th style="padding: 10px; text-align: left;">Qty</th>
+                    <th style="padding: 10px; text-align: left;">Price</th>
+                    <th style="padding: 10px; text-align: left;">Total</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (session('invoice')['items'] as $index => $item)
-                    <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td>{{ $item['description'] }}</td>
-                        <td>{{ $item['qty'] }}</td>
-                        <td>{{ number_format($item['qty'] * $item['price'], 2) }}</td>
+                @foreach (session('invoice')['items'] as $item)
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 8px;">{{ $item['description'] }}</td>
+                        <td style="padding: 8px;">{{ $item['qty'] }}</td>
+                        <td style="padding: 8px;">₱{{ number_format($item['price'], 2) }}</td>
+                        <td style="padding: 8px;">₱{{ number_format($item['qty'] * $item['price'], 2) }}</td>
                     </tr>
                 @endforeach
             </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="3">Subtotal</td>
-                    <td>₱{{ number_format(session('invoice')['subtotal'], 2) }}</td>
-                </tr>
-                <tr>
-                    <td colspan="3">Tax (15%)</td>
-                    <td>₱{{ number_format(session('invoice')['tax'], 2) }}</td>
-                </tr>
-                <tr>
-                    <td colspan="3">Total</td>
-                    <td><strong>₱{{ number_format(session('invoice')['total'], 2) }}</strong></td>
-                </tr>
-            </tfoot>
         </table>
 
+        <p><strong>🧮 Subtotal:</strong> ₱{{ number_format(session('invoice')['subtotal'], 2) }}</p>
+        <p><strong>➕ Tax (15%):</strong> ₱{{ number_format(session('invoice')['tax'], 2) }}</p>
+        <p><strong>💰 Total:</strong> <span style="font-size: 1.2em; color: #007bff; font-weight: bold;">₱{{ number_format(session('invoice')['total'], 2) }}</span></p>
+
         @if (!empty(session('invoice')['note']))
-        <p><strong>Note:</strong> {{ session('invoice')['note'] }}</p>
+            <hr>
+            <p><strong>📝 Note:</strong><br> {{ session('invoice')['note'] }}</p>
         @endif
 
-        <div class="text-center">
-            Thank you for your business!<br>
-            <button class="btn btn-outline-primary mt-2" onclick="window.print()">🖨 Print</button>
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="{{ route('payments.upload', session('invoice')['invoice_id']) }}"
+                style="background-color: #007bff; color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; display: inline-block;">
+                📤 Upload Proof of Payment
+            </a>
         </div>
+
+        <p style="text-align: center; font-size: 12px; color: #999; margin-top: 20px;">
+            This is a preview of the invoice email your client will receive.
+        </p>
     </div>
 </div>
 @endif
+
 
 <script>
     let rowCount = 1;

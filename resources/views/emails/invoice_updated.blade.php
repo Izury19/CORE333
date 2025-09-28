@@ -81,6 +81,7 @@ Your invoice has been successfully **updated**. Please find the updated details 
 🔗 View Updated Invoice
 @endcomponent
 
-Thanks again,<br>
-**{{ config('app.name') }}**
+Thanks again!  
+**– Cali-CMS**
+
 @endcomponent

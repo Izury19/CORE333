@@ -65,7 +65,8 @@ Upload Proof of Payment
 @endcomponent
 
 Thanks again!  
-**– {{ config('app.name') }}**
+**– Cali-CMS**
+
 
 <p style="font-size: 12px; color: gray; text-align: center;">
 Generated automatically by Admin of Cali-CMS
