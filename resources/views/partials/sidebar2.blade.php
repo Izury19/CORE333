@@ -76,7 +76,6 @@
                         'title' => 'Record and Payment Management',
                         'icon' => 'record.svg',
                         'routes' => [
-                            ['name' => 'invoice-tracking', 'label' => 'Invoice Tracking'],
                             ['name' => 'manage-payment', 'label' => 'Manage Payments'],
                             ['name' => 'ledger-viewer', 'label' => 'Payment History'],
                             ['name' => 'payment-reminders', 'label' => 'Payment Reminders'],

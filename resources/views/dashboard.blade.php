@@ -177,11 +177,6 @@
   <ul x-show="open" x-transition
       class="pl-10 mt-2 space-y-1 text-sm font-medium text-white overflow-hidden">
     <li>
-      <a href="{{ route('invoice-tracking') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
-        Invoice Tracking
-      </a>
-    </li>
-    <li>
       <a href="{{ route('manage-payment') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
         Manage Payments
       </a>
