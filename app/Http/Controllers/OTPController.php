@@ -3,47 +3,66 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use App\Models\User;
 
 class OTPController extends Controller
 {
-    public function showForm()
+    public function showVerifyForm()
     {
+        if (!session('otp_email')) {
+            return redirect()->route('login')->withErrors(['msg' => 'Please login first.']);
+        }
+
         return view('auth.verify-otp');
     }
 
     public function verify(Request $request)
     {
-        $userOtp = preg_replace('/\D/', '', $request->otp);
-        $storedOtp = session('verification_code');
-        $expiry = session('code_expiry', 0);
+        $request->validate(['otp' => 'required']);
 
-        if ((string)$userOtp === (string)$storedOtp && time() < $expiry) {
-            session()->forget(['verification_code', 'code_expiry']);
-            return redirect()->route('dashboard')->with('success', 'OTP verified successfully!');
-        } elseif (time() >= $expiry) {
-            return back()->with('error', 'OTP expired. Please request a new code.');
-        } else {
-            return back()->with('error', 'Invalid OTP. Please try again.');
+        $sessionOtp = session('otp');
+        $expiresAt = session('otp_expires_at');
+
+        if (!$sessionOtp || now()->greaterThan($expiresAt)) {
+            return back()->with('error', 'OTP expired. Please resend.');
         }
+
+        if ($request->otp != $sessionOtp) {
+            return back()->with('error', 'Invalid OTP.');
+        }
+
+        $email = session('otp_email');
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            return redirect()->route('login')->withErrors(['msg' => 'User not found.']);
+        }
+
+        Auth::login($user);
+
+        session()->forget(['otp', 'otp_email', 'otp_expires_at']);
+
+        return redirect()->route('dashboard')->with('success', 'Login successful!');
     }
 
     public function resend()
     {
+        $email = session('otp_email');
+
+        if (!$email) {
+            return response()->json(['error' => 'Session expired. Please login again.'], 403);
+        }
+
         $otp = rand(100000, 999999);
-        $expiry = time() + 300;
+        session(['otp' => $otp, 'otp_expires_at' => now()->addMinutes(5)]);
 
-        session(['verification_code' => $otp, 'code_expiry' => $expiry]);
-
-        // Send via email using PHPMailer (setup below)
-        Mail::raw("Your OTP is: $otp", function ($message) {
-            $message->to(Auth::user()->email)
-                    ->subject('Your OTP Code');
+        Mail::raw("Your new CaliCrane OTP is: {$otp}", function ($message) use ($email) {
+            $message->to($email)
+                    ->subject('CaliCrane New OTP Code');
         });
 
-        return response('OTP has been resent!');
+        return response()->json(['success' => true]);
     }
 }
-

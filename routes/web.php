@@ -16,6 +16,9 @@ use App\Http\Controllers\JobController;
 use App\Http\Controllers\RecordController;
 use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\TechnicianController;
+use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\OTPController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -201,4 +204,12 @@ Route::get('/record', [RecordController::class, 'index'])->name('record');
 Route::resource('receipts', ReceiptController::class);
 
 Route::resource('technicians', TechnicianController::class);
+
+// ✅ Forgot Password (Email reset link)
+Route::post('/password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+
+// ✅ OTP Verification Routes (Updated to match controller)
+Route::get('/verify-otp', [OTPController::class, 'showVerifyForm'])->name('otp.verify.form');
+Route::post('/verify-otp', [OTPController::class, 'verify'])->name('otp.verify.submit');
+Route::get('/resend-otp', [OTPController::class, 'resend'])->name('otp.resend');
 
