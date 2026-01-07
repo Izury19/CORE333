@@ -48,11 +48,6 @@
     <ul x-show="open" x-transition
         class="pl-10 mt-2 space-y-1 text-sm font-medium text-white overflow-hidden">
         <li>
-            <a href="{{ route ('order') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
-                Job Completed Management
-            </a>
-        </li>
-        <li>
             <a href="{{ route ('invoice') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
                 Invoice Creation
             </a>

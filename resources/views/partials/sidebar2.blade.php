@@ -66,7 +66,6 @@
                         'title' => 'Billing and Invoicing',
                         'icon' => 'billing.svg',
                         'routes' => [
-                            ['name' => 'order', 'label' => 'Job Completed Management'],
                             ['name' => 'invoice', 'label' => 'Invoice Creation'],
                             ['name' => 'delivery', 'label' => 'Invoice Delivery'],
                             ['name' => 'record', 'label' => 'Billing Record'],
