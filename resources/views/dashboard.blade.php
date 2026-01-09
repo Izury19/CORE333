@@ -42,7 +42,7 @@
                         <button type="button" class="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" aria-expanded="false" data-dropdown-toggle="dropdown-user">
                             <span class="sr-only">Open user menu</span>
                             <img class="w-8 h-8 rounded-full object-cover"
-                                src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('images/uploadprof.png') }}"
+                                src="{{ Auth::check() ? (Auth::user()?->photo ? asset('storage/' . Auth::user()?->photo) : asset('images/uploadprof.png')) : asset('images/uploadprof.png') }}"
                                 alt="Profile Photo">
                         </button>
                     </div>
@@ -51,17 +51,17 @@
                         <!-- Profile Image in dropdown -->
                         <div class="flex justify-center items-center p-2">
                             <img class="w-20 h-20 rounded-full shadow-lg object-cover"
-                                src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('images/uploadprof.png') }}"
+                               src="{{ Auth::check() ? (Auth::user()?->photo ? asset('storage/' . Auth::user()?->photo) : asset('images/uploadprof.png')) : asset('images/uploadprof.png') }}"
                                 alt="Profile Photo">
                         </div>
 
                         <!-- User Info -->
                         <div class="px-4 py-3 text-center" role="none">
                             <p class="text-sm font-semibold text-gray-900">
-                                {{ Auth::user()->name }} {{ Auth::user()->lastname }}
+                              {{ Auth::check() ? Auth::user()?->name : 'Guest' }}  {{ Auth::check() ? Auth::user()?->lastname : '' }}
                             </p>
                             <p class="text-sm font-medium text-gray-500 truncate">
-                                {{ Auth::user()->email }}
+                                {{ Auth::user()?->email }}
                             </p>
                         </div>
 
@@ -137,28 +137,16 @@
     <ul x-show="open" x-transition
         class="pl-10 mt-2 space-y-1 text-sm font-medium text-white overflow-hidden">
         <li>
-            <a href="{{ route ('order') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
-                Job Completed Management
-            </a>
-        </li>
-        <li>
             <a href="{{ route ('invoice') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
                 Invoice Creation
             </a>
         </li>
-        <li>
-            <a href="{{ route ('delivery') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
-                Invoice Delivery
-            </a>
-        </li>
-        <li>
-            <a href="{{ route ('record') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
-                Biling Record
-            </a>
-        </li>
-    </ul>
+       <li class="mb-2">
+    <a href="{{ route('invoices.index') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
+      View Invoices
+    </a>
 </li>
-
+</ul>
            <li x-data="{ open: false }" class="relative">
   <!-- Parent button -->
   <button @click="open = !open" 
@@ -333,73 +321,192 @@
         <!-- breadcrumb -->
     
         <!-- Main Content -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+         <!-- Main Content -->
+<div class="p-4 rounded-lg dark:border-gray-700 mt-14">
 
-            <!-- Billing and Invoicing -->
-            <div class="bg-gray-50 rounded-2xl shadow-lg border-l-4 border-gray-900 p-6 hover:shadow-xl transition">
-                <div class="flex items-center justify-between mb-2">
-                    <h2 class="text-lg font-bold text-gray-900">👤 Billing & Invoicing</h2>
-                    <span class="text-sm bg-gray-800 text-white px-2 py-1 rounded-full">Module</span>
-                </div>
-                <p class="text-gray-600 mb-3">Manage user roles, permissions, and accounts.</p>
-                <div class="text-sm">
-                    <span class="block text-lg font-bold text-gray-800">Lumantas lll, Romeo A.</span>
-                    <span class="text-gray-500">Administrator in Charge</span>
-                </div>
-            </div>
-
-            <div class="bg-gray-50 rounded-2xl shadow-lg border-l-4 border-gray-900 p-6 hover:shadow-xl transition">
-                <div class="flex items-center justify-between mb-2">
-                    <h2 class="text-lg font-bold text-gray-900">🏢 Record & Payment </h2>
-                    <span class="text-sm bg-gray-800 text-white px-2 py-1 rounded-full">Module</span>
-                </div>
-                <p class="text-gray-600 mb-3">Oversee office equipment, rooms, and maintenance.</p>
-                <div class="text-sm">
-                    <span class="block text-lg font-bold text-gray-800">Olandria, Jan Ryan D.</span>
-                    <span class="text-gray-500">Administrator in Charge</span>
-                </div>
-            </div>
-
-            <div class="bg-gray-50 rounded-2xl shadow-lg border-l-4 border-gray-900 p-6 hover:shadow-xl transition">
-                <div class="flex items-center justify-between mb-2">
-                    <h2 class="text-lg font-bold text-gray-900">📊 Schedule Preventive</h2>
-                    <span class="text-sm bg-gray-800 text-white px-2 py-1 rounded-full">Module</span>
-                </div>
-                <p class="text-gray-600 mb-3">Track system access and changes for accountability.</p>
-                <div class="text-sm">
-                    <span class="block text-lg font-bold text-gray-800">Loria, Raymon G.</span>
-                    <span class="text-gray-500">Administrator in Charge</span>
-                </div>
-            </div>
-
-            <div class="bg-gray-50 rounded-2xl shadow-lg border-l-4 border-gray-900 p-6 hover:shadow-xl transition">
-                <div class="flex items-center justify-between mb-2">
-                    <h2 class="text-lg font-bold text-gray-900">🗄️ Contract & Permit </h2>
-                    <span class="text-sm bg-gray-800 text-white px-2 py-1 rounded-full">Module</span>
-                </div>
-                <p class="text-gray-600 mb-3">Store, retrieve, and preserve critical records.</p>
-                <div class="text-sm">
-                    <span class="block text-lg font-bold text-gray-800">Magpili, John Christian C.</span>
-                    <span class="text-gray-500">Administrator in Charge</span>
-                </div>
-            </div>
-
-            <div class="bg-gray-50 rounded-2xl shadow-lg border-l-4 border-gray-900 p-6 hover:shadow-xl transition">
-              <div class="flex items-center justify-between mb-2">
-              <h2 class="text-base font-bold text-gray-900 flex items-center space-x-2 leading-tight whitespace-nowrap">
-                <span class="inline-block align-middle">📁</span>
-                <span>Reporting & Analytics</span>
-              </h2>
-                <span class="text-sm bg-gray-800 text-white px-2 py-1 rounded-full">Module</span>
-           </div>
-              <p class="text-gray-600 mb-3">Manage reporting documents securely.</p>
-              <div class="text-sm">
-                <span class="block text-lg font-bold text-gray-800">Salas, Marcus Miguel</span>
-                <span class="text-gray-500">Administrator in Charge</span>
-          </div>
-          </div>
-
+  <!-- Breadcrumb -->
+  <div class="flex mb-5" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a href="#" class="inline-flex items-center text-sm font-medium text-gray-900 hover:text-blue-600">
+          <svg class="w-3 h-3 mr-2.5 text-gray-900" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"/>
+          </svg>
+          Core 3
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-3 h-3 text-gray-900 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+          </svg>
+          <a href="#" class="ml-1 text-sm font-medium text-black text-gray-900 hover:text-blue-900 md:ml-2">Dashboard</a>
         </div>
+      </li>
+    </ol>
+  </div>
+
+  <!-- 🔽 FILTERS -->
+  <div class="bg-white p-4 rounded-xl shadow-sm mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div>
+      <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Date Range</label>
+      <select class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        <option>Today</option>
+        <option selected>This Week</option>
+        <option>This Month</option>
+        <option>Last 30 Days</option>
+        <option>Custom Range</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Client</label>
+      <select class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        <option>All Clients</option>
+        <option>ABC Corp</option>
+        <option>XYZ Industries</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Status</label>
+      <select class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        <option>All Statuses</option>
+        <option>Paid</option>
+        <option>Unpaid</option>
+        <option>Overdue</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- 📊 KPI CARDS -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+    <div class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-4">
+      <p class="text-xs text-blue-700 font-semibold">TOTAL REVENUE</p>
+      <p class="text-lg font-bold mt-1">₱245,890</p>
+      <p class="text-xs text-gray-500">Today</p>
+    </div>
+    <div class="bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200 rounded-xl p-4">
+      <p class="text-xs text-amber-700 font-semibold">UNPAID INVOICES</p>
+      <p class="text-lg font-bold mt-1">₱89,420</p>
+      <p class="text-xs text-gray-500">12 clients</p>
+    </div>
+    <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 rounded-xl p-4">
+      <p class="text-xs text-emerald-700 font-semibold">PAID INVOICES</p>
+      <p class="text-lg font-bold mt-1">₱156,470</p>
+      <p class="text-xs text-gray-500">This week</p>
+    </div>
+    <div class="bg-gradient-to-br from-rose-50 to-rose-100 border border-rose-200 rounded-xl p-4">
+      <p class="text-xs text-rose-700 font-semibold">OUTSTANDING BALANCES</p>
+      <p class="text-lg font-bold mt-1">₱72,300</p>
+      <p class="text-xs text-gray-500">Net 30</p>
+    </div>
+    <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 border border-indigo-200 rounded-xl p-4">
+      <p class="text-xs text-indigo-700 font-semibold">ACTIVE CONTRACTS</p>
+      <p class="text-lg font-bold mt-1">28</p>
+      <p class="text-xs text-gray-500">Ongoing</p>
+    </div>
+    <div class="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-4">
+      <p class="text-xs text-orange-700 font-semibold">EXPIRING CONTRACTS</p>
+      <p class="text-lg font-bold mt-1">5</p>
+      <p class="text-xs text-gray-500">Next 30 days</p>
+    </div>
+    <div class="bg-gradient-to-br from-cyan-50 to-cyan-100 border border-cyan-200 rounded-xl p-4">
+      <p class="text-xs text-cyan-700 font-semibold">ACTIVE PERMITS</p>
+      <p class="text-lg font-bold mt-1">42</p>
+      <p class="text-xs text-gray-500">Valid</p>
+    </div>
+    <div class="bg-gradient-to-br from-red-50 to-red-100 border border-red-200 rounded-xl p-4">
+      <p class="text-xs text-red-700 font-semibold">OVERDUE PAYMENTS</p>
+      <p class="text-lg font-bold mt-1">9</p>
+      <p class="text-xs text-gray-500">Past due</p>
+    </div>
+    <div class="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl p-4">
+      <p class="text-xs text-green-700 font-semibold">SCHEDULED MAINTENANCE</p>
+      <p class="text-lg font-bold mt-1">7</p>
+      <p class="text-xs text-gray-500">This week</p>
+    </div>
+    <div class="bg-gradient-to-br from-violet-50 to-violet-100 border border-violet-200 rounded-xl p-4">
+      <p class="text-xs text-violet-700 font-semibold">EQUIPMENT UNDER MAINT.</p>
+      <p class="text-lg font-bold mt-1">3</p>
+      <p class="text-xs text-gray-500">In service</p>
+    </div>
+  </div>
+
+  <!-- 📈 GRAPHS with VISUAL PLACEHOLDERS -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+    
+    <!-- 1. Monthly Revenue Trend -->
+    <div class="bg-white rounded-xl p-5 shadow-sm border">
+      <h3 class="font-semibold text-gray-700 mb-3">Monthly Revenue Trend</h3>
+      <div class="h-48 flex items-end justify-between px-2">
+        <div class="flex flex-col items-center"><div class="w-2 bg-blue-300 rounded-t h-16 mb-1"></div><span class="text-xs text-gray-500">Jan</span></div>
+        <div class="flex flex-col items-center"><div class="w-2 bg-blue-400 rounded-t h-20 mb-1"></div><span class="text-xs text-gray-500">Feb</span></div>
+        <div class="flex flex-col items-center"><div class="w-2 bg-blue-500 rounded-t h-28 mb-1"></div><span class="text-xs text-gray-500">Mar</span></div>
+        <div class="flex flex-col items-center"><div class="w-2 bg-blue-600 rounded-t h-32 mb-1"></div><span class="text-xs text-gray-500">Apr</span></div>
+        <div class="flex flex-col items-center"><div class="w-2 bg-blue-500 rounded-t h-24 mb-1"></div><span class="text-xs text-gray-500">May</span></div>
+      </div>
+    </div>
+
+    <!-- 2. Paid vs Unpaid -->
+    <div class="bg-white rounded-xl p-5 shadow-sm border">
+      <h3 class="font-semibold text-gray-700 mb-3">Paid vs Unpaid Invoices</h3>
+      <div class="h-48 flex items-end justify-center space-x-8 pt-4">
+        <div class="flex flex-col items-center">
+          <div class="w-10 bg-emerald-500 rounded-t h-32"></div>
+          <span class="mt-2 text-xs text-gray-600">Paid</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <div class="w-10 bg-amber-500 rounded-t h-20"></div>
+          <span class="mt-2 text-xs text-gray-600">Unpaid</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Payment Methods (Pie) -->
+    <div class="bg-white rounded-xl p-5 shadow-sm border">
+      <h3 class="font-semibold text-gray-700 mb-3">Payment Methods</h3>
+      <div class="h-48 flex flex-col items-center justify-center">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="50" fill="#f3f4f6" />
+          <path d="M60,60 L60,10 A50,50 0 0,1 103,27 Z" fill="#3b82f6" opacity="0.9" />
+          <path d="M60,60 L103,27 A50,50 0 0,1 85,105 Z" fill="#10b981" opacity="0.9" />
+          <path d="M60,60 L85,105 A50,50 0 0,1 60,10 Z" fill="#f59e0b" opacity="0.9" />
+        </svg>
+        <div class="mt-3 flex space-x-4 text-xs text-gray-600">
+          <span>Cash</span> <span>GCash</span> <span>Bank</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Maintenance Cost -->
+    <div class="bg-white rounded-xl p-5 shadow-sm border">
+      <h3 class="font-semibold text-gray-700 mb-3">Maintenance Cost / Month</h3>
+      <div class="h-48 flex items-end justify-between px-3 pt-4">
+        <div class="flex flex-col items-center"><div class="w-3 bg-rose-400 rounded-t h-20"></div><span class="text-xs mt-1 text-gray-500">Jan</span></div>
+        <div class="flex flex-col items-center"><div class="w-3 bg-rose-400 rounded-t h-24"></div><span class="text-xs mt-1 text-gray-500">Feb</span></div>
+        <div class="flex flex-col items-center"><div class="w-3 bg-rose-500 rounded-t h-32"></div><span class="text-xs mt-1 text-gray-500">Mar</span></div>
+        <div class="flex flex-col items-center"><div class="w-3 bg-rose-600 rounded-t h-28"></div><span class="text-xs mt-1 text-gray-500">Apr</span></div>
+      </div>
+    </div>
+
+    <!-- 5. Equipment Availability (Gauge) -->
+    <div class="bg-white rounded-xl p-5 shadow-sm border lg:col-span-2 xl:col-span-1">
+      <h3 class="font-semibold text-gray-700 mb-3">Equipment Availability Rate</h3>
+      <div class="h-48 flex flex-col items-center justify-center">
+        <svg width="140" height="100" viewBox="0 0 140 100">
+          <path d="M20,80 A60,60 0 1,1 120,80" fill="none" stroke="#e5e7eb" stroke-width="12"/>
+          <path d="M20,80 A60,60 0 1,1 95,30" fill="none" stroke="#8b5cf6" stroke-width="12" stroke-linecap="round"/>
+        </svg>
+        <div class="text-center mt-2">
+          <p class="text-2xl font-bold text-gray-800">87%</p>
+          <p class="text-xs text-gray-500">Available</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+<!-- End Main Content -->
         <!-- Main Content --> 
             
     </div>

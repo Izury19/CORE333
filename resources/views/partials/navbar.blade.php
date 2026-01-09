@@ -84,7 +84,7 @@ a.no-underline {
                         <button type="button" class="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" aria-expanded="false" data-dropdown-toggle="dropdown-user">
                             <span class="sr-only">Open user menu</span>
                             <img class="w-8 h-8 rounded-full object-cover"
-                                src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('images/uploadprof.png') }}"
+                               src="{{ Auth::check() ? (Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('images/uploadprof.png')) : asset('images/uploadprof.png') }}"
                                 alt="Profile Photo">
                         </button>
                     </div>
@@ -93,19 +93,25 @@ a.no-underline {
                         <!-- Profile Image in dropdown -->
                         <div class="flex justify-center items-center p-2">
                             <img class="w-20 h-20 rounded-full shadow-lg object-cover"
-                                src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('images/uploadprof.png') }}"
+                                src="{{ Auth::check() ? (Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('images/uploadprof.png')) : asset('images/uploadprof.png') }}"
                                 alt="Profile Photo">
                         </div>
 
                         <!-- User Info -->
-                        <div class="px-4 py-3 text-center" role="none">
-                            <p class="text-sm font-semibold text-gray-900">
-                                {{ Auth::user()->name }} {{ Auth::user()->lastname }}
-                            </p>
-                            <p class="text-sm font-medium text-gray-500 truncate">
-                                {{ Auth::user()->email }}
-                            </p>
-                        </div>
+                        <!-- User Info -->
+<div class="px-4 py-3 text-center" role="none">
+    @if(Auth::check())
+        <p class="text-sm font-semibold text-gray-900">
+            {{ Auth::user()->name }} {{ Auth::user()->lastname }}
+        </p>
+        <p class="text-sm font-medium text-gray-500 truncate">
+            {{ Auth::user()->email }}
+        </p>
+    @else
+        <p class="text-sm font-semibold text-gray-900">Guest</p>
+        <p class="text-sm font-medium text-gray-500">Not logged in</p>
+    @endif
+</div>
 
                         <!-- Dropdown Links -->
                         <ul class="py-1" role="none">

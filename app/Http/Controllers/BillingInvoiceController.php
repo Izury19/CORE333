@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\BillingInvoice;
 use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\Pdf;
-class InvoiceController extends Controller
+
+class BillingInvoiceController extends Controller
 {
     public function index()
     {
@@ -23,9 +23,9 @@ class InvoiceController extends Controller
         $request->validate([
             'client_name' => 'required|string|max:255',
             'equipment_type' => 'required|in:crane,truck',
-            'equipment_id' => 'required|string|max:100',
-            'hours_used' => 'required|integer|min:1|max:1000',
-            'hourly_rate' => 'required|numeric|min:0|max:999999',
+            'equipment_id' => 'required|string|max=100',
+            'hours_used' => 'required|integer|min=1',
+            'hourly_rate' => 'required|numeric|min=0',
             'billing_period_start' => 'required|date',
             'billing_period_end' => 'required|date|after_or_equal:billing_period_start',
         ]);
@@ -44,7 +44,7 @@ class InvoiceController extends Controller
             ]);
         }
 
-        // ✅ Generate UID & Save to billing_invoices
+        // ✅ Generate UID & Save
         $uid = BillingInvoice::generateUid($request->equipment_type);
         BillingInvoice::create([
             'invoice_uid' => $uid,
@@ -57,10 +57,10 @@ class InvoiceController extends Controller
             'total_amount' => $totalAmount,
             'billing_period_start' => $request->billing_period_start,
             'billing_period_end' => $request->billing_period_end,
-            'status' => 'issued', // changed from 'billed' to match your status list
+            'status' => 'billed'
         ]);
 
-        return redirect()->route('invoices.index')->with('success', 'Invoice generated: ' . $uid);
+        return redirect()->route('billing.invoices.index')->with('success', 'Invoice generated: ' . $uid);
     }
 
     public function show($id)
@@ -68,43 +68,4 @@ class InvoiceController extends Controller
         $invoice = BillingInvoice::findOrFail($id);
         return view('Billing and Invoicing.show', compact('invoice'));
     }
-
-    public function updateStatus(Request $request, $id)
-{
-    $request->validate(['status' => 'in:issued,paid,overdue']);
-    $invoice = BillingInvoice::findOrFail($id);
-    $invoice->status = $request->status;
-    $invoice->save();
-
-    // For AJAX response
-    if ($request->ajax()) {
-        return response()->json(['success' => true]);
-    }
-
-    return back()->with('success', 'Status updated to ' . $request->status);
 }
-
-
-public function exportPdf($id)
-{
-    $invoice = BillingInvoice::findOrFail($id);
-    $pdf = Pdf::loadView('Billing and Invoicing.pdf', compact('invoice'));
-    return $pdf->download('invoice_' . $invoice->invoice_uid . '.pdf');
-}
-
-public function destroy($id)
-{
-
-    $invoice = BillingInvoice::findOrFail($id);
-    $invoice->delete();
-    return redirect()->route('invoices.index')->with('success', 'Invoice deleted.');
-}
-
-
-public function update(Request $request, $id)
-{
-    // Redirect to your custom status update method
-    return $this->updateStatus($request, $id);
-}
-}
-

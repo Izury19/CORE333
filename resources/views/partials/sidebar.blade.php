@@ -47,26 +47,18 @@
     <!-- Dropdown menu -->
     <ul x-show="open" x-transition
         class="pl-10 mt-2 space-y-1 text-sm font-medium text-white overflow-hidden">
-        <li>
-            <a href="{{ route ('order') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
-                Job Completed Management
-            </a>
-        </li>
+
         <li>
             <a href="{{ route ('invoice') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
                 Invoice Creation
             </a>
         </li>
-        <li>
-            <a href="{{ route ('delivery') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
-                Invoice Delivery
-            </a>
-        </li>
-        <li>
-            <a href="{{ route ('record') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
-                Billing Record
-            </a>
-        </li>
+       <li class="mb-2">
+    <a href="{{ route('invoices.index') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
+        View Invoices
+    </a>
+</li>
+       
     </ul>
 </li>
 
