@@ -66,7 +66,10 @@
                         'title' => 'Billing and Invoicing',
                         'icon' => 'billing.svg',
                         'routes' => [
+<<<<<<< HEAD
         
+=======
+>>>>>>> 724bb568807758bfd056d168922a3bc737c068c3
                             ['name' => 'invoice', 'label' => 'Invoice Creation'],
                             
                         ],

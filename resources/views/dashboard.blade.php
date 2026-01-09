@@ -321,6 +321,7 @@
         <!-- breadcrumb -->
     
         <!-- Main Content -->
+<<<<<<< HEAD
          <!-- Main Content -->
 <div class="p-4 rounded-lg dark:border-gray-700 mt-14">
 
@@ -507,10 +508,249 @@
 
 </div>
 <!-- End Main Content -->
+=======
+ <style>
+/* ================= DASHBOARD CSS ================= */
+
+.dashboard-container {
+    padding: 24px;
+    background: #f5f6fa;
+}
+
+/* FILTERS */
+.filters {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.filter-item select {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: #fff;
+}
+
+/* KPI CARDS */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+}
+
+.kpi-card {
+    background: #ffffff;
+    padding: 16px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.kpi-title {
+    font-size: 12px;
+    color: #777;
+    margin-bottom: 6px;
+}
+
+.kpi-value {
+    font-size: 26px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+/* CHARTS */
+.charts-grid {
+    margin-top: 32px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.chart-card {
+    background: #ffffff;
+    padding: 16px;
+    border-radius: 10px;
+    height: 320px; /* mas roomy */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+
+.chart-wide {
+    grid-column: span 2;
+}
+
+.chart-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.chart-placeholder {
+    height: calc(100% - 30px);
+    background: #ecf0f1;
+    border-radius: 6px;
+}
+
+/* GAUGE PLACEHOLDER */
+.chart-placeholder.gauge {
+    background: linear-gradient(90deg, #2ecc71 70%, #ecf0f1 70%);
+}
+.kpi-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.kpi-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+}
+.chart-card canvas {
+    flex: 1;
+    width: 100% !important;
+}
+
+
+/* RESPONSIVE */
+@media (max-width: 1200px) {
+    .kpi-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-wide {
+        grid-column: span 1;
+    }
+
+    .filters {
+        flex-direction: column;
+    }
+}
+</style>
+
+<div class="dashboard-container">
+
+    <!-- FILTER BAR -->
+    <div class="filters">
+        <div class="filter-item">
+            <select><option>Date Range</option></select>
+        </div>
+        <div class="filter-item">
+            <select><option>Client</option></select>
+        </div>
+        <div class="filter-item">
+            <select><option>Status</option></select>
+        </div>
+        <div class="filter-item">
+            <select><option>Equipment Type</option></select>
+        </div>
+    </div>
+
+    <!-- KPI CARDS -->
+    <div class="kpi-grid">
+
+        <div class="kpi-card">
+            <div class="kpi-title">Total Revenue</div>
+            <div class="kpi-value">₱0.00</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-title">Total Paid Invoices</div>
+            <div class="kpi-value">₱0.00</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-title">Total Unpaid Invoices</div>
+            <div class="kpi-value">₱0.00</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-title">Outstanding Balances</div>
+            <div class="kpi-value">₱0.00</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-title">Active Contracts</div>
+            <div class="kpi-value">0</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-title">Expiring Contracts</div>
+            <div class="kpi-value">0</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-title">Active Permits</div>
+            <div class="kpi-value">0</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-title">Overdue Payments</div>
+            <div class="kpi-value">0</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-title">Scheduled Maintenance (This Week)</div>
+            <div class="kpi-value">0</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-title">Equipment Under Maintenance</div>
+            <div class="kpi-value">0</div>
+        </div>
+
+    </div>
+
+    <!-- CHARTS -->
+    <div class="charts-grid">
+
+<div class="chart-card">
+    <div class="chart-title">Monthly Revenue Trend</div>
+    <canvas id="revenueChart"></canvas>
+</div>
+
+
+<div class="chart-card">
+    <div class="chart-title">Paid vs Unpaid Invoices</div>
+    <canvas id="invoiceChart"></canvas>
+</div>
+
+
+<div class="chart-card">
+    <div class="chart-title">Payment Methods Distribution</div>
+    <canvas id="paymentMethodChart"></canvas>
+</div>
+
+
+<div class="chart-card">
+    <div class="chart-title">Maintenance Cost per Month</div>
+    <canvas id="maintenanceChart"></canvas>
+</div>
+
+
+<div class="chart-card chart-wide">
+    <div class="chart-title">Equipment Availability Rate</div>
+    <canvas id="availabilityChart"></canvas>
+</div>
+
+
+    </div>
+
+</div>
+
+>>>>>>> 724bb568807758bfd056d168922a3bc737c068c3
         <!-- Main Content --> 
             
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </body>
 
@@ -551,5 +791,102 @@
     displayPhilippineTime();
     });
 </script>
+
+<script>
+const commonOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: {
+            labels: {
+                boxWidth: 14
+            }
+        }
+    }
+};
+
+// Monthly Revenue (Line)
+new Chart(document.getElementById('revenueChart'), {
+    type: 'line',
+    data: {
+        labels: ['Jan','Feb','Mar','Apr','May','Jun'],
+        datasets: [{
+            label: 'Revenue (₱)',
+            data: [120000, 150000, 170000, 140000, 190000, 210000],
+            borderColor: '#2563eb',
+            backgroundColor: 'rgba(37,99,235,0.2)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: commonOptions
+});
+
+// Paid vs Unpaid (Doughnut)
+new Chart(document.getElementById('invoiceChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Paid', 'Unpaid'],
+        datasets: [{
+            data: [75, 25],
+            backgroundColor: ['#16a34a', '#dc2626']
+        }]
+    },
+    options: commonOptions
+});
+
+// Payment Methods (Pie)
+new Chart(document.getElementById('paymentMethodChart'), {
+    type: 'pie',
+    data: {
+        labels: ['Cash', 'Bank Transfer', 'Cheque'],
+        datasets: [{
+            data: [40, 45, 15],
+            backgroundColor: ['#0ea5e9', '#6366f1', '#f59e0b']
+        }]
+    },
+    options: commonOptions
+});
+
+// Maintenance Cost (Bar)
+new Chart(document.getElementById('maintenanceChart'), {
+    type: 'bar',
+    data: {
+        labels: ['Jan','Feb','Mar','Apr','May'],
+        datasets: [{
+            label: 'Cost (₱)',
+            data: [30000, 25000, 40000, 20000, 35000],
+            backgroundColor: '#ef4444'
+        }]
+    },
+    options: commonOptions
+});
+
+// Equipment Availability (Semi Gauge)
+new Chart(document.getElementById('availabilityChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Available', 'Unavailable'],
+        datasets: [{
+            data: [85, 15],
+            backgroundColor: ['#22c55e', '#e5e7eb'],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        ...commonOptions,
+        circumference: 180,
+        rotation: 270,
+        cutout: '70%',
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+</script>
+
+
 
 </html>

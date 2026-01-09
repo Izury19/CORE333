@@ -47,7 +47,10 @@
     <!-- Dropdown menu -->
     <ul x-show="open" x-transition
         class="pl-10 mt-2 space-y-1 text-sm font-medium text-white overflow-hidden">
+<<<<<<< HEAD
 
+=======
+>>>>>>> 724bb568807758bfd056d168922a3bc737c068c3
         <li>
             <a href="{{ route ('invoice') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
                 Invoice Creation
