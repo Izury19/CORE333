@@ -8,7 +8,7 @@ use App\Http\Controllers\LandingController;
 use App\Http\Controllers\InvoiceController; // <-- Existing controller (we'll use it for billing_invoices)
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\ContractController;
-use App\Http\Controllers\PaymentController;
+
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\PaymentApiController;
@@ -18,6 +18,8 @@ use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\TechnicianController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\OTPController;
+use App\Http\Controllers\ReportingController;
+use App\Http\Controllers\BillingInvoiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,42 +56,47 @@ Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
 Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
 
 /*
-|--------------------------------------------------------------------------
-| Billing & Invoicing (Views + API)
-|--------------------------------------------------------------------------
-*/
-Route::get('/order', [JobController::class, 'index'])->name('order');
-Route::view('/invoice', 'Billing and Invoicing.invoice')->name('invoice');
-Route::get('/record', [RecordController::class, 'record'])->name('record');
-
-// ✅ Invoice Resource (uses InvoiceController but works with billing_invoices table via model)
-Route::resource('invoices', InvoiceController::class);
-Route::get('/invoice/create', [InvoiceController::class, 'create'])->name('invoice.create');
-Route::post('/invoice/store', [InvoiceController::class, 'store'])->name('invoice.store');
-
 /*
 |--------------------------------------------------------------------------
-| Record & Payment (Views Only)
+| Billing & Invoicing (Cleaned)
 |--------------------------------------------------------------------------
 */
-Route::view('/invoice-tracking', 'Record And Payment.invoice-tracking')->name('invoice-tracking');
-Route::get('/manage-payment', [PaymentController::class, 'index'])->name('manage-payment');
-Route::view('/ledger-viewer', 'Record And Payment.ledger-viewer')->name('ledger-viewer');
-Route::view('/payment-reminders', 'Record And Payment.payment-reminders')->name('payment-reminders');
+// Main billing invoices route (MISSING!)
+Route::get('/billing-invoices', [BillingInvoiceController::class, 'index'])
+    ->name('billing.invoices.index');
 
-// Upload proof of payment (client side)
-Route::get('/payments/{invoiceId}/upload', [PaymentController::class, 'create'])
-    ->name('payments.upload');
-Route::post('/payments/{invoiceId}', [PaymentController::class, 'store'])
-    ->name('payments.upload.store');
+// Demo invoice generation
+Route::post('/billing-invoices/demo', [BillingInvoiceController::class, 'demoStore'])
+    ->name('billing.invoices.demo-store');
 
-// Payment approval/rejection (admin side)
-Route::patch('/payments/{id}/approve', [PaymentController::class, 'markApproved'])
-    ->name('payments.approve');
-Route::patch('/payments/{id}/reject', [PaymentController::class, 'markRejected'])
-    ->name('payments.reject');
-Route::patch('/payments/{id}/cancel', [PaymentController::class, 'markCancelled'])
-    ->name('payments.cancel');
+// Scan duplicates
+Route::post('/billing-invoices/scan', [BillingInvoiceController::class, 'scanDuplicates'])
+    ->name('billing.invoices.scan');
+
+// PDF download
+Route::get('/billing-invoices/{id}/pdf', [BillingInvoiceController::class, 'downloadPdf'])
+    ->name('billing.invoices.pdf');
+
+// Show single invoice
+Route::get('/billing-invoices/{id}', [BillingInvoiceController::class, 'show'])
+    ->name('billing.invoices.show');
+
+// InvoiceController routes (existing)
+Route::resource('invoices', InvoiceController::class)->except(['create', 'edit']);
+Route::patch('/invoices/{id}/status', [InvoiceController::class, 'updateStatus'])->name('invoices.update.status');
+Route::delete('/invoices/{id}', [InvoiceController::class, 'destroy'])->name('invoices.destroy');
+
+    
+/*
+|--------------------------------------------------------------------------
+| Record & Payment Management
+|--------------------------------------------------------------------------
+*/
+
+
+// Record & Payment Routes
+Route::get('/record-payment', [RecordController::class, 'index'])->name('record.index');
+Route::post('/record-payment', [RecordController::class, 'store'])->name('record.store');
 
 /*
 |--------------------------------------------------------------------------
@@ -107,10 +114,16 @@ Route::post('/technicians/{technician}/upload-image', [TechnicianController::cla
 | Contract & Permit (Views Only)
 |--------------------------------------------------------------------------
 */
-Route::view('/make-contract', 'Contract and Permit.make-contract')->name('make-contract');
-Route::view('/manage-permits', 'Contract and Permit.manage-permits')->name('manage-permits');
-Route::view('/renewal-req', 'Contract and Permit.renewal-req')->name('renewal-req');
-Route::view('/expiry-notif', 'Contract and Permit.expiry-notif')->name('expiry-notif');
+// Contract Management Routes
+Route::get('/contract-management', [ContractController::class, 'index'])->name('contract.management');
+// Dapat nasa taas ng file: use statement
+
+// Contract Management Routes
+Route::get('/contract-management', [ContractController::class, 'index'])->name('contract.management');
+Route::post('/contract-management', [ContractController::class, 'store'])->name('contracts.store');
+Route::get('/contract-management/{id}', [ContractController::class, 'show'])->name('contracts.show'); // ✅ ADD THIS
+Route::get('/contract-management/{id}/pdf', [ContractController::class, 'exportPdf'])->name('contracts.pdf');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -118,9 +131,8 @@ Route::view('/expiry-notif', 'Contract and Permit.expiry-notif')->name('expiry-n
 |--------------------------------------------------------------------------
 */
 Route::view('/financial-report', 'Reporting and Analytics.financial-report')->name('financial-report');
-Route::view('/maintenance-report', 'Reporting and Analytics.maintenance-report')->name('maintenance-report');
-Route::view('/contractpermit-report', 'Reporting and Analytics.contractpermit-report')->name('contractpermit-report');
-Route::view('/ai-report', 'Reporting and Analytics.ai-report')->name('ai-report');
+Route::get('/reporting-analytics', [ReportingController::class, 'index'])->name('reporting.analytics');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -130,7 +142,6 @@ Route::view('/ai-report', 'Reporting and Analytics.ai-report')->name('ai-report'
 Route::get('/delivery', [InvoiceController::class, 'delivery'])->name('delivery');
 Route::post('/invoices/{id}/generate-receipt', [RecordController::class, 'generateReceipt'])
     ->name('invoices.generateReceipt');
-Route::get('/record', [RecordController::class, 'index'])->name('record');
 Route::resource('receipts', ReceiptController::class);
 
 /*
@@ -161,8 +172,6 @@ Route::post('/make-contract', [ContractController::class, 'store'])->name('contr
 | Payments
 |--------------------------------------------------------------------------
 */
-Route::resource('payments', PaymentController::class);
-Route::post('payments/{id}/mark-paid', [PaymentController::class, 'markPaid'])->name('payments.markPaid');
 
 Route::prefix('dashboard/payments')->as('dashboard.payments.')->group(function () {
     Route::get('/', [PaymentApiController::class, 'index'])->name('index');
@@ -210,8 +219,16 @@ Route::prefix('billing-invoices')->name('billing.invoices.')->middleware('auth')
     Route::get('/{id}', [BillingInvoiceController::class, 'show'])->name('show');
 });
 
-Route::patch('/invoices/{id}/status', [InvoiceController::class, 'updateStatus'])->name('invoices.update.status');
-Route::get('/invoices/{id}/pdf', [InvoiceController::class, 'exportPdf'])->name('invoices.pdf');
-// Sa routes/web.php
-Route::delete('/invoices/{id}', [InvoiceController::class, 'destroy'])->name('invoices.destroy');
-Route::resource('invoices', InvoiceController::class);
+
+
+
+Route::get('/test-db', function() {
+    try {
+        $records = \DB::table('records')->count();
+        return "Connected! Found {$records} records.";
+    } catch (\Exception $e) {
+        return "Error: " . $e->getMessage();
+    }
+});
+
+

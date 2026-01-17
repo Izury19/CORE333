@@ -1,0 +1,346 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="p-6 max-w-7xl mx-auto">
+    <!-- Header -->
+<div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900">Record & Payment Management</h1>
+        <p class="text-gray-600 mt-1">Central hub for issued bills and payment tracking</p>
+    </div>
+    <div class="mt-4 md:mt-0 flex space-x-3">
+        @php
+            $paymentCount = isset($payments) ? $payments->count() : 0;
+        @endphp
+        <div class="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm font-medium">
+            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+            </svg>
+            {{ $paymentCount }} Transactions
+        </div>
+        
+        <!-- Record Payment Button -->
+        <button type="button" onclick="openRecordPaymentModal()"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium">
+            + Record Payment
+        </button>
+    </div>
+</div>
+
+    <!-- Summary Cards - CLIENT REVENUE ONLY -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <!-- Total Revenue Received -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-2">Total Revenue Received</h3>
+                    <p class="text-2xl font-bold text-gray-900">₱{{ number_format($totalReceived ?? 0, 2) }}</p>
+                    <p class="text-xs text-green-600 mt-1">From crane and truck rental services</p>
+                </div>
+                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+        
+     <!-- Net Cash Flow -->
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h3 class="text-sm font-medium text-gray-500 mb-2">Payment Collection Rate</h3>
+            <p class="text-2xl font-bold text-gray-900">
+                {{ $collectionRate ?? 0 }}%
+            </p>
+            <p class="text-xs text-gray-600 mt-1">
+                Of issued bills collected
+            </p>
+        </div>
+        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+        </div>
+    </div>
+</div>
+</div>  
+
+    <!-- Compact Filters -->
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+    <form id="filterForm" method="GET" class="flex flex-col sm:flex-row gap-3">
+        <!-- Search -->
+        <div class="flex-1">
+            <input type="text" name="search" value="{{ request('search') }}" 
+                   placeholder="Search by client, invoice ID..."
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                   onkeyup="applyFilters()">
+        </div>
+        
+        <!-- Status Filter -->
+        <div class="sm:w-48">
+            <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-lg" onchange="applyFilters()">
+                <option value="">All Status</option>
+                <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
+            </select>
+        </div>
+        
+        <!-- Date Range -->
+        <div class="sm:w-48">
+            <input type="date" name="start_date" value="{{ request('start_date') }}" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg" onchange="applyFilters()">
+        </div>
+        
+        <div class="sm:w-48">
+            <input type="date" name="end_date" value="{{ request('end_date') }}" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg" onchange="applyFilters()">
+        </div>
+        
+        <!-- Export Buttons -->
+        <div class="flex gap-2">
+            <button type="button" class="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm">
+                Excel
+            </button>
+            <button type="button" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm">
+                PDF
+            </button>
+        </div>
+    </form>
+</div>
+    <!-- PAYMENT TRANSACTIONS TABLE - CLIENT REVENUE ONLY -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Issued Bills & Payment Status</h2>
+            <p class="text-sm text-gray-600 mt-1">All invoices sent from Billing & Invoicing Module with payment status</p>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                            onclick="sortTable('invoice_id')">
+                            Invoice ID
+                            @if(request('sort_by') == 'invoice_id')
+                                <span class="ml-1">{{ request('sort_order') == 'asc' ? '↑' : '↓' }}</span>
+                            @endif
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                            onclick="sortTable('client_name')">
+                            Client
+                            @if(request('sort_by') == 'client_name')
+                                <span class="ml-1">{{ request('sort_order') == 'asc' ? '↑' : '↓' }}</span>
+                            @endif
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Equipment</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                            onclick="sortTable('total_amount')">
+                            Amount
+                            @if(request('sort_by') == 'total_amount')
+                                <span class="ml-1">{{ request('sort_order') == 'asc' ? '↑' : '↓' }}</span>
+                            @endif
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reference No.</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                            onclick="sortTable('payment_date')">
+                            Date
+                            @if(request('sort_by') == 'payment_date')
+                                <span class="ml-1">{{ request('sort_order') == 'asc' ? '↑' : '↓' }}</span>
+                            @endif
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @php
+                        $payments = $payments ?? collect();
+                    @endphp
+                    
+                    @forelse($payments as $payment)
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {{ $payment->invoice_id }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {{ $payment->client_name }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {{ ucfirst(str_replace('_', ' ', $payment->equipment_type ?? 'N/A')) }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            @if($payment->payment_status === null)
+                                <span class="text-gray-500">₱{{ number_format($payment->total_amount, 2) }} (Pending)</span>
+                            @else
+                                <span class="text-green-600">₱{{ number_format($payment->amount_paid, 2) }}</span>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+    @if($payment->payment_status === null)
+        <span class="text-gray-500">Not Paid Yet</span>
+    @elseif($payment->payment_method == 'bank')
+        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Bank Transfer
+    @elseif($payment->payment_method == 'check')
+        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        Check
+    @elseif($payment->payment_method == 'gcash')
+        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        GCash
+    @elseif($payment->payment_method == 'cash')
+        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Cash
+    @else
+        <span class="text-gray-500">Not Paid Yet</span>
+        
+    @endif
+</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {{ $payment->reference_number ?? '—' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            @if($payment->payment_date)
+                                {{ \Carbon\Carbon::parse($payment->payment_date)->format('Y-m-d') }}
+                            @else
+                                —
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            @if($payment->payment_status === null)
+                                <span class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                    Pending Payment
+                                </span>
+                            @else
+                                <span class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full bg-green-100 text-green-800">
+                                    Completed
+                                </span>
+                            @endif
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="8" class="px-6 py-12 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900">No issued bills yet</h3>
+                            <p class="mt-1 text-sm text-gray-500">Issued bills will be automatically synced from Billing & Invoicing Module</p>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+                
+            </table>
+        </div>
+    </div>
+    
+    
+</div>
+
+<!-- Record Payment Modal -->
+<div id="recordPaymentModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-6 w-full max-w-2xl mx-4">
+        <h3 class="text-lg font-bold mb-4">Record Client Payment</h3>
+        <form action="{{ route('record.store') }}" method="POST">
+            @csrf
+            <div class="mb-4">
+                <label class="block text-sm text-gray-700 mb-2">Select Invoice</label>
+                <select name="invoice_id" required class="w-full px-3 py-2 border rounded" id="invoiceSelect">
+                    <option value="">Choose an unpaid invoice</option>
+                   @foreach(($unpaidInvoices ?? collect()) as $invoice)
+                        <option value="{{ $invoice->id }}" data-amount="{{ $invoice->total_amount }}">
+                            {{ $invoice->id }} - {{ $invoice->client_name }} 
+                            (₱{{ number_format($invoice->total_amount, 2) }})
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm text-gray-700 mb-2">Payment Mode</label>
+                    <select name="payment_mode" required class="w-full px-3 py-2 border rounded">
+                         <option value="">Select payment method</option>
+                        <option value="cash">Cash</option>
+                        <option value="bank">Bank Transfer</option>
+                        <option value="gcash">GCash</option>
+                        <option value="check">Check</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-700 mb-2">Amount</label>
+                    <input type="number" name="amount_paid" step="0.01" min="0" readonly
+                           id="paymentAmount"
+                           class="w-full px-3 py-2 border rounded bg-gray-100">
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm text-gray-700 mb-2">Reference Number</label>
+                <input type="text" name="reference_number" required
+                       placeholder="OR Number, Check #, or Transaction ID"
+                       class="w-full px-3 py-2 border rounded">
+            </div>
+            
+            <div class="flex justify-end space-x-2">
+                <button type="button" onclick="closeRecordPaymentModal()" 
+                        class="px-4 py-2 text-gray-600">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded">
+                    Record Payment
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openRecordPaymentModal() {
+    document.getElementById('recordPaymentModal').classList.remove('hidden');
+}
+
+function closeRecordPaymentModal() {
+    document.getElementById('recordPaymentModal').classList.add('hidden');
+}
+
+// Auto-fill amount when invoice is selected
+document.getElementById('invoiceSelect').addEventListener('change', function() {
+    const invoiceId = this.value;
+    if (invoiceId) {
+        const selectedOption = this.options[this.selectedIndex];
+        const amount = selectedOption.getAttribute('data-amount');
+        document.getElementById('paymentAmount').value = amount;
+    } else {
+        document.getElementById('paymentAmount').value = '';
+    }
+});
+
+// Live search and filtering
+function applyFilters() {
+    document.getElementById('filterForm').submit();
+}
+
+// Sorting
+function sortTable(column) {
+    const currentSortBy = '{{ request("sort_by") }}';
+    const currentSortOrder = '{{ request("sort_order") }}';
+    let newSortOrder = 'asc';
+    
+    if (currentSortBy === column && currentSortOrder === 'asc') {
+        newSortOrder = 'desc';
+    }
+    
+    const url = new URL(window.location);
+    url.searchParams.set('sort_by', column);
+    url.searchParams.set('sort_order', newSortOrder);
+    window.location.href = url.toString();
+}
+</script>
+@endsection

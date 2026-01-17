@@ -47,19 +47,13 @@
     <!-- Dropdown menu -->
     <ul x-show="open" x-transition
         class="pl-10 mt-2 space-y-1 text-sm font-medium text-white overflow-hidden">
-<<<<<<< HEAD
 
-=======
->>>>>>> 724bb568807758bfd056d168922a3bc737c068c3
-        <li>
-            <a href="{{ route ('invoice') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
-                Invoice Creation
-            </a>
-        </li>
-       <li class="mb-2">
-    <a href="{{ route('invoices.index') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
-        View Invoices
-    </a>
+         <li>
+                <a href="{{ route('invoices.index') }}" class="flex items-center p-3 rounded-lg hover:bg-blue-900 transition">
+                    <img src="{{ asset('svg/billing.svg') }}" alt="Billing Icon" class="w-6 h-6 mr-3">
+                    <span class="ml-4">Billing and Invoicing</span>
+                </a>
+            </li>
 </li>
        
     </ul>
@@ -67,38 +61,14 @@
 
            <li x-data="{ open: false }" class="relative">
   <!-- Parent button -->
-  <button @click="open = !open" 
-    class="flex items-center w-full p-3 rounded-lg hover:bg-blue-900 transition focus:outline-none select-none">
+  <!-- SIMPLE BUTTON (NO DROPDOWN) -->
+<li>
+  <a href="{{ route('record.index') }}" class="flex items-center p-3 rounded-lg hover:bg-blue-900 transition">
     <img src="{{ asset('svg/record.svg') }}" alt="Record Icon" class="w-4 h-4 mr-3" />
-    <span class="ml-4 flex-1 min-w-0 break-words whitespace-normal">
-        Record and Payment Management
-    </span>
-
-    <svg :class="{ 'rotate-180': open }" class="w-4 h-4 ml-auto transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-    </svg>
-  </button>
-
-  <!-- Dropdown menu -->
-  <ul x-show="open" x-transition
-      class="pl-10 mt-2 space-y-1 text-sm font-medium text-white overflow-hidden">
-    <li>
-      <a href="{{ route('manage-payment') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
-        Manage Payments
-      </a>
-    </li>
-    <li>
-      <a href="{{ route('ledger-viewer') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
-        Payment History
-      </a>
-    </li>
-    <li>
-      <a href="{{ route('payment-reminders') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
-        Payment Reminders
-      </a>
-    </li>
-  </ul>
+    <span class="ml-4">Record and Payment Management</span>
+  </a>
 </li>
+
 
             <li x-data="{ open: false }" class="relative">
   <!-- Parent button -->

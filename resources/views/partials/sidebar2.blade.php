@@ -1,32 +1,8 @@
-<style>
-/* Scrollbar hide - cross-browser */
-.scrollbar-hide::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
-}
-.scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;     /* Firefox */
-}
-#logo-sidebar a[role="link"] {
-    text-decoration: none !important;
-}
-#logo-sidebar a {
-    text-decoration: none !important;
-}
- 
-</style>
-
-<!-- Sidebar -->
+<!-- side bar -->
 <aside id="logo-sidebar"
     class="fixed top-0 left-0 z-40 w-72 h-screen pt-20 transition-transform -translate-x-full lg:translate-x-0 bg-black shadow-xl"
-    aria-label="Sidebar" 
-    role="navigation" 
-    aria-expanded="false"
-    x-data="{ open: false }"
-    :class="open ? 'translate-x-0' : '-translate-x-full'"
-    @toggle-sidebar.window="open = !open"
->
-    <div class="h-full px-6 pb-6 overflow-y-auto scrollbar-hide bg-black">
+    aria-label="Sidebar">
+    <div class="h-full px-6 pb-6 overflow-y-auto bg-black">
 
         <!-- Title -->
         <div class="flex justify-center items-center mb-8">
@@ -35,125 +11,92 @@
             </h1>
         </div>
 
-        <!-- Sidebar toggle button -->
+        <!-- Toggle Button (same style as sidebar.blade.php) -->
         <button id="toggleSidebar"
-    style="width: 40px; height: 40px; border-radius: 9999px;"
-    class="absolute -right-6 top-1/2 transform -translate-y-1/2 bg-black text-white flex justify-center items-center shadow hover:bg-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-    aria-label="Toggle Sidebar"
-    @click="$dispatch('toggle-sidebar')"
->
-    <svg id="arrowIcon"
-        class="w-5 h-5 transition-transform transform"
-        :class="{ 'rotate-180': open }"
-        fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"
-    >
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-    </svg>
-</button>
-
+            class="absolute -right-5 top-1/2 transform -translate-y-1/2 bg-black text-white rounded-full p-2 shadow hover:bg-black transition z-50">
+            <svg id="arrowIcon" class="w-5 h-5 transition-transform transform rotate-0" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
 
         <!-- Navigation Links -->
-        <nav aria-label="Primary" class="space-y-3 text-white text-sm font-semibold">
-            <a href="{{ route('dashboard') }}" style="color: white;" class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-900 transition focus:outline-none" role="link"> 
-                <img src="{{ asset('svg/dashboard.svg') }}" alt="" class="w-6 h-6 mr-3" aria-hidden="true">
-                <span class="flex-grow text-left whitespace-normal break-words">Dashboard</span>
-            </a>
+        <ul class="space-y-2 text-sm font-medium text-white">
+            <!-- Dashboard -->
+            <li>
+                <a href="{{ route('dashboard') }}" class="flex items-center p-3 rounded-lg hover:bg-blue-900 transition">
+                    <img src="{{ asset('svg/dashboard.svg') }}"
+                        alt="Dashboard Icon"
+                        class="w-6 h-6 mr-3">
+                    <span class="ml-4">Dashboard</span>
+                </a>
+            </li>
 
-            <!-- Dropdown Items -->
-            @php
-                $menus = [
-                    [
-                        'title' => 'Billing and Invoicing',
-                        'icon' => 'billing.svg',
-                        'routes' => [
-<<<<<<< HEAD
-        
-=======
->>>>>>> 724bb568807758bfd056d168922a3bc737c068c3
-                            ['name' => 'invoice', 'label' => 'Invoice Creation'],
-                            
-                        ],
-                    ],
-                    [
-                        'title' => 'Record and Payment Management',
-                        'icon' => 'record.svg',
-                        'routes' => [
-                            ['name' => 'manage-payment', 'label' => 'Manage Payments'],
-                            ['name' => 'ledger-viewer', 'label' => 'Payment History'],
-                            ['name' => 'payment-reminders', 'label' => 'Payment Reminders'],
-                        ],
-                    ],
-                    [
-                        'title' => 'Schedule Preventive Maintenance',
-                        'icon' => 'schedule.svg',
-                        'routes' => [
-                            ['name' => 'maintenance-sched', 'label' => 'Maintenance Schedule'],
-                            ['name' => 'maintenance-notif', 'label' => 'Maintenance Notifications'],
-                            ['name' => 'maintenance-history', 'label' => 'Maintenance History Log'],
-                        ],
-                    ],
-                    [
-                        'title' => 'Contract and Permit Management',
-                        'icon' => 'contract.svg',
-                        'routes' => [
-                            ['name' => 'make-contract', 'label' => 'Make Contracts'],
-                            ['name' => 'manage-permits', 'label' => 'Manage Permits'],
-                            ['name' => 'renewal-req', 'label' => 'Contract Renewal Requests'],
-                            ['name' => 'expiry-notif', 'label' => 'Contract Expiry Notifications'],
-                        ],
-                    ],
-                    [
-                        'title' => 'Reporting and Analytics',
-                        'icon' => 'reporting.svg',
-                        'routes' => [
-                            ['name' => 'financial-report', 'label' => 'Billing Summary Report'],
-                            ['name' => 'maintenance-report', 'label' => 'Maintenance Reports'],
-                            ['name' => 'contractpermit-report', 'label' => 'Contract & Permit Reports'],
-                            ['name' => 'ai-report', 'label' => 'AI-Powered Predictive Analytics'],
-                        ],
-                    ],
-                ];
-            @endphp
+            <!-- Billing and Invoicing (Simple Link) -->
+            <li>
+                <a href="{{ route('invoices.index') }}" class="flex items-center p-3 rounded-lg hover:bg-blue-900 transition">
+                    <img src="{{ asset('svg/billing.svg') }}" alt="Billing Icon" class="w-6 h-6 mr-3">
+                    <span class="ml-4">Billing and Invoicing</span>
+                </a>
+            </li>
 
-            @foreach ($menus as $menu)
-                <li x-data="{ open: false }" class="relative list-none">
-                    <button @click="open = !open" 
-                        class="flex items-center w-full px-4 py-3 rounded-lg hover:bg-blue-900 transition focus:outline-none select-none"
-                        aria-expanded="false"
-                        :aria-expanded="open.toString()"
-                        aria-controls="{{ \Illuminate\Support\Str::slug($menu['title']) }}-submenu"
-                    >
-                        <img src="{{ asset('svg/' . $menu['icon']) }}" alt="" class="w-6 h-6 mr-3" aria-hidden="true">
-                        <span class="flex-grow text-left whitespace-normal break-words">{{ $menu['title'] }}</span>
-                        <svg :class="{ 'rotate-180': open }" class="w-5 h-5 ml-auto transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-                    <ul
-    x-show="open"
-    x-transition:enter="transition ease-out duration-200"
-    x-transition:enter-start="opacity-0 max-h-0"
-    x-transition:enter-end="opacity-100 max-h-screen"
-    x-transition:leave="transition ease-in duration-150"
-    x-transition:leave-start="opacity-100 max-h-screen"
-    x-transition:leave-end="opacity-0 max-h-0"
-    id="{{ \Illuminate\Support\Str::slug($menu['title']) }}-submenu"
-    class="pl-14 mt-1 space-y-1 text-sm font-medium text-white overflow-hidden"
->
-    @foreach ($menu['routes'] as $item)
-        <li>
-            <a href="{{ route($item['name']) }}" 
-                class="block p-2 rounded-lg text-white hover:bg-blue-800 hover:text-white transition"
-            >
-                {{ $item['label'] }}
-            </a>
-        </li>
-    @endforeach
-</ul>
+            <!-- Record and Payment (Simple Link) -->
+            <li>
+    <a href="{{ route('record.index') }}" class="flex items-center p-3 rounded-lg hover:bg-blue-900 transition">
+        <img src="{{ asset('svg/record.svg') }}" alt="Record Icon" class="w-6 h-6 mr-3" />
+        <span class="ml-4">Record and Payment Management</span>
+    </a>
+</li>
 
-                </li>
-            @endforeach
-        </nav>
+            <!-- Schedule Preventive Maintenance -->
+            <li x-data="{ open: false }" class="relative">
+                <button @click="open = !open"
+                    class="flex items-center w-full p-3 rounded-lg hover:bg-blue-900 transition focus:outline-none select-none">
+                    <img src="{{ asset('svg/schedule.svg') }}" alt="Schedule Icon" class="w-6 h-6 mr-3" />
+                    <span class="ml-4 flex-1 min-w-0 break-words whitespace-normal">
+                        Schedule Preventive Maintenance
+                    </span>
+                    <svg :class="{ 'rotate-180': open }" class="w-5 h-5 ml-auto transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <ul x-show="open" x-transition
+                    class="pl-10 mt-2 space-y-1 text-sm font-medium text-white overflow-hidden">
+                    <li>
+                        <a href="{{ route('maintenance-sched') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
+                            Maintenance Schedule
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('maintenance-notif') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
+                            Maintenance Notifications
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('maintenance-history') }}" class="block p-2 rounded-lg hover:bg-blue-800 transition">
+                            Maintenance History Log
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Contract and Permit Management -->
+                 <li>
+                <a href="{{ route('contract.management') }}" class="flex items-center p-3 rounded-lg hover:bg-blue-900 transition">
+                    <img src="{{ asset('svg/contract.svg') }}" alt="Record Icon" class="w-6 h-6 mr-3" />
+                    <span class="ml-4">Contract and Permit Management</span>
+                </a>
+            </li>
+
+            <!-- Reporting and Analytics -->
+         <li>
+                <a href="{{ route('financial-report') }}" class="flex items-center p-3 rounded-lg hover:bg-blue-900 transition">
+                    <img src="{{ asset('svg/reporting.svg') }}" alt="Record Icon" class="w-6 h-6 mr-3" />
+                    <span class="ml-4">Reporting and Analytics</span>
+                </a>
+            </li>
+        </ul>
     </div>
 </aside>
-<!-- End Sidebar -->
+<!-- side bar -->
+

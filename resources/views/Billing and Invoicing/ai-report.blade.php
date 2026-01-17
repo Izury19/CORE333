@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('sidebar2
 @section('content')
 <div class="p-6">
     <h2 class="text-xl font-bold mb-4">AI-Powered Billing Insights</h2>

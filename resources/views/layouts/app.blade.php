@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
+  
   <title>{{ $title ?? 'Cali Tests' }}</title>
   <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
 
@@ -14,16 +14,15 @@
 
   @stack('styles')
 </head>
-<body x-data="{ sidebarOpen: false }">
-  
+<body class="bg-gray-50">
   {{-- Navbar --}}
   @include('partials.navbar')
 
   {{-- Sidebar --}}
-  @include('partials.sidebar')
+  @include('partials.sidebar2')
 
   {{-- Page Content --}}
-  <div class="p-4 sm:ml-64">
+  <div class="p-4 sm:ml-72 min-h-screen pb-16">
     <div class="p-4 mt-14">
       {{-- Flash Message --}}
      {{-- @if (session('success'))
@@ -87,6 +86,5 @@
   </script>
 
   @stack('scripts')
-
 </body>
 </html>

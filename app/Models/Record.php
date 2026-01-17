@@ -2,29 +2,35 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Record extends Model
 {
+    use HasFactory;
+
+    // Set the correct primary key
     protected $primaryKey = 'record_id';
+
+    // If your primary key is not auto-incrementing, set this to false
+    public $incrementing = true;
+
+    // If your primary key is not integer, set this accordingly
+    protected $keyType = 'int';
 
     protected $fillable = [
         'invoice_id',
+        'payment_uid',
+        'payment_type',
         'client_name',
-        'client_email',
-        'client_address',
         'total',
         'payment_method',
-        'status',
+        'reference_number',
+        'status'
     ];
-
-    public function items()
-    {
-        return $this->hasMany(RecordItem::class, 'record_id', 'record_id');
-    }
 
     public function invoice()
     {
-        return $this->belongsTo(Invoice::class, 'invoice_id', 'invoice_id');
+        return $this->belongsTo(BillingInvoice::class, 'invoice_id');
     }
 }

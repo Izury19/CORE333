@@ -7,9 +7,15 @@ use Illuminate\Http\Request;
 
 class ContractController extends Controller
 {
+
+public function index()
+{
+    $contracts = Contract::latest()->get();
+    return view('contract and permit.contract-management', compact('contracts'));
+}
     public function create()
     {
-        return view('Contract and Permit.make-contract');
+        return view('contract and permit.make-contract');
     }
 
     public function store(Request $request)

@@ -1,116 +1,293 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="p-6">
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl font-bold">Invoices</h2>
-        <a href="{{ route('invoice.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            + New Invoice
-        </a>
+<div class="p-6 max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Billing & Invoicing</h1>
+            <p class="text-gray-600 mt-1">Auto-generated invoices with AI-powered intelligent billing</p>
+        </div>
+        <div class="mt-4 md:mt-0 flex space-x-3">
+            @php
+                $invoiceCount = isset($invoices) ? $invoices->count() : 0;
+            @endphp
+            <div class="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-medium">
+                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                </svg>
+                {{ $invoiceCount }} Total Invoices
+            </div>
+            
+            <!-- SCAN BUTTON FOR AI ANALYSIS -->
+            <form action="{{ route('billing.invoices.scan') }}" method="POST" class="inline">
+                @csrf
+                <button type="submit" 
+                        class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium">
+                    🔍 Scan for Duplicates
+                </button>
+            </form>
+            
+            <!-- DEMO BUTTON FOR INTEGRATION DEMONSTRATION -->
+            <button type="button" onclick="openGenerateInvoiceModal()"
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium">
+                + Generate Invoice (Demo)
+            </button>
+        </div>
     </div>
 
     @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-            {{ session('success') }}
+        <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center">
+            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+            <span class="text-green-800">{{ session('success') }}</span>
         </div>
     @endif
 
-    <div class="bg-white rounded shadow overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-4 py-2 text-left">Invoice UID</th>
-                    <th class="px-4 py-2 text-left">Client</th>
-                    <th class="px-4 py-2 text-left">Amount</th>
-                    <th class="px-4 py-2 text-left">Status</th>
-                    <th class="px-4 py-2 text-left">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-                @foreach($invoices as $inv)
-                <tr>
-                    <td class="px-4 py-2 font-mono">{{ $inv->invoice_uid }}</td>
-                    <td class="px-4 py-2">{{ $inv->client_name }}</td>
-                    <td class="px-4 py-2">₱{{ number_format($inv->total_amount, 2) }}</td>
-                    <td class="px-4 py-2">
-                        @if($inv->status == 'paid')
-                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">Paid</span>
-                        @elseif($inv->status == 'overdue')
-                            <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">Overdue</span>
-                        @else
-                            <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">Issued</span>
-                        @endif
-                    </td>
-                    <td class="px-4 py-2">
-                        <div class="flex gap-2 items-center">
-                            <!-- View Button -->
-                            <a href="{{ route('invoices.show', $inv->id) }}" class="text-blue-600 hover:text-blue-800 text-sm">
-                                👁️ View
-                            </a>
+    @if(session('errors'))
+        <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center">
+            <svg class="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+            <span class="text-red-800">{{ session('errors')->first() }}</span>
+        </div>
+    @endif
 
-                            <!-- Delete Button (only if not paid) -->
-                            @if($inv->status !== 'paid')
-                                <form action="{{ route('invoices.destroy', $inv->id) }}" method="POST" onsubmit="return confirm('Delete this invoice?')" style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-800 text-sm">
-                                        🗑️ Delete
-                                    </button>
-                                </form>
-                            @endif
-
-                            <!-- Status Menu Trigger & Content (only if not paid) -->
-                            @if($inv->status !== 'paid')
-                                <div class="relative">
-                                    <button onclick="toggleMenu({{ $inv->id }})" class="text-gray-600 hover:text-gray-900">⋮</button>
-                                    <div id="menu-{{ $inv->id }}" class="absolute right-0 z-10 hidden bg-white border rounded shadow-lg py-1 w-36 mt-1">
-                                        @if($inv->status !== 'issued')
-                                            <form method="POST" action="{{ route('invoices.update.status', $inv->id) }}">
-                                                @csrf @method('PATCH')
-                                                <input type="hidden" name="status" value="issued">
-                                                <button type="submit" class="block w-full text-left px-4 py-1 hover:bg-gray-100 text-sm">Set as Issued</button>
-                                            </form>
-                                        @endif
-                                        @if($inv->status !== 'paid')
-                                            <form method="POST" action="{{ route('invoices.update.status', $inv->id) }}">
-                                                @csrf @method('PATCH')
-                                                <input type="hidden" name="status" value="paid">
-                                                <button type="submit" class="block w-full text-left px-4 py-1 hover:bg-gray-100 text-sm">Mark as Paid</button>
-                                            </form>
-                                        @endif
-                                        @if($inv->status !== 'overdue')
-                                            <form method="POST" action="{{ route('invoices.update.status', $inv->id) }}">
-                                                @csrf @method('PATCH')
-                                                <input type="hidden" name="status" value="overdue">
-                                                <button type="submit" class="block w-full text-left px-4 py-1 hover:bg-gray-100 text-sm">Set as Overdue</button>
-                                            </form>
-                                        @endif
-                                    </div>
-                                </div>
-                            @endif
+    <!-- AI INTELLIGENT BILLING DASHBOARD -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
+        <div class="px-6 py-5 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                AI-Powered Intelligent Billing
+            </h2>
+            <p class="text-sm text-gray-600 mt-1">AI features focused on billing accuracy and duplicate prevention</p>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Duplicate Detection AI -->
+                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
                         </div>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+                        <h3 class="ml-3 font-medium text-gray-900">Duplicate AI</h3>
+                    </div>
+                    <p class="text-sm text-gray-600">
+                        Duplicate alerts:<br>
+                        <span class="font-bold text-yellow-700">{{ $aiPredictions['duplicate_alerts'] ?? 0 }}</span> potential duplicates<br>
+                        <span class="text-xs text-gray-500">Last 7 days monitoring</span>
+                    </p>
+                </div>
+                
+                <!-- Rate Validation AI -->
+                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7l4-4m0 0l4 4m-4-4v18m0 0l-4-4m4 4l4-4" />
+                            </svg>
+                        </div>
+                        <h3 class="ml-3 font-medium text-gray-900">Rate AI</h3>
+                    </div>
+                    <p class="text-sm text-gray-600">
+                        Recommended rate:<br>
+                        <span class="font-bold text-blue-700">{{ $aiPredictions['recommended_rate'] ?? '₱1,800/hr' }}</span><br>
+                        <span class="text-xs text-gray-500">Based on equipment type</span>
+                    </p>
+                </div>
+                
+                <!-- Invoice Verification AI -->
+                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="ml-3 font-medium text-gray-900">Verification AI</h3>
+                    </div>
+                    <p class="text-sm text-gray-600">
+                        Invoices verified:<br>
+                        <span class="font-bold text-green-700">{{ $aiPredictions['verified_invoices'] ?? 0 }}</span> clean invoices<br>
+                        <span class="text-xs text-gray-500">AI-verified status</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        @if($invoices->isEmpty())
-            <p class="text-gray-500 text-center py-4">No invoices yet.</p>
-        @endif
+    <!-- AUTO-GENERATED INVOICES -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Auto-Generated Invoices
+            </h2>
+            <p class="text-sm text-gray-600 mt-1">Invoices automatically generated from completed job orders</p>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ref #</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Job Order</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Equipment</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Period</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">AI Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @php
+                        $invoices = $invoices ?? collect();
+                    @endphp
+                    
+                    @forelse($invoices as $invoice)
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {{ $invoice->invoice_uid ?? 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            @if($invoice->job_order_id ?? null)
+                                JO-{{ str_pad($invoice->job_order_id, 4, '0', STR_PAD_LEFT) }}
+                            @else
+                                N/A
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {{ $invoice->client_name ?? 'Unknown Client' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {{ ucfirst(str_replace('_', ' ', $invoice->equipment_type ?? 'N/A')) }}<br>
+                            <span class="text-xs text-gray-500">{{ $invoice->equipment_id ?? 'No ID' }}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            @if($invoice->billing_period_start && $invoice->billing_period_end)
+                                {{ \Carbon\Carbon::parse($invoice->billing_period_start)->format('M d') }} -<br>
+                                {{ \Carbon\Carbon::parse($invoice->billing_period_end)->format('M d, Y') }}
+                            @else
+                                N/A
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            ₱{{ number_format($invoice->total_amount ?? 0, 2) }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @php
+                                $status = $invoice->status ?? 'unknown';
+                            @endphp
+                            @if($status == 'billed' || $status == 'issued')
+                                <span class="px-2.5 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                    Issued
+                                </span>
+                            @elseif($status == 'paid')
+                                <span class="px-2.5 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-green-100 text-green-800">
+                                    Paid
+                                </span>
+                            @else
+                                <span class="px-2.5 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                    {{ ucfirst($status) }}
+                                </span>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @if($invoice->ai_duplicate_flag ?? false)
+                                <span class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full bg-red-100 text-red-800">
+                                    ⚠️ Review Needed
+                                </span>
+                            @else
+                                <span class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full bg-green-100 text-green-800">
+                                    ✅ Verified
+                                </span>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex space-x-2">
+                                <a href="{{ route('billing.invoices.show', $invoice->id) }}" 
+                                   class="text-blue-600 hover:text-blue-900 p-1.5 rounded-md hover:bg-blue-50 transition"
+                                   title="View Invoice">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </a>
+                                
+                                @if(isset($invoice->id))
+                                    <a href="{{ route('billing.invoices.pdf', $invoice->id) }}" 
+                                       target="_blank"
+                                       class="text-green-600 hover:text-green-900 p-1.5 rounded-md hover:bg-green-50 transition"
+                                       title="Download PDF">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                        </svg>
+                                    </a>
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="9" class="px-6 py-12 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900">No invoices generated yet</h3>
+                            <p class="mt-1 text-sm text-gray-500">Invoices will be auto-generated when job orders are completed.</p>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Demo Invoice Generation Modal -->
+<div id="invoiceModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+        <h3 class="text-lg font-bold mb-4">Generate Demo Invoice</h3>
+        <form action="{{ route('billing.invoices.demo-store') }}" method="POST">
+            @csrf
+            <div class="mb-3">
+                <label class="block text-sm text-gray-700">Client Name</label>
+                <input type="text" name="client_name" value="ABC Construction" required class="w-full px-3 py-2 border rounded">
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm text-gray-700">Equipment Type</label>
+                <select name="equipment_type" required class="w-full px-3 py-2 border rounded">
+                    <option value="crane">Crane</option>
+                    <option value="truck">Truck</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm text-gray-700">Hours Used</label>
+                <input type="number" name="hours_used" value="8" min="1" required class="w-full px-3 py-2 border rounded">
+            </div>
+            <div class="flex justify-end space-x-2">
+                <button type="button" onclick="closeModal()" class="px-4 py-2 text-gray-600">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded">Generate</button>
+            </div>
+        </form>
     </div>
 </div>
 
 <script>
-function toggleMenu(id) {
-    document.querySelectorAll('[id^="menu-"]').forEach(el => el.classList.add('hidden'));
-    document.getElementById('menu-' + id).classList.toggle('hidden');
+function openGenerateInvoiceModal() {
+    document.getElementById('invoiceModal').classList.remove('hidden');
 }
-
-document.addEventListener('click', function(e) {
-    if (!e.target.closest('[id^="menu-"]') && !e.target.closest('button[onclick^="toggleMenu"]')) {
-        document.querySelectorAll('[id^="menu-"]').forEach(el => el.classList.add('hidden'));
-    }
-});
+function closeModal() {
+    document.getElementById('invoiceModal').classList.add('hidden');
+}
 </script>
 @endsection
