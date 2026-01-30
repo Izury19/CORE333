@@ -26,7 +26,11 @@ class Record extends Model
         'total',
         'payment_method',
         'reference_number',
+        'forwarded_to_financials',
         'status'
+    ];
+     protected $casts = [
+        'forwarded_to_financials' => 'boolean', // ADD THIS
     ];
 
     public function invoice()

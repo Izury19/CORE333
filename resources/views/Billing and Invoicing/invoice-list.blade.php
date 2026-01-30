@@ -1,6 +1,25 @@
 @extends('layouts.app')
 
 @section('content')
+<!-- Session Messages (FIXED: Removed duplicates) -->
+@if(session('success'))
+    <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center">
+        <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+        </svg>
+        <span class="text-green-800">{{ session('success') }}</span>
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center">
+        <svg class="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+        </svg>
+        <span class="text-red-800">{{ session('error') }}</span>
+    </div>
+@endif
+
 <div class="p-6 max-w-7xl mx-auto">
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
@@ -36,25 +55,7 @@
         </div>
     </div>
 
-    @if(session('success'))
-        <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center">
-            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-            </svg>
-            <span class="text-green-800">{{ session('success') }}</span>
-        </div>
-    @endif
-
-    @if(session('errors'))
-        <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center">
-            <svg class="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-            </svg>
-            <span class="text-red-800">{{ session('errors')->first() }}</span>
-        </div>
-    @endif
-
-    <!-- AI INTELLIGENT BILLING DASHBOARD -->
+    <!-- AI-Powered Intelligent Billing Section -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
         <div class="px-6 py-5 border-b border-gray-200">
             <h2 class="text-lg font-semibold text-gray-900 flex items-center">
@@ -124,28 +125,121 @@
     <!-- AUTO-GENERATED INVOICES -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div class="px-6 py-5 border-b border-gray-200">
-            <h2 class="text-lg font-semibold text-gray-900 flex items-center">
-                <svg class="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Auto-Generated Invoices
-            </h2>
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Auto-Generated Invoices
+                </h2>
+                
+                <!-- BULK FORWARD BUTTON -->
+                <button type="button" 
+                        onclick="openBulkForwardModal()" 
+                        class="mt-4 md:mt-0 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium"
+                        id="bulkForwardBtn" style="display: none;">
+                    📤 Forward Selected to Financials
+                </button>
+            </div>
             <p class="text-sm text-gray-600 mt-1">Invoices automatically generated from completed job orders</p>
         </div>
         
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
+            <!-- BULK FORWARD FORM -->
+            <form id="bulkForwardForm" method="POST" action="{{ route('billing.invoices.bulk-forward') }}">
+                @csrf
+                <input type="hidden" name="invoice_ids_json" id="selectedInvoiceIds">
+            </form>
+            
+            <table class="min-w-full divide-y divide-gray-200" id="invoicesTable">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ref #</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Job Order</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Equipment</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Period</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">AI Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <!-- Checkbox Column -->
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <input type="checkbox" id="selectAll" class="rounded">
+                        </th>
+                        
+                        <!-- Ref # Column with Search -->
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <div class="flex flex-col space-y-1">
+                                <span>Ref #</span>
+                                <input type="text" placeholder="Search..." 
+                                       class="w-full text-xs border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                       onkeyup="filterColumn(1, this.value)">
+                            </div>
+                        </th>
+                        
+                        <!-- Job Order Column with Search -->
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <div class="flex flex-col space-y-1">
+                                <span>Job Order</span>
+                                <input type="text" placeholder="Search..." 
+                                       class="w-full text-xs border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                       onkeyup="filterColumn(2, this.value)">
+                            </div>
+                        </th>
+                        
+                        <!-- Client Column with Search -->
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <div class="flex flex-col space-y-1">
+                                <span>Client</span>
+                                <input type="text" placeholder="Search..." 
+                                       class="w-full text-xs border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                       onkeyup="filterColumn(3, this.value)">
+                            </div>
+                        </th>
+                        
+                        <!-- Equipment Column with Dropdown Filter -->
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <div class="flex flex-col space-y-1">
+                                <span>Equipment</span>
+                                <select class="w-full text-xs border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                        onchange="filterColumn(4, this.value)">
+                                    <option value="">All Types</option>
+                                    <option value="crane">Crane</option>
+                                    <option value="truck">Truck</option>
+                                </select>
+                            </div>
+                        </th>
+                        
+                        <!-- Period Column -->
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <span>Period</span>
+                        </th>
+                        
+                        <!-- Amount Column with Search -->
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <div class="flex flex-col space-y-1">
+                                <span>Amount</span>
+                                <input type="text" placeholder="Search..." 
+                                       class="w-full text-xs border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                       onkeyup="filterColumn(6, this.value)">
+                            </div>
+                        </th>
+                        
+                        <!-- Status Column with Dropdown Filter -->
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <div class="flex flex-col space-y-1">
+                                <span>Status</span>
+                                <select class="w-full text-xs border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                        onchange="filterColumn(7, this.value)">
+                                    <option value="">All Status</option>
+                                    <option value="issued">Issued</option>
+                                    <option value="paid">Paid</option>
+                                    <option value="overdue">Overdue</option>
+                                </select>
+                            </div>
+                        </th>
+                        
+                        <!-- AI Status Column -->
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <span>AI Status</span>
+                        </th>
+                        
+                        <!-- Actions Column -->
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <span>Actions</span>
+                        </th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -154,7 +248,18 @@
                     @endphp
                     
                     @forelse($invoices as $invoice)
-                    <tr class="hover:bg-gray-50 transition-colors">
+                    <tr class="hover:bg-gray-50 transition-colors invoice-row" 
+                        data-client="{{ strtolower($invoice->client_name ?? '') }}"
+                        data-equipment="{{ strtolower($invoice->equipment_type ?? '') }}"
+                        data-status="{{ strtolower($invoice->status ?? '') }}"
+                        data-date="{{ \Carbon\Carbon::parse($invoice->created_at)->format('Y-m-d') }}">
+                        <!-- Checkbox -->
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @if(in_array(strtolower($invoice->status), ['issued', 'billed']))
+                                <input type="checkbox" name="invoice_ids[]" value="{{ $invoice->id }}" class="invoice-checkbox rounded">
+                            @endif
+                        </td>
+                        
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                             {{ $invoice->invoice_uid ?? 'N/A' }}
                         </td>
@@ -165,7 +270,7 @@
                                 N/A
                             @endif
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 client-name">
                             {{ $invoice->client_name ?? 'Unknown Client' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
@@ -180,7 +285,7 @@
                                 N/A
                             @endif
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 amount-value">
                             ₱{{ number_format($invoice->total_amount ?? 0, 2) }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -188,15 +293,19 @@
                                 $status = $invoice->status ?? 'unknown';
                             @endphp
                             @if($status == 'billed' || $status == 'issued')
-                                <span class="px-2.5 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                <span class="px-2.5 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-yellow-100 text-yellow-800 status-badge">
                                     Issued
                                 </span>
                             @elseif($status == 'paid')
-                                <span class="px-2.5 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-green-100 text-green-800">
+                                <span class="px-2.5 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-green-100 text-green-800 status-badge">
                                     Paid
                                 </span>
+                            @elseif($status == 'overdue')
+                                <span class="px-2.5 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-red-100 text-red-800 status-badge">
+                                    Overdue
+                                </span>
                             @else
-                                <span class="px-2.5 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                <span class="px-2.5 py-0.5 inline-flex text-xs leading-4 font-semibold rounded-full bg-gray-100 text-gray-800 status-badge">
                                     {{ ucfirst($status) }}
                                 </span>
                             @endif
@@ -233,12 +342,26 @@
                                         </svg>
                                     </a>
                                 @endif
+                                
+                                <!-- Individual Forward Button -->
+                                @if(in_array(strtolower($invoice->status), ['issued', 'billed']))
+                                    <form action="{{ route('billing.invoices.forward-financials', $invoice->id) }}" method="POST" style="display: inline;">
+                                        @csrf
+                                        <button type="submit" 
+                                                class="text-purple-600 hover:text-purple-900 p-1.5 rounded-md hover:bg-purple-50 transition"
+                                                title="Forward to Financials System">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7l4-4m0 0l4 4m-4-4v18m0 0l-4-4m4 4l4-4" />
+                                            </svg>
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="9" class="px-6 py-12 text-center">
+                        <td colspan="10" class="px-6 py-12 text-center">
                             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
@@ -283,11 +406,73 @@
 </div>
 
 <script>
+// Column-specific filtering function
+function filterColumn(columnIndex, filterValue) {
+    const rows = document.querySelectorAll('.invoice-row');
+    let visibleCount = 0;
+    
+    rows.forEach(row => {
+        const cellText = row.cells[columnIndex].textContent.toLowerCase();
+        const shouldShow = !filterValue || cellText.includes(filterValue.toLowerCase());
+        row.style.display = shouldShow ? '' : 'none';
+        
+        if (shouldShow) visibleCount++;
+    });
+}
+
+// Modal functions
 function openGenerateInvoiceModal() {
     document.getElementById('invoiceModal').classList.remove('hidden');
 }
 function closeModal() {
     document.getElementById('invoiceModal').classList.add('hidden');
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('invoiceModal');
+    if (e.target === modal) {
+        closeModal();
+    }
+});
+
+// Select All / Deselect All
+document.getElementById('selectAll').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.invoice-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+    });
+    updateBulkForwardButton();
+});
+
+// Update bulk forward button visibility
+function updateBulkForwardButton() {
+    const selectedCount = document.querySelectorAll('.invoice-checkbox:checked').length;
+    const bulkForwardBtn = document.getElementById('bulkForwardBtn');
+    bulkForwardBtn.style.display = selectedCount > 0 ? 'inline-block' : 'none';
+}
+
+// Individual checkbox change
+document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('invoice-checkbox')) {
+        updateBulkForwardButton();
+    }
+});
+
+// Bulk forward modal
+function openBulkForwardModal() {
+    const selectedIds = Array.from(document.querySelectorAll('.invoice-checkbox:checked'))
+        .map(checkbox => checkbox.value);
+    
+    if (selectedIds.length === 0) {
+        alert('Please select at least one invoice to forward.');
+        return;
+    }
+    
+    if (confirm(`Are you sure you want to forward ${selectedIds.length} invoice(s) to Financials System?`)) {
+        document.getElementById('selectedInvoiceIds').value = JSON.stringify(selectedIds);
+        document.getElementById('bulkForwardForm').submit();
+    }
 }
 </script>
 @endsection

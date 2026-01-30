@@ -8,4 +8,7 @@ Route::prefix('dashboard/payments')->group(function () {
     Route::get('/summary', [PaymentApiController::class, 'summary']);
     Route::put('/{id}/status', [PaymentApiController::class, 'updateStatus']);
     Route::post('/{id}/reminder', [PaymentApiController::class, 'sendReminder']);
+
+
+    
 });

@@ -6,6 +6,8 @@ use App\Models\BillingInvoice;
 use App\Models\Record; 
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Http;
+use TCPDF;
 
 class BillingInvoiceController extends Controller
 {
@@ -175,4 +177,146 @@ class BillingInvoiceController extends Controller
         return redirect()->route('billing.invoices.index')
             ->with('success', 'Demo invoice generated and sent to Record & Payment!');
     }
+    
+   // Add this method at the bottom of your BillingInvoiceController class
+public function forwardIssuedBill(Request $request, $invoiceId)
+{
+    $invoice = BillingInvoice::findOrFail($invoiceId);
+    
+    if (!in_array($invoice->status, ['issued', 'billed'])) {
+        return back()->with('error', 'Only issued/billed invoices can be forwarded to Financials System.');
+    }
+
+    try {
+        // PREPARE DATA IN EXACT FORMAT THEY EXPECT
+        $data = [
+            'action' => 'transfer_to_collections',
+            'invoice_number' => 'INV-' . str_pad($invoice->id, 3, '0', STR_PAD_LEFT),
+            'client_name' => $invoice->client_name,
+            'billing_date' => \Carbon\Carbon::parse($invoice->created_at)->format('Y-m-d'),
+            'due_date' => \Carbon\Carbon::parse($invoice->due_date ?? now()->addDays(30))->format('Y-m-d'),
+            'amount_base' => $invoice->total_amount,
+            'vat_applied' => 'No',
+            'notes' => 'Auto-transferred from Billing System'
+        ];
+
+        // SEND TO THEIR EXACT ENDPOINT
+        $response = Http::withOptions(['verify' => false, 'timeout' => 30])
+            ->post('https://financials.cranecali-ms.com/collections_api.php', $data);
+
+        if ($response->successful()) {
+            return back()->with('success', '✅ Invoice successfully forwarded to Financials System!');
+        } else {
+            \Log::error('Financials API Error', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+                'invoice_id' => $invoice->id
+            ]);
+            
+            return back()->with('error', '❌ Failed to send. Status: ' . $response->status());
+        }
+
+    } catch (\Exception $e) {
+        return back()->with('error', '❌ Server error: ' . $e->getMessage());
+    }
 }
+
+private function generateInvoicePdf($invoice)
+{
+    $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+    $pdf->SetCreator('Billing System');
+    $pdf->SetAuthor('Admin');
+    $pdf->SetTitle('Invoice: ' . $invoice->invoice_uid);
+    $pdf->setPrintHeader(false);
+    $pdf->setPrintFooter(false);
+    $pdf->AddPage();
+    $pdf->SetFont('helvetica', '', 10);
+    
+    $html = '<h2>INVOICE</h2>';
+    $html .= '<p><strong>Client:</strong> ' . $invoice->client_name . '</p>';
+    $html .= '<p><strong>Amount:</strong> ₱' . number_format($invoice->total_amount, 2) . '</p>';
+    $html .= '<p><strong>Date:</strong> ' . $invoice->created_at . '</p>';
+    
+    $pdf->writeHTML($html, true, false, true, false, '');
+    $pdf->SetProtection(['print', 'copy'], 'document', 'admin');
+    
+    return $pdf->Output('invoice_' . $invoice->id . '.pdf', 'S');
+}
+
+public function bulkForwardToFinancials(Request $request)
+{
+    \Log::info('=== BULK FORWARD TO FINANCIALS ===', ['all_request' => $request->all()]);
+    
+    $request->validate([
+        'invoice_ids_json' => 'required|string'
+    ]);
+    
+    $invoiceIds = json_decode($request->invoice_ids_json, true);
+    
+    if (!is_array($invoiceIds) || empty($invoiceIds)) {
+        return back()->with('error', '❌ Invalid invoice selection.');
+    }
+    
+    $successCount = 0;
+    $errorCount = 0;
+    
+    foreach ($invoiceIds as $invoiceId) {
+        $invoice = BillingInvoice::find($invoiceId);
+        
+        if (!$invoice || !in_array(strtolower($invoice->status), ['issued', 'billed'])) {
+            $errorCount++;
+            continue;
+        }
+        
+        try {
+            // PREPARE DATA IN EXACT FORMAT THEY EXPECT
+            $data = [
+                'action' => 'transfer_to_collections',
+                'invoice_number' => 'INV-' . str_pad($invoice->id, 3, '0', STR_PAD_LEFT),
+                'client_name' => $invoice->client_name,
+                'billing_date' => \Carbon\Carbon::parse($invoice->created_at)->format('Y-m-d'),
+                'due_date' => \Carbon\Carbon::parse($invoice->due_date ?? now()->addDays(30))->format('Y-m-d'),
+                'amount_base' => $invoice->total_amount,
+                'vat_applied' => 'No', // Based on their system
+                'notes' => 'Auto-transferred from Billing System'
+            ];
+            
+            // SEND TO THEIR EXACT ENDPOINT
+            $response = Http::withOptions(['verify' => false, 'timeout' => 30])
+                ->post('https://financials.cranecali-ms.com/collections_api.php', $data);
+                
+            if ($response->successful()) {
+                $successCount++;
+                \Log::info('✅ Invoice forwarded successfully', [
+                    'invoice_id' => $invoiceId,
+                    'response' => $response->json()
+                ]);
+            } else {
+                $errorCount++;
+                \Log::error('API Error', [
+                    'invoice_id' => $invoiceId,
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
+            }
+            
+        } catch (\Exception $e) {
+            $errorCount++;
+            \Log::error('Forward Exception', [
+                'invoice_id' => $invoiceId,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+    
+    if ($successCount > 0) {
+        $message = "✅ Successfully forwarded {$successCount} invoice(s) to Financials System!";
+        if ($errorCount > 0) {
+            $message .= " ❌ {$errorCount} failed.";
+        }
+        return back()->with('success', $message);
+    } else {
+        return back()->with('error', '❌ All selected invoices failed to forward.');
+    }
+}
+}       

@@ -86,13 +86,24 @@ Route::resource('invoices', InvoiceController::class)->except(['create', 'edit']
 Route::patch('/invoices/{id}/status', [InvoiceController::class, 'updateStatus'])->name('invoices.update.status');
 Route::delete('/invoices/{id}', [InvoiceController::class, 'destroy'])->name('invoices.destroy');
 
-    
+
+Route::post('/billing/invoices/{id}/forward-financials', [BillingController::class, 'forwardIssuedBill'])
+    ->name('billing.invoices.forward-financials');
+
+    Route::post('/billing/invoices/bulk-forward', [BillingInvoiceController::class, 'bulkForwardToFinancials'])
+    ->name('billing.invoices.bulk-forward');
+
+   Route::get('/test-forward', function() {
+    return redirect()->route('billing.invoices.index')
+        ->with('success', '✅ Test success message working!');
+});
 /*
 |--------------------------------------------------------------------------
 | Record & Payment Management
 |--------------------------------------------------------------------------
 */
-
+Route::post('/records/{id}/forward-payment', [RecordController::class, 'forwardPaymentToFinancials'])
+    ->name('records.forward-payment');
 
 // Record & Payment Routes
 Route::get('/record-payment', [RecordController::class, 'index'])->name('record.index');
@@ -121,7 +132,7 @@ Route::get('/contract-management', [ContractController::class, 'index'])->name('
 // Contract Management Routes
 Route::get('/contract-management', [ContractController::class, 'index'])->name('contract.management');
 Route::post('/contract-management', [ContractController::class, 'store'])->name('contracts.store');
-Route::get('/contract-management/{id}', [ContractController::class, 'show'])->name('contracts.show'); // ✅ ADD THIS
+Route::get('/contract-management/{id}', [ContractController::class, 'show'])->name('contracts.show'); 
 Route::get('/contract-management/{id}/pdf', [ContractController::class, 'exportPdf'])->name('contracts.pdf');
 
 
@@ -130,10 +141,19 @@ Route::get('/contract-management/{id}/pdf', [ContractController::class, 'exportP
 | Reporting & Analytics (Views Only)
 |--------------------------------------------------------------------------
 */
-Route::view('/financial-report', 'Reporting and Analytics.financial-report')->name('financial-report');
-Route::get('/reporting-analytics', [ReportingController::class, 'index'])->name('reporting.analytics');
+Route::get('/financial-report', [ReportingController::class, 'index'])->name('financial-report');
 
+    // Financial Report routes
+Route::get('/financial-report', [ReportingController::class, 'index'])->name('financial-report')->middleware('auth');
+Route::get('/financial-report/export/excel', [ReportingController::class, 'exportExcel'])->name('financial-report.export.excel');
+Route::get('/financial-report/export/pdf', [ReportingController::class, 'exportPdf'])->name('financial-report.export.pdf');
 
+Route::post('/api/send-to-document-manager', [DocumentManagerController::class, 'storeReport'])->name('document.manager.store');
+// Add this route
+Route::post('/forward-document', [ReportingController::class, 'forwardDocument'])->name('forward.document');
+Route::get('/forward-files', function () {
+    return view('forward-form');
+})->name('forward.files');
 /*
 |--------------------------------------------------------------------------
 | Delivery & Receipts
@@ -143,6 +163,21 @@ Route::get('/delivery', [InvoiceController::class, 'delivery'])->name('delivery'
 Route::post('/invoices/{id}/generate-receipt', [RecordController::class, 'generateReceipt'])
     ->name('invoices.generateReceipt');
 Route::resource('receipts', ReceiptController::class);
+
+
+// Temporary proxy for development
+Route::get('/test-admin-api', function () {
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, 'https://admin.cranecali-ms.com/api/documents/store');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    return "HTTP Code: " . $httpCode . "<br>Response: " . $response;
+});
 
 /*
 |--------------------------------------------------------------------------

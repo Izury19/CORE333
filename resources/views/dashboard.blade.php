@@ -4,13 +4,150 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="//unpkg.com/alpinejs" defer></script>
     <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
     <title>Dashboard</title>
     
+    <style>
+        /* Dashboard Layout */
+        .dashboard-container {
+            padding: 24px;
+            background: #f5f6fa;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        
+        /* Filters Section */
+        .filters {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            align-items: end;
+        }
+        
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .kpi-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .kpi-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .kpi-content h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #4b5563;
+            margin-bottom: 4px;
+        }
+        
+        .kpi-content p {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-bottom: 0;
+        }
+        
+        .kpi-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        
+        /* Charts Section */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .chart-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            height: 280px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chart-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+        
+        .chart-placeholder {
+            flex: 1;
+            background: #ecf0f1;
+            border-radius: 6px;
+        }
+        
+        /* Project Status Card */
+        .project-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .project-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+        
+        .project-placeholder {
+            height: 280px;
+            background: #ecf0f1;
+            border-radius: 6px;
+        }
+    </style>
 </head>
-<body>
+<body class="flex flex-col min-h-screen">
    <!-- nav bar -->
 <nav class="fixed bg-[#1f1f1f] top-0 z-50 w-full shadow">
     <div class="px-3 py-3 lg:px-5 lg:pl-3">
@@ -24,25 +161,17 @@
                 </button>
                 <a href="#" class="flex items-center ms-2 md:me-24">
                     <img src="{{ asset('images/logo.png') }}" class="h-8 me-2" alt="Logo">
-                    <span class="self-center text-xl font-extrabold sm:text-2xl whitespace-nowrap text-white">CaliCrane </span>
+                    <span class="self-center text-xl font-extrabold sm:text-2xl whitespace-nowrap text-white">CaliCrane</span>
                 </a>
             </div>
 
             <div class="flex items-center">
-                <!-- Philippine Time Display - Now beside notification -->
-                <div class="hidden md:flex items-center text-white mr-4">
-                    <svg class="w-5 h-5 mr-2 text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
-                    </svg>
-                    <span id="philippineTime" class="font-bold text-white"></span>
-                </div>
-
                 <div class="flex items-center ms-3">
                     <div>
                         <button type="button" class="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" aria-expanded="false" data-dropdown-toggle="dropdown-user">
                             <span class="sr-only">Open user menu</span>
                             <img class="w-8 h-8 rounded-full object-cover"
-                                src="{{ Auth::check() ? (Auth::user()?->photo ? asset('storage/' . Auth::user()?->photo) : asset('images/uploadprof.png')) : asset('images/uploadprof.png') }}"
+                                src="{{ Auth::check() && Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('images/uploadprof.png') }}"
                                 alt="Profile Photo">
                         </button>
                     </div>
@@ -51,17 +180,17 @@
                         <!-- Profile Image in dropdown -->
                         <div class="flex justify-center items-center p-2">
                             <img class="w-20 h-20 rounded-full shadow-lg object-cover"
-                               src="{{ Auth::check() ? (Auth::user()?->photo ? asset('storage/' . Auth::user()?->photo) : asset('images/uploadprof.png')) : asset('images/uploadprof.png') }}"
+                               src="{{ Auth::check() && Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('images/uploadprof.png') }}"
                                 alt="Profile Photo">
                         </div>
 
                         <!-- User Info -->
                         <div class="px-4 py-3 text-center" role="none">
                             <p class="text-sm font-semibold text-gray-900">
-                              {{ Auth::check() ? Auth::user()?->name : 'Guest' }}  {{ Auth::check() ? Auth::user()?->lastname : '' }}
+                              {{ Auth::check() ? Auth::user()->name ?? 'Guest' : 'Guest' }}
                             </p>
                             <p class="text-sm font-medium text-gray-500 truncate">
-                                {{ Auth::user()?->email }}
+                                {{ Auth::check() ? Auth::user()->email ?? 'guest@example.com' : 'guest@example.com' }}
                             </p>
                         </div>
 
@@ -197,392 +326,152 @@
 <!-- Sidebar -->
 
 <!-- content -->
-<div class="p-4 sm:ml-72">
-    <div class="p-4   rounded-lg dark:border-gray-700 mt-14">
+<div class="flex-1 pt-20 pl-72 pb-16">
+    <div class="p-4 rounded-lg dark:border-gray-700 mt-14">
 
+        <!-- Main Content -->
+        <div class="space-y-6">
+            <!-- Header -->
+            <div class="header">
+                <div class="header-title">Dashboard</div>
+            </div>
 
-    
-         <!-- Main Content -->
+            <!-- Filters -->
+            <div class="filters">
+                <div class="filters-grid">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Period</label>
+                        <select class="w-full text-sm border border-gray-300 rounded-md px-3 py-2 focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="monthly">Monthly</option>
+                            <option value="yearly">Yearly</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Start Date</label>
+                        <input type="date" class="w-full text-sm border border-gray-300 rounded-md px-3 py-2 focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">End Date</label>
+                        <input type="date" class="w-full text-sm border border-gray-300 rounded-md px-3 py-2 focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <button class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors">
+                            Apply Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
 
- <style>
-/* ================= DASHBOARD CSS ================= */
+            <!-- KPI Cards -->
+            <div class="kpi-grid">
+                <!-- Total Revenue -->
+                <div class="kpi-card">
+                    <div class="kpi-icon bg-green-100">
+                        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h4>Total Revenue</h4>
+                        <p>Payment Management</p>
+                    </div>
+                    <div class="kpi-value">₱0.00</div>
+                </div>
 
-.dashboard-container {
-    padding: 24px;
-    background: #f5f6fa;
-}
+                <!-- Collection Rate -->
+                <div class="kpi-card">
+                    <div class="kpi-icon bg-blue-100">
+                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h4>Collection Rate</h4>
+                        <p>Payment performance</p>
+                    </div>
+                    <div class="kpi-value">0%</div>
+                </div>
 
-/* FILTERS */
-.filters {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 24px;
-}
+                <!-- Active Contracts -->
+                <div class="kpi-card">
+                    <div class="kpi-icon bg-purple-100">
+                        <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-3-3H6a3 3 0 00-3 3v2h5m14-4a2 2 0 012 2v2H3v-2a2 2 0 012-2h14m-9-4a2 2 0 012 2v2H8v-2a2 2 0 012-2h4M9 8a2 2 0 012-2h2a2 2 0 012 2v2H9V8z" />
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h4>Active Contracts</h4>
+                        <p>Contract Management</p>
+                    </div>
+                    <div class="kpi-value">0</div>
+                </div>
 
-.filter-item select {
-    padding: 8px 12px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    background: #fff;
-}
+                <!-- Maintenance Status -->
+                <div class="kpi-card">
+                    <div class="kpi-icon bg-yellow-100">
+                        <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h4>Maintenance Status</h4>
+                        <p>Completed this month</p>
+                    </div>
+                    <div class="kpi-value">0</div>
+                </div>
 
-/* KPI CARDS */
-.kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 16px;
-}
+                <!-- Compliance Reports -->
+                <div class="kpi-card">
+                    <div class="kpi-icon bg-red-100">
+                        <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h4>Compliance Reports</h4>
+                        <p>Sent to CORE 2</p>
+                    </div>
+                    <div class="kpi-value">0</div>
+                </div>
+            </div>
 
-.kpi-card {
-    background: #ffffff;
-    padding: 16px;
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-}
+            <!-- Charts Section -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-title">Revenue Trend (Financial Intelligence)</div>
+                    <div class="chart-placeholder"></div>
+                </div>
 
-.kpi-title {
-    font-size: 12px;
-    color: #777;
-    margin-bottom: 6px;
-}
+                <div class="chart-card">
+                    <div class="chart-title">Payment Methods Distribution</div>
+                    <div class="chart-placeholder"></div>
+                </div>
 
-.kpi-value {
-    font-size: 26px;
-    font-weight: bold;
-    color: #2c3e50;
-}
+                <div class="chart-card">
+                    <div class="chart-title">Equipment Availability Rate (Maintenance Scheduling)</div>
+                    <div class="chart-placeholder"></div>
+                </div>
+            </div>
 
-/* CHARTS */
-.charts-grid {
-    margin-top: 32px;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-}
-
-.chart-card {
-    background: #ffffff;
-    padding: 16px;
-    border-radius: 10px;
-    height: 320px; /* mas roomy */
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    display: flex;
-    flex-direction: column;
-}
-
-
-.chart-wide {
-    grid-column: span 2;
-}
-
-.chart-title {
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 10px;
-}
-
-.chart-placeholder {
-    height: calc(100% - 30px);
-    background: #ecf0f1;
-    border-radius: 6px;
-}
-
-/* GAUGE PLACEHOLDER */
-.chart-placeholder.gauge {
-    background: linear-gradient(90deg, #2ecc71 70%, #ecf0f1 70%);
-}
-.kpi-card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.kpi-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
-}
-.chart-card canvas {
-    flex: 1;
-    width: 100% !important;
-}
-
-
-/* RESPONSIVE */
-@media (max-width: 1200px) {
-    .kpi-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-@media (max-width: 768px) {
-    .kpi-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .charts-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .chart-wide {
-        grid-column: span 1;
-    }
-
-    .filters {
-        flex-direction: column;
-    }
-}
-</style>
-
-<div class="dashboard-container">
-
-    <!-- FILTER BAR -->
-    <div class="filters">
-        <div class="filter-item">
-            <select><option>Date Range</option></select>
-        </div>
-        <div class="filter-item">
-            <select><option>Client</option></select>
-        </div>
-        <div class="filter-item">
-            <select><option>Status</option></select>
-        </div>
-        <div class="filter-item">
-            <select><option>Equipment Type</option></select>
+            <!-- Project Status Updates -->
+            <div class="project-card">
+                <div class="project-title">Project Status Updates (CORE 4)</div>
+                <div class="project-placeholder"></div>
+            </div>
         </div>
     </div>
-
-    <!-- KPI CARDS -->
-    <div class="kpi-grid">
-
-        <div class="kpi-card">
-            <div class="kpi-title">Total Revenue</div>
-            <div class="kpi-value">₱0.00</div>
-        </div>
-
-        <div class="kpi-card">
-            <div class="kpi-title">Total Paid Invoices</div>
-            <div class="kpi-value">₱0.00</div>
-        </div>
-
-        <div class="kpi-card">
-            <div class="kpi-title">Total Unpaid Invoices</div>
-            <div class="kpi-value">₱0.00</div>
-        </div>
-
-        <div class="kpi-card">
-            <div class="kpi-title">Outstanding Balances</div>
-            <div class="kpi-value">₱0.00</div>
-        </div>
-
-        <div class="kpi-card">
-            <div class="kpi-title">Active Contracts</div>
-            <div class="kpi-value">0</div>
-        </div>
-
-        <div class="kpi-card">
-            <div class="kpi-title">Expiring Contracts</div>
-            <div class="kpi-value">0</div>
-        </div>
-
-        <div class="kpi-card">
-            <div class="kpi-title">Active Permits</div>
-            <div class="kpi-value">0</div>
-        </div>
-
-        <div class="kpi-card">
-            <div class="kpi-title">Overdue Payments</div>
-            <div class="kpi-value">0</div>
-        </div>
-
-        <div class="kpi-card">
-            <div class="kpi-title">Scheduled Maintenance (This Week)</div>
-            <div class="kpi-value">0</div>
-        </div>
-
-        <div class="kpi-card">
-            <div class="kpi-title">Equipment Under Maintenance</div>
-            <div class="kpi-value">0</div>
-        </div>
-
-    </div>
-
-    <!-- CHARTS -->
-    <div class="charts-grid">
-
-<div class="chart-card">
-    <div class="chart-title">Monthly Revenue Trend</div>
-    <canvas id="revenueChart"></canvas>
 </div>
 
-
-<div class="chart-card">
-    <div class="chart-title">Paid vs Unpaid Invoices</div>
-    <canvas id="invoiceChart"></canvas>
-</div>
-
-
-<div class="chart-card">
-    <div class="chart-title">Payment Methods Distribution</div>
-    <canvas id="paymentMethodChart"></canvas>
-</div>
-
-
-<div class="chart-card">
-    <div class="chart-title">Maintenance Cost per Month</div>
-    <canvas id="maintenanceChart"></canvas>
-</div>
-
-
-<div class="chart-card chart-wide">
-    <div class="chart-title">Equipment Availability Rate</div>
-    <canvas id="availabilityChart"></canvas>
-</div>
-
-
-    </div>
-
-</div>
-
-        <!-- Main Content --> 
-            
-    </div>
-</div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-
-
-</body>
-
-<footer class="bg-[#1f1f1f] text-white fixed bottom-0 w-full p-3 shadow-lg flex justify-center items-center">
-    <div class="flex gap-5 items-center justify-center">
+<footer class="bg-[#1f1f1f] text-white py-3 px-4 shadow-lg flex justify-center items-center">
+    <div class="flex gap-5 items-center">
         <img class="rounded-full w-10 h-10" src="{{ asset('images/logo.png') }}" alt="">
         <p class="text-sm text-gray-300">© 2025 CaliCrane All rights reserved.</p>
     </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
-<script>
-    function displayPhilippineTime() {
-        const options = {
-            timeZone: 'Asia/Manila',
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: true
-        };
-
-        const philippineDateTime = new Date().toLocaleString('en-PH', options);
-
-        const timeElement = document.getElementById('philippineTime');
-        if (timeElement) {
-            timeElement.textContent = philippineDateTime;
-        }
-    }
-
-    displayPhilippineTime();
-
-    setInterval(displayPhilippineTime, 1000);
-    document.addEventListener('DOMContentLoaded', function() {
-    displayPhilippineTime();
-    });
-</script>
-
-<script>
-const commonOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-        legend: {
-            labels: {
-                boxWidth: 14
-            }
-        }
-    }
-};
-
-// Monthly Revenue (Line)
-new Chart(document.getElementById('revenueChart'), {
-    type: 'line',
-    data: {
-        labels: ['Jan','Feb','Mar','Apr','May','Jun'],
-        datasets: [{
-            label: 'Revenue (₱)',
-            data: [120000, 150000, 170000, 140000, 190000, 210000],
-            borderColor: '#2563eb',
-            backgroundColor: 'rgba(37,99,235,0.2)',
-            tension: 0.4,
-            fill: true
-        }]
-    },
-    options: commonOptions
-});
-
-// Paid vs Unpaid (Doughnut)
-new Chart(document.getElementById('invoiceChart'), {
-    type: 'doughnut',
-    data: {
-        labels: ['Paid', 'Unpaid'],
-        datasets: [{
-            data: [75, 25],
-            backgroundColor: ['#16a34a', '#dc2626']
-        }]
-    },
-    options: commonOptions
-});
-
-// Payment Methods (Pie)
-new Chart(document.getElementById('paymentMethodChart'), {
-    type: 'pie',
-    data: {
-        labels: ['Cash', 'Bank Transfer', 'Cheque'],
-        datasets: [{
-            data: [40, 45, 15],
-            backgroundColor: ['#0ea5e9', '#6366f1', '#f59e0b']
-        }]
-    },
-    options: commonOptions
-});
-
-// Maintenance Cost (Bar)
-new Chart(document.getElementById('maintenanceChart'), {
-    type: 'bar',
-    data: {
-        labels: ['Jan','Feb','Mar','Apr','May'],
-        datasets: [{
-            label: 'Cost (₱)',
-            data: [30000, 25000, 40000, 20000, 35000],
-            backgroundColor: '#ef4444'
-        }]
-    },
-    options: commonOptions
-});
-
-// Equipment Availability (Semi Gauge)
-new Chart(document.getElementById('availabilityChart'), {
-    type: 'doughnut',
-    data: {
-        labels: ['Available', 'Unavailable'],
-        datasets: [{
-            data: [85, 15],
-            backgroundColor: ['#22c55e', '#e5e7eb'],
-            borderWidth: 0
-        }]
-    },
-    options: {
-        ...commonOptions,
-        circumference: 180,
-        rotation: 270,
-        cutout: '70%',
-        plugins: {
-            legend: {
-                position: 'bottom'
-            }
-        }
-    }
-});
-</script>
-
-
-
+</body>
 </html>

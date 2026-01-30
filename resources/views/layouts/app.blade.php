@@ -13,8 +13,78 @@
   <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
 
   @stack('styles')
+  
+  {{-- Loading Spinner Styles --}}
+  <style>
+    /* Loading Spinner */
+    #loadingSpinner {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.9);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    
+    #loadingSpinner.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .spinner-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+    }
+    
+    .spinner-logo {
+        width: 60px;
+        height: 60px;
+        animation: pulse 2s infinite;
+    }
+    
+    .spinner-text {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1f1f1f;
+        animation: fadeInOut 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    
+    @keyframes fadeInOut {
+        0% { opacity: 0.5; }
+        50% { opacity: 1; }
+        100% { opacity: 0.5; }
+    }
+    
+    /* Smooth scrolling for anchor links */
+    html {
+        scroll-behavior: smooth;
+    }
+  </style>
 </head>
 <body class="bg-gray-50">
+  {{-- Loading Spinner --}}
+  <div id="loadingSpinner">
+    <div class="spinner-container">
+      <img src="{{ asset('images/logo.png') }}" class="spinner-logo" alt="CaliCrane Logo">
+      <div class="spinner-text">Loading...</div>
+    </div>
+  </div>
+
   {{-- Navbar --}}
   @include('partials.navbar')
 
@@ -82,6 +152,47 @@
         sidebar.classList.toggle('-translate-x-full');
         sidebar.classList.toggle('translate-x-0');
         arrowIcon?.classList.toggle('rotate-180', !isHidden);
+    });
+  </script>
+
+  {{-- Loading Spinner Script --}}
+  <script>
+    // Show loading spinner on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        loadingSpinner.classList.add('active');
+        
+        // Hide loading spinner when page is fully loaded
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                loadingSpinner.classList.remove('active');
+            }, 300);
+        });
+    });
+
+    // Show loading spinner on internal link clicks (anchor links)
+    document.addEventListener('click', function(e) {
+        const target = e.target.closest('a[href^="#"]');
+        if (target) {
+            e.preventDefault();
+            const sectionId = target.getAttribute('href');
+            const section = document.querySelector(sectionId);
+            
+            if (section) {
+                // Show loading spinner briefly
+                const loadingSpinner = document.getElementById('loadingSpinner');
+                loadingSpinner.classList.add('active');
+                
+                // Scroll to section after brief delay
+                setTimeout(() => {
+                    loadingSpinner.classList.remove('active');
+                    section.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }, 100);
+            }
+        }
     });
   </script>
 

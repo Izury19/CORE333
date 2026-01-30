@@ -10,7 +10,7 @@
     </div>
     <div class="mt-4 md:mt-0 flex space-x-3">
         @php
-            $paymentCount = isset($payments) ? $payments->count() : 0;
+            $paymentCount = isset($total) ? $total : 0;
         @endphp
         <div class="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm font-medium">
             <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -118,49 +118,29 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                            onclick="sortTable('invoice_id')">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Invoice ID
-                            @if(request('sort_by') == 'invoice_id')
-                                <span class="ml-1">{{ request('sort_order') == 'asc' ? '↑' : '↓' }}</span>
-                            @endif
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                            onclick="sortTable('client_name')">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Client
-                            @if(request('sort_by') == 'client_name')
-                                <span class="ml-1">{{ request('sort_order') == 'asc' ? '↑' : '↓' }}</span>
-                            @endif
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Equipment</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                            onclick="sortTable('total_amount')">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Amount
-                            @if(request('sort_by') == 'total_amount')
-                                <span class="ml-1">{{ request('sort_order') == 'asc' ? '↑' : '↓' }}</span>
-                            @endif
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reference No.</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                            onclick="sortTable('payment_date')">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Date
-                            @if(request('sort_by') == 'payment_date')
-                                <span class="ml-1">{{ request('sort_order') == 'asc' ? '↑' : '↓' }}</span>
-                            @endif
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @php
-                        $payments = $payments ?? collect();
-                    @endphp
-                    
                     @forelse($payments as $payment)
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {{ $payment->invoice_id }}
+                            INV-{{ str_pad($payment->invoice_id, 3, '0', STR_PAD_LEFT) }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                             {{ $payment->client_name }}
@@ -200,7 +180,6 @@
         Cash
     @else
         <span class="text-gray-500">Not Paid Yet</span>
-        
     @endif
 </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
@@ -237,12 +216,60 @@
                     </tr>
                     @endforelse
                 </tbody>
-                
             </table>
         </div>
+        
+        <!-- CUSTOM PAGINATION UI -->
+        <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <span class="text-sm text-gray-700">Items per page:</span>
+                <select id="itemsPerPage" class="border border-gray-300 rounded px-2 py-1 text-sm"
+                        onchange="changeItemsPerPage()">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                </select>
+                <span class="text-sm text-gray-700">
+                    {{ ($page - 1) * $perPage + 1 }} to {{ min($page * $perPage, $total) }} of {{ $total }}
+                </span>
+            </div>
+
+            <div class="flex items-center space-x-2">
+                <!-- First Page -->
+                <button type="button" 
+                        onclick="goToPage(1)"
+                        class="p-1.5 rounded border border-gray-300 hover:bg-gray-50 disabled:opacity-50"
+                        {{ $page <= 1 ? 'disabled' : '' }}>
+                    <<
+                </button>
+                
+                <!-- Previous Page -->
+                <button type="button" 
+                        onclick="goToPage({{ $page - 1 }})"
+                        class="p-1.5 rounded border border-gray-300 hover:bg-gray-50 disabled:opacity-50"
+                        {{ $page <= 1 ? 'disabled' : '' }}>
+                    <
+                </button>
+                
+                <!-- Next Page -->
+                <button type="button" 
+                        onclick="goToPage({{ $page + 1 }})"
+                        class="p-1.5 rounded border border-gray-300 hover:bg-gray-50 disabled:opacity-50"
+                        {{ $page * $perPage >= $total ? 'disabled' : '' }}>
+                    >
+                </button>
+                
+                <!-- Last Page -->
+                <button type="button" 
+                        onclick="goToPage({{ ceil($total / $perPage) }})"
+                        class="p-1.5 rounded border border-gray-300 hover:bg-gray-50 disabled:opacity-50"
+                        {{ $page * $perPage >= $total ? 'disabled' : '' }}>
+                    >>
+                </button>
+            </div>
+        </div>
     </div>
-    
-    
 </div>
 
 <!-- Record Payment Modal -->
@@ -327,19 +354,18 @@ function applyFilters() {
     document.getElementById('filterForm').submit();
 }
 
-// Sorting
-function sortTable(column) {
-    const currentSortBy = '{{ request("sort_by") }}';
-    const currentSortOrder = '{{ request("sort_order") }}';
-    let newSortOrder = 'asc';
-    
-    if (currentSortBy === column && currentSortOrder === 'asc') {
-        newSortOrder = 'desc';
-    }
-    
+// Pagination functions
+function goToPage(page) {
     const url = new URL(window.location);
-    url.searchParams.set('sort_by', column);
-    url.searchParams.set('sort_order', newSortOrder);
+    url.searchParams.set('page', page);
+    window.location.href = url.toString();
+}
+
+function changeItemsPerPage() {
+    const select = document.getElementById('itemsPerPage');
+    const url = new URL(window.location);
+    url.searchParams.set('page', 1);
+    url.searchParams.set('per_page', select.value);
     window.location.href = url.toString();
 }
 </script>

@@ -48,4 +48,9 @@ public static function generateUid($equipmentType)
     
     return "{$prefix}-{$year}-" . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
 }
+
+public function getInvoiceUidAttribute()
+{
+    return 'INV-' . str_pad($this->id, 3, '0', STR_PAD_LEFT);
+}
 }
