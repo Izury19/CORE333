@@ -14,14 +14,24 @@ class MaintenanceSchedule extends Model
     public $incrementing = true;
     protected $keyType = 'int';
 
+    // ✅ UPDATED: Added ALL fields including AI fields to $fillable array
     protected $fillable = [
         'equipment_name',
-        'maintenance_type_id', // foreign key papunta sa maintenance_types
+        'maintenance_type_id',
         'scheduled_date',
+        'priority',
         'status',
+        'is_recurring',
+        'recurrence_type',
+        'recurrence_frequency',
+        'recurrence_end_date',
         'proof_image',
         'completed_at',
-        'technician_name', // string lang, hindi id
+        
+        // ✅ AI FIELDS (NEW)
+        'ai_risk_score',
+        'ai_predicted_failure_date',
+        'ai_recommendations'
     ];
 
     /**
@@ -39,9 +49,4 @@ class MaintenanceSchedule extends Model
     {
         return $this->hasMany(MaintenanceHistoryLog::class, 'schedule_id', 'maintenance_sched_id');
     }
-
-    /**
-     * ⚠️ Removed technician() kasi wala kang technician_id sa table na ito.
-     * Kung gusto mo ng relation sa Technician table, dapat magdagdag ka muna ng `technician_id` column dito.
-     */
 }

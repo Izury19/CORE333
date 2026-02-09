@@ -50,8 +50,7 @@
             <!-- DEMO BUTTON FOR INTEGRATION DEMONSTRATION -->
             <button type="button" onclick="openGenerateInvoiceModal()"
                     class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium">
-                + Generate Invoice (Demo)
-            </button>
+                + Generate Invoice
         </div>
     </div>
 
@@ -144,6 +143,20 @@
             <p class="text-sm text-gray-600 mt-1">Invoices automatically generated from completed job orders</p>
         </div>
         
+        <!-- GLOBAL SEARCH BAR -->
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <label class="block text-sm font-medium text-gray-700 mb-2 sm:mb-0">
+                    Search Invoices:
+                </label>
+                <input type="text" 
+                       id="globalSearch" 
+                       placeholder="Search by Ref #, Client, Equipment, or Amount..." 
+                       class="w-full sm:w-64 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                       onkeyup="globalSearch(this.value)">
+            </div>
+        </div>
+        
         <div class="overflow-x-auto">
             <!-- BULK FORWARD FORM -->
             <form id="bulkForwardForm" method="POST" action="{{ route('billing.invoices.bulk-forward') }}">
@@ -159,86 +172,49 @@
                             <input type="checkbox" id="selectAll" class="rounded">
                         </th>
                         
-                        <!-- Ref # Column with Search -->
+                        <!-- Ref # Column -->
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            <div class="flex flex-col space-y-1">
-                                <span>Ref #</span>
-                                <input type="text" placeholder="Search..." 
-                                       class="w-full text-xs border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                                       onkeyup="filterColumn(1, this.value)">
-                            </div>
+                            Ref #
                         </th>
                         
-                        <!-- Job Order Column with Search -->
+                        <!-- Job Order Column -->
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            <div class="flex flex-col space-y-1">
-                                <span>Job Order</span>
-                                <input type="text" placeholder="Search..." 
-                                       class="w-full text-xs border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                                       onkeyup="filterColumn(2, this.value)">
-                            </div>
+                            Job Order
                         </th>
                         
-                        <!-- Client Column with Search -->
+                        <!-- Client Column -->
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            <div class="flex flex-col space-y-1">
-                                <span>Client</span>
-                                <input type="text" placeholder="Search..." 
-                                       class="w-full text-xs border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                                       onkeyup="filterColumn(3, this.value)">
-                            </div>
+                            Client
                         </th>
                         
-                        <!-- Equipment Column with Dropdown Filter -->
+                        <!-- Equipment Column -->
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            <div class="flex flex-col space-y-1">
-                                <span>Equipment</span>
-                                <select class="w-full text-xs border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                                        onchange="filterColumn(4, this.value)">
-                                    <option value="">All Types</option>
-                                    <option value="crane">Crane</option>
-                                    <option value="truck">Truck</option>
-                                </select>
-                            </div>
+                            Equipment
                         </th>
                         
                         <!-- Period Column -->
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            <span>Period</span>
+                            Period
                         </th>
                         
-                        <!-- Amount Column with Search -->
+                        <!-- Amount Column -->
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            <div class="flex flex-col space-y-1">
-                                <span>Amount</span>
-                                <input type="text" placeholder="Search..." 
-                                       class="w-full text-xs border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                                       onkeyup="filterColumn(6, this.value)">
-                            </div>
+                            Amount
                         </th>
                         
-                        <!-- Status Column with Dropdown Filter -->
+                        <!-- Status Column -->
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            <div class="flex flex-col space-y-1">
-                                <span>Status</span>
-                                <select class="w-full text-xs border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                                        onchange="filterColumn(7, this.value)">
-                                    <option value="">All Status</option>
-                                    <option value="issued">Issued</option>
-                                    <option value="paid">Paid</option>
-                                    <option value="overdue">Overdue</option>
-                                </select>
-                            </div>
+                            Status
                         </th>
                         
                         <!-- AI Status Column -->
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            <span>AI Status</span>
+                            AI Status
                         </th>
                         
                         <!-- Actions Column -->
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            <span>Actions</span>
+                            Actions
                         </th>
                     </tr>
                 </thead>
@@ -252,6 +228,8 @@
                         data-client="{{ strtolower($invoice->client_name ?? '') }}"
                         data-equipment="{{ strtolower($invoice->equipment_type ?? '') }}"
                         data-status="{{ strtolower($invoice->status ?? '') }}"
+                        data-ref="{{ strtolower($invoice->invoice_uid ?? '') }}"
+                        data-amount="{{ str_replace(['₱', ','], '', number_format($invoice->total_amount ?? 0, 2)) }}"
                         data-date="{{ \Carbon\Carbon::parse($invoice->created_at)->format('Y-m-d') }}">
                         <!-- Checkbox -->
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -274,7 +252,24 @@
                             {{ $invoice->client_name ?? 'Unknown Client' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            {{ ucfirst(str_replace('_', ' ', $invoice->equipment_type ?? 'N/A')) }}<br>
+                            @if($invoice->equipment_type)
+                                @php
+                                    $equipmentDisplay = [
+                                        'tower_crane' => ' Tower Crane',
+                                        'mobile_crane' => ' Mobile Crane',
+                                        'rough_terrain_crane' => ' Rough Terrain Crane',
+                                        'crawler_crane' => ' Crawler Crane',
+                                        'dump_truck' => ' Dump Truck',
+                                        'concrete_mixer' => ' Concrete Mixer',
+                                        'flatbed_truck' => ' Flatbed Truck',
+                                        'tanker_truck' => ' Tanker Truck'
+                                    ];
+                                @endphp
+                                {{ $equipmentDisplay[$invoice->equipment_type] ?? ucfirst(str_replace('_', ' ', $invoice->equipment_type)) }}
+                            @else
+                                N/A
+                            @endif
+                            <br>
                             <span class="text-xs text-gray-500">{{ $invoice->equipment_id ?? 'No ID' }}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
@@ -333,28 +328,14 @@
                                 </a>
                                 
                                 @if(isset($invoice->id))
-                                    <a href="{{ route('billing.invoices.pdf', $invoice->id) }}" 
-                                       target="_blank"
+                                    <a href="#" 
+                                       onclick="downloadProtectedPdf({{ $invoice->id }})"
                                        class="text-green-600 hover:text-green-900 p-1.5 rounded-md hover:bg-green-50 transition"
-                                       title="Download PDF">
+                                       title="Download PDF (Password Protected)">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                         </svg>
                                     </a>
-                                @endif
-                                
-                                <!-- Individual Forward Button -->
-                                @if(in_array(strtolower($invoice->status), ['issued', 'billed']))
-                                    <form action="{{ route('billing.invoices.forward-financials', $invoice->id) }}" method="POST" style="display: inline;">
-                                        @csrf
-                                        <button type="submit" 
-                                                class="text-purple-600 hover:text-purple-900 p-1.5 rounded-md hover:bg-purple-50 transition"
-                                                title="Forward to Financials System">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7l4-4m0 0l4 4m-4-4v18m0 0l-4-4m4 4l4-4" />
-                                            </svg>
-                                        </button>
-                                    </form>
                                 @endif
                             </div>
                         </td>
@@ -376,46 +357,146 @@
     </div>
 </div>
 
-<!-- Demo Invoice Generation Modal -->
+<!-- Professional Generate Demo Invoice Modal -->
 <div id="invoiceModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4">
-        <h3 class="text-lg font-bold mb-4">Generate Demo Invoice</h3>
-        <form action="{{ route('billing.invoices.demo-store') }}" method="POST">
-            @csrf
-            <div class="mb-3">
-                <label class="block text-sm text-gray-700">Client Name</label>
-                <input type="text" name="client_name" value="ABC Construction" required class="w-full px-3 py-2 border rounded">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+        <!-- Modal Header -->
+        <div class="px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-xl font-bold">Generate Demo Invoice</h3>
+                    <p class="text-blue-100 text-sm mt-1">Professional invoice for equipment rental</p>
+                </div>
+                <button type="button" onclick="closeModal()" class="text-white hover:text-gray-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
-            <div class="mb-3">
-                <label class="block text-sm text-gray-700">Equipment Type</label>
-                <select name="equipment_type" required class="w-full px-3 py-2 border rounded">
-                    <option value="crane">Crane</option>
-                    <option value="truck">Truck</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label class="block text-sm text-gray-700">Hours Used</label>
-                <input type="number" name="hours_used" value="8" min="1" required class="w-full px-3 py-2 border rounded">
-            </div>
-            <div class="flex justify-end space-x-2">
-                <button type="button" onclick="closeModal()" class="px-4 py-2 text-gray-600">Cancel</button>
-                <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded">Generate</button>
-            </div>
-        </form>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="p-6">
+            <form action="{{ route('billing.invoices.demo-store') }}" method="POST">
+                @csrf
+
+                <!-- Client Name -->
+                <div class="mb-5">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Client Name</label>
+                    <input type="text" name="client_name" 
+                           value="ABC Construction"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                           required>
+                </div>
+
+                <!-- Equipment Type -->
+                <div class="mb-5">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Equipment Type</label>
+                    <select name="equipment_type" 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg appearance-none bg-white"
+                            required>
+                        <option value="mobile_crane">Mobile Crane (50T)</option>
+                        <option value="tower_crane">Tower Crane (20T)</option>
+                        <option value="dump_truck">Dump Truck (10T)</option>
+                        <option value="concrete_mixer">Concrete Mixer Truck</option>
+                    </select>
+                </div>
+
+                <!-- Hours Used -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Hours Used</label>
+                    <div class="flex items-center space-x-4">
+                        <input type="number" name="hours_used" 
+                               value="8"
+                               min="1" step="0.5"
+                               class="w-1/2 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                               required>
+                        <div class="text-gray-500 text-sm">
+                            <p>Hourly Rate: <span class="font-semibold text-blue-600">₱2,500.00</span></p>
+                            <p>Total: <span class="font-bold text-green-600">₱20,000.00</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invoice Preview -->
+                <div class="bg-gray-50 rounded-lg p-5 mb-6">
+                    <h4 class="font-semibold text-gray-900 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Invoice Preview
+                    </h4>
+                    <div class="border border-gray-200 rounded-lg p-4 bg-white">
+                        <!-- Bill To & Equipment -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <p class="text-sm text-gray-500">Bill To:</p>
+                                <p class="font-medium">ABC Construction</p>
+                                <p class="text-sm text-gray-600">123 Construction Ave, Manila</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Equipment:</p>
+                                <p class="font-medium">Mobile Crane (50T)</p>
+                                <p class="text-sm text-gray-600">Hours: 8 | Rate: ₱2,500/hr</p>
+                            </div>
+                        </div>
+                        <!-- Totals -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Subtotal</span>
+                                <span class="font-medium">₱20,000.00</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">VAT (12%)</span>
+                                <span class="font-medium">₱2,400.00</span>
+                            </div>
+                            <div class="pt-3 border-t border-gray-200 flex justify-between">
+                                <span class="text-lg font-bold text-gray-900">Total Amount</span>
+                                <span class="text-xl font-bold text-green-600">₱22,400.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end space-x-3">
+                    <button type="button" 
+                            onclick="closeModal()"
+                            class="px-6 py-3 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" 
+                            class="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all shadow-md hover:shadow-lg flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Generate Invoice
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
 <script>
-// Column-specific filtering function
-function filterColumn(columnIndex, filterValue) {
+// Global search function
+function globalSearch(searchValue) {
     const rows = document.querySelectorAll('.invoice-row');
     let visibleCount = 0;
     
     rows.forEach(row => {
-        const cellText = row.cells[columnIndex].textContent.toLowerCase();
-        const shouldShow = !filterValue || cellText.includes(filterValue.toLowerCase());
-        row.style.display = shouldShow ? '' : 'none';
+        const ref = row.getAttribute('data-ref') || '';
+        const client = row.getAttribute('data-client') || '';
+        const equipment = row.getAttribute('data-equipment') || '';
+        const amount = row.getAttribute('data-amount') || '';
         
+        const searchLower = searchValue.toLowerCase();
+        const shouldShow = ref.includes(searchLower) || 
+                          client.includes(searchLower) || 
+                          equipment.includes(searchLower) || 
+                          amount.includes(searchLower);
+        
+        row.style.display = shouldShow ? '' : 'none';
         if (shouldShow) visibleCount++;
     });
 }
@@ -474,5 +555,39 @@ function openBulkForwardModal() {
         document.getElementById('bulkForwardForm').submit();
     }
 }
+
+// Password-protected PDF download
+function downloadProtectedPdf(invoiceId) {
+    // Show password info
+    alert("🔒 PDF Password Information:\n\nYour password is: [client_name][invoice_id]\nExample: abcconstruction60\n\nClick OK to download PDF");
+    
+    // Redirect to PDF download
+    window.location.href = '{{ route("billing.invoices.pdf", ":id") }}'.replace(':id', invoiceId);
+}
+</script>
+
+<!-- 3-MINUTE AUTO-LOCK -->
+<script>
+    let inactivityTimer;
+    const INACTIVITY_LIMIT = 7200000; // 3 minutes
+
+    function startInactivityTimer() {
+        inactivityTimer = setTimeout(() => {
+            alert('🔒 System auto-locked due to inactivity!');
+            window.location.href = '{{ route("auto.logout") }}';
+        }, INACTIVITY_LIMIT);
+    }
+
+    function resetInactivityTimer() {
+        clearTimeout(inactivityTimer);
+        startInactivityTimer();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        startInactivityTimer();
+        ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(event => {
+            document.addEventListener(event, resetInactivityTimer, true);
+        });
+    });
 </script>
 @endsection

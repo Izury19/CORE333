@@ -1,292 +1,250 @@
-@extends('layouts.maintenance')
+@extends('layouts.app')
 
 @section('content')
-  <div class="container mt-4">
-    <h2 class="text-center">🛠 Maintenance Notification Calendar</h2>
-    <div id="maintenance-calendar" style="height: 600px;"></div>
-  </div>
+<style>
+.notifications-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.page-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.page-title svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: #3b82f6;
+}
+.notification-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    border-left: 4px solid #3b82f6;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.notification-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.notification-card.unread {
+    background: #f8fafc;
+    border-left-color: #ef4444;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.1);
+}
+.notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.notification-type {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    margin-right: 0.5rem;
+}
+.type-upcoming { background: #dcfce7; color: #166534; }
+.type-overdue { background: #fee2e2; color: #dc2626; }
+.type-completed { background: #dbeafe; color: #1d4ed8; }
+.notification-message {
+    font-weight: 600;
+    margin: 0.5rem 0;
+    color: #1e293b;
+    line-height: 1.5;
+}
+.notification-date {
+    color: #64748b;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #64748b;
+}
+.empty-state svg {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 1.5rem;
+    color: #cbd5e1;
+}
+.empty-state h3 {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #334155;
+    margin-bottom: 0.5rem;
+}
+.empty-state p {
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 500px;
+    margin: 0 auto;
+}
+.pagination-container {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+}
+.pagination {
+    display: flex;
+    gap: 0.25rem;
+}
+.pagination a,
+.pagination span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+.pagination a {
+    color: #3b82f6;
+    background-color: #eff6ff;
+}
+.pagination a:hover {
+    background-color: #dbeafe;
+}
+.pagination .active {
+    background-color: #3b82f6;
+    color: white;
+}
+.pagination .disabled {
+    color: #94a3b8;
+    background-color: #f1f5f9;
+    cursor: not-allowed;
+}
 
-  <style>
-    #maintenance-calendar {
-      max-width: 1000px;
-      margin: 20px auto;
-      background: white;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+/* Responsive Design */
+@media (max-width: 768px) {
+    .notifications-container {
+        padding: 1rem;
     }
-    body {
-      padding-bottom: 100px;
-      overflow-x: hidden;
-      background: #f4f6f8;
+    .page-title {
+        font-size: 1.5rem;
     }
-    footer {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      height: 60px;
-      background-color: #000;
-      color: white;
-      text-align: center;
-      line-height: 60px;
-      z-index: 10;
+    .notification-card {
+        padding: 1.25rem;
     }
-    .fc-day-today {
-      background: none !important;
+    .notification-header {
+        flex-direction: column;
+        align-items: stretch;
     }
-    .status-badge {
-      color: #fff;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-weight: 600;
-      font-size: 0.9em;
+    .notification-type {
+        align-self: flex-start;
     }
-  </style>
+}
+</style>
+
+<div class="notifications-container">
+    <div class="page-header">
+        <h1 class="page-title">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+            Maintenance Notifications
+        </h1>
+    </div>
+    
+    @if($notifications->count() > 0)
+        @foreach($notifications as $notification)
+        <div class="notification-card {{ !$notification->is_read ? 'unread' : '' }}">
+            <div class="notification-header">
+                <span class="notification-type type-{{ $notification->notification_type }}">
+                    {{ ucfirst(str_replace('_', ' ', $notification->notification_type)) }}
+                </span>
+                <span class="notification-date">
+                    {{ $notification->created_at->format('M d, Y \a\t H:i') }}
+                </span>
+            </div>
+            <div class="notification-message">
+                {{ $notification->message }}
+            </div>
+            @if($notification->equipment_name)
+                <div class="text-sm text-gray-600 mt-2">
+                    Equipment: <span class="font-medium">{{ $notification->equipment_name }}</span>
+                </div>
+            @endif
+        </div>
+        @endforeach
+        
+        <div class="pagination-container">
+            <div class="pagination">
+                {{-- Previous Page Link --}}
+                @if ($notifications->onFirstPage())
+                    <span class="disabled">&laquo; Previous</span>
+                @else
+                    <a href="{{ $notifications->previousPageUrl() }}" rel="prev">&laquo; Previous</a>
+                @endif
+
+                {{-- Pagination Elements --}}
+                @php
+                    $currentPage = $notifications->currentPage();
+                    $lastPage = $notifications->lastPage();
+                    $start = max(1, $currentPage - 2);
+                    $end = min($lastPage, $currentPage + 2);
+                @endphp
+
+                @if($start > 1)
+                    <a href="{{ $notifications->url(1) }}">1</a>
+                    @if($start > 2)
+                        <span>...</span>
+                    @endif
+                @endif
+
+                @for($i = $start; $i <= $end; $i++)
+                    @if($i == $currentPage)
+                        <span class="active">{{ $i }}</span>
+                    @else
+                        <a href="{{ $notifications->url($i) }}">{{ $i }}</a>
+                    @endif
+                @endfor
+
+                @if($end < $lastPage)
+                    @if($end < $lastPage - 1)
+                        <span>...</span>
+                    @endif
+                    <a href="{{ $notifications->url($lastPage) }}">{{ $lastPage }}</a>
+                @endif
+
+                {{-- Next Page Link --}}
+                @if ($notifications->hasMorePages())
+                    <a href="{{ $notifications->nextPageUrl() }}" rel="next">Next &raquo;</a>
+                @else
+                    <span class="disabled">Next &raquo;</span>
+                @endif
+            </div>
+        </div>
+    @else
+        <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+            <h3>No notifications yet</h3>
+            <p>Maintenance notifications will appear here when schedules are created, completed, or become overdue. Create your first maintenance schedule to get started!</p>
+        </div>
+    @endif
+</div>
 @endsection
-
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    var calendarEl = document.getElementById('maintenance-calendar');
-    var currentClickedDate = null;
-    var selectedScheduleId = null;
-
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-      initialView: 'dayGridMonth',
-      headerToolbar: {
-        left: 'prev,next today',
-        center: 'title',
-        right: 'dayGridMonth,listWeek'
-      },
-      showNonCurrentDates: false,  
-      fixedWeekCount: false,      
-
-      events: function(fetchInfo, successCallback, failureCallback) {
-        fetch('{{ route("calendar.events") }}')
-          .then(response => response.json())
-          .then(events => {
-            const today = new Date();
-            const transformedEvents = events.map(event => {
-              let status = event.status.toLowerCase();
-              if (status === 'pending' && new Date(event.start) < today) {
-                status = 'overdue';
-              }
-              return { 
-                ...event, 
-                title: status.charAt(0).toUpperCase() + status.slice(1), 
-                status: status,
-                extendedProps: { ...event, status: status }
-              };
-            });
-            successCallback(transformedEvents);
-          })
-          .catch(err => failureCallback(err));
-      },
-
-      eventDidMount: function(info) {
-        let status = (info.event.status || info.event.extendedProps.status).toLowerCase();
-        let color = status === 'pending' ? '#f0ad4e' :
-                    status === 'completed' ? '#87CEEB' :
-                    status === 'overdue' ? '#e74c3c' : '#6c757d';
-
-        info.el.style.backgroundColor = color;
-        info.el.style.borderColor = color;
-        let tooltip = `${info.event.title}\nTechnician: ${info.event.extendedProps.technician}\nStatus: ${status}`;
-        info.el.setAttribute("title", tooltip);
-      },
-
-      dateClick: function(info) {
-        const clickedDate = info.dateStr;
-        currentClickedDate = clickedDate;
-
-        fetch('{{ route("calendar.events") }}')
-          .then(response => response.json())
-          .then(events => {
-            const today = new Date();
-            const matched = events.map(e => {
-              let status = e.status.toLowerCase();
-              if (status === 'pending' && new Date(e.start) < today) {
-                status = 'overdue';
-              }
-              return { ...e, status };
-            }).filter(e => e.start === clickedDate);
-
-            function getStatusBadge(status) {
-              let bgColor = status === 'pending' ? '#f0ad4e' :
-                            status === 'completed' ? '#87CEEB' :
-                            status === 'overdue' ? '#e74c3c' : '#6c757d';
-              return `<span class="status-badge" style="background-color:${bgColor};">
-                        ${status.charAt(0).toUpperCase() + status.slice(1)}
-                      </span>`;
-            }
-
-            if (matched.length > 0) {
-              let content = '<ul class="list-group">';
-              matched.forEach(e => {
-                content += `<li class="list-group-item" data-id="${e.id}">
-                  <strong>${e.title}</strong><br>
-                  Technician: ${e.technician}<br>
-                  Email: <a href="mailto:${e.email}">${e.email}</a><br>
-                  Status: ${getStatusBadge(e.status)}
-                </li>`;
-                selectedScheduleId = e.id; // pick first schedule ID
-              });
-              content += '</ul>';
-              document.getElementById('modal-date').innerText = new Date(clickedDate).toDateString();
-              document.getElementById('modal-body').innerHTML = content;
-              new bootstrap.Modal(document.getElementById('scheduleModal')).show();
-            } else {
-              document.getElementById('modal-date').innerText = new Date(clickedDate).toDateString();
-              document.getElementById('modal-body').innerHTML = "<p class='text-muted'>No schedules for this date.</p>";
-              new bootstrap.Modal(document.getElementById('scheduleModal')).show();
-            }
-          });
-      },
-
-      eventClick: function(info) {
-        const clickedDate = info.event.startStr;
-        currentClickedDate = clickedDate;
-        selectedScheduleId = info.event.id; // assign schedule ID
-
-        fetch('{{ route("calendar.events") }}')
-          .then(response => response.json())
-          .then(events => {
-            const today = new Date();
-            const matched = events.map(e => {
-              let status = e.status.toLowerCase();
-              if (status === 'pending' && new Date(e.start) < today) {
-                status = 'overdue';
-              }
-              return { ...e, status };
-            }).filter(e => e.start === clickedDate);
-
-            function getStatusBadge(status) {
-              let bgColor = status === 'pending' ? '#f0ad4e' :
-                            status === 'completed' ? '#87CEEB' :
-                            status === 'overdue' ? '#e74c3c' : '#6c757d';
-              return `<span class="status-badge" style="background-color:${bgColor};">
-                        ${status.charAt(0).toUpperCase() + status.slice(1)}
-                      </span>`;
-            }
-
-            if (matched.length > 0) {
-              let content = '<ul class="list-group">';
-              matched.forEach(e => {
-                content += `<li class="list-group-item" data-id="${e.id}">
-                  <strong>${e.title}</strong><br>
-                  Technician: ${e.technician}<br>
-                  Email: <a href="mailto:${e.email}">${e.email}</a><br>
-                  Status: ${getStatusBadge(e.status)}
-                </li>`;
-              });
-              content += '</ul>';
-              document.getElementById('modal-date').innerText = new Date(clickedDate).toDateString();
-              document.getElementById('modal-body').innerHTML = content;
-              new bootstrap.Modal(document.getElementById('scheduleModal')).show();
-            }
-          });
-      }
-    });
-
-    calendar.render();
-
-    // Send email notification
-    document.getElementById('sendEmailBtn').addEventListener('click', function () {
-      if (!currentClickedDate) return;
-      Swal.fire({ title: 'Sending...', text: 'Please wait while emails are being sent.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-      fetch('/send-email-notification', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-        body: JSON.stringify({ date: currentClickedDate })
-      })
-      .then(res => res.json())
-      .then(data => {
-        Swal.close();
-        Swal.fire({ icon: data.success ? 'success' : 'warning', title: data.message });
-      })
-      .catch(() => {
-        Swal.close();
-        Swal.fire({ icon: 'error', title: 'Oops...', text: 'Something went wrong while sending email.' });
-      });
-    });
-
-    // Upload Proof Button
-    document.getElementById('uploadProofBtn').addEventListener('click', function () {
-      if (!selectedScheduleId) {
-        Swal.fire('No schedule selected', '', 'warning');
-        return;
-      }
-      document.getElementById('schedule_id').value = selectedScheduleId;
-      new bootstrap.Modal(document.getElementById('proofModal')).show();
-    });
-
-    // Proof Form Submit
-    document.getElementById('proofForm').addEventListener('submit', function (e) {
-      e.preventDefault();
-      let formData = new FormData(this);
-      fetch(`/maintenance/${selectedScheduleId}/upload-proof`, {
-        method: 'POST',
-        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-        body: formData
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          Swal.fire('Success', data.message, 'success');
-          location.reload();
-        } else {
-          Swal.fire('Error', data.message, 'error');
-        }
-      })
-      .catch(() => Swal.fire('Error', 'Something went wrong.', 'error'));
-    });
-  });
-</script>
-@endpush
-
-
-<!-- Schedule Modal -->
-<div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title">Maintenance Schedules on <span id="modal-date"></span></h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body" id="modal-body"></div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="sendEmailBtn">Send Email Notification</button>
-        <button type="button" class="btn btn-warning" id="uploadProofBtn">Upload Proof</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Upload Proof Modal -->
-<div class="modal fade" id="proofModal" tabindex="-1" aria-labelledby="proofModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-md modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-warning">
-        <h5 class="modal-title">Upload Proof of Completion</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <form id="proofForm" enctype="multipart/form-data">
-          @csrf
-          <div class="modal-body">
-              <input type="hidden" id="schedule_id" name="schedule_id">
-              <div class="mb-3">
-                  <label for="proof" class="form-label">Upload Image</label>
-                  <input type="file" class="form-control" name="proof_image" id="proof" accept="image/*" required>
-              </div>
-          </div>
-          <div class="modal-footer">
-              <button type="submit" class="btn btn-success">Submit Proof</button>
-          </div>
-      </form>
-
-    </div>
-  </div>
-</div>

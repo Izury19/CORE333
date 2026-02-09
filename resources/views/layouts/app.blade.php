@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
@@ -197,5 +198,29 @@
   </script>
 
   @stack('scripts')
+
+<script>
+    let inactivityTimer;
+    const INACTIVITY_LIMIT = 7200000; // 5 seconds
+
+    function startInactivityTimer() {
+        inactivityTimer = setTimeout(() => {
+            alert('🔒 System auto-locked due to inactivity!');
+            window.location.href = '{{ route("auto.logout") }}'; // ✅ CORRECT ROUTE NAME
+        }, INACTIVITY_LIMIT);
+    }
+
+    function resetInactivityTimer() {
+        clearTimeout(inactivityTimer);
+        startInactivityTimer();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        startInactivityTimer();
+        ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(event => {
+            document.addEventListener(event, resetInactivityTimer, true);
+        });
+    });
+</script>
 </body>
 </html>

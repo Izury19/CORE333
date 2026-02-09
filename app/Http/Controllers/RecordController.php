@@ -68,7 +68,16 @@ class RecordController extends Controller
         $paidInvoices = DB::table('billing_invoices')->where('status', 'paid')->count();
         $collectionRate = $totalInvoices > 0 ? round(($paidInvoices / $totalInvoices) * 100, 1) : 0;
 
-        $unpaidInvoices = DB::table('billing_invoices')->where('status', 'billed')->get();
+  $unpaidInvoices = DB::table('billing_invoices')
+    ->whereIn('billing_invoices.status', ['issued', 'billed'])
+    ->leftJoin('records', 'billing_invoices.id', '=', 'records.invoice_id')
+    ->where(function($q) {
+        // Include invoices with NO record OR record with status = 'pending'
+        $q->whereNull('records.invoice_id')
+          ->orWhere('records.status', 'pending');
+    })
+    ->select('billing_invoices.*')
+    ->get();
 
         return view('Record and Payment.index', compact(
             'payments',

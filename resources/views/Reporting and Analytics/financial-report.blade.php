@@ -171,19 +171,44 @@
                         </p>
                     </div>
 
-                    <!-- Charts Section -->
+                    <!-- Charts Section - REAL DATA -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <!-- Revenue Trend - REAL DATA -->
                         <div class="bg-gray-50 rounded-xl p-4">
                             <h3 class="text-lg font-semibold text-gray-900 mb-4">Revenue Trend</h3>
-                            <div class="h-64">
-                                <canvas id="revenueChart"></canvas>
+                            <div class="space-y-2">
+                                @php
+                                $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+                                $maxRevenue = max($revenueData);
+                                @endphp
+                                
+                                @for($i = 0; $i < count($months); $i++)
+                                <div class="flex items-center">
+                                    <span class="text-xs text-gray-500 w-8">{{ $months[$i] }}</span>
+                                    <div class="flex-1 bg-gray-200 rounded-full h-2 ml-2">
+                                        <div class="bg-green-500 h-2 rounded-full" style="width: {{ $maxRevenue > 0 ? ($revenueData[$i] / $maxRevenue) * 100 : 0 }}%"></div>
+                                    </div>
+                                    <span class="text-xs text-gray-500 w-12 text-right">₱{{ number_format($revenueData[$i]/1000, 0) }}K</span>
+                                </div>
+                                @endfor
                             </div>
                         </div>
                         
+                        <!-- Payment Methods - REAL DATA -->
                         <div class="bg-gray-50 rounded-xl p-4">
                             <h3 class="text-lg font-semibold text-gray-900 mb-4">Payment Methods</h3>
-                            <div class="h-64">
-                                <canvas id="paymentChart"></canvas>
+                            <div class="space-y-3">
+                                @foreach($paymentMethods as $method)
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span>{{ $method['name'] }}</span>
+                                        <span>{{ $method['percentage'] }}%</span>
+                                    </div>
+                                    <div class="w-full bg-{{ $method['color'] }}-200 rounded-full h-3">
+                                        <div class="bg-{{ $method['color'] }}-500 h-3 rounded-full" style="width: {{ $method['percentage'] }}%"></div>
+                                    </div>
+                                </div>
+                                @endforeach
                             </div>
                         </div>
                     </div>
@@ -253,18 +278,218 @@
                     <p class="text-sm text-yellow-700 mt-1">Equipment maintenance status from Maintenance Scheduling system</p>
                 </div>
                 <div class="p-6">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Maintenance Summary Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
                         <div class="bg-gray-50 rounded-lg p-4">
                             <p class="text-sm text-gray-600 mb-1">Completed This Month</p>
-                            <p class="text-xl font-bold text-gray-900">12</p>
+                            <p class="text-xl font-bold text-gray-900">{{ $completedThisMonth }}</p>
                         </div>
                         <div class="bg-gray-50 rounded-lg p-4">
                             <p class="text-sm text-gray-600 mb-1">Pending Maintenance</p>
-                            <p class="text-xl font-bold text-gray-900">3</p>
+                            <p class="text-xl font-bold text-gray-900">{{ $pendingCount }}</p>
                         </div>
                         <div class="bg-gray-50 rounded-lg p-4">
-                            <p class="text-sm text-gray-600 mb-1">Upcoming Schedule</p>
-                            <p class="text-xl font-bold text-gray-900">8</p>
+                            <p class="text-sm text-gray-600 mb-1">Overdue Schedules</p>
+                            <p class="text-xl font-bold text-gray-900">{{ $overdueCount }}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <p class="text-sm text-gray-600 mb-1">High Risk Equipment</p>
+                            <p class="text-xl font-bold text-gray-900">{{ $highRiskCount }}</p>
+                        </div>
+                    </div>
+
+                    <!-- AI Risk Distribution Chart -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">AI Risk Distribution</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="p-4 bg-red-50 rounded-lg">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-medium text-red-800">High Risk (≥80%)</span>
+                                    <span class="text-xl font-bold text-red-900">{{ $highRiskCount }}</span>
+                                </div>
+                                <div class="w-full bg-red-200 rounded-full h-2">
+                                    <div class="bg-red-600 h-2 rounded-full" style="width: {{ $highRiskCount + $mediumRiskCount + $lowRiskCount > 0 ? ($highRiskCount / ($highRiskCount + $mediumRiskCount + $lowRiskCount)) * 100 : 0 }}%"></div>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-yellow-50 rounded-lg">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-medium text-yellow-800">Medium Risk (60-79%)</span>
+                                    <span class="text-xl font-bold text-yellow-900">{{ $mediumRiskCount }}</span>
+                                </div>
+                                <div class="w-full bg-yellow-200 rounded-full h-2">
+                                    <div class="bg-yellow-600 h-2 rounded-full" style="width: {{ $highRiskCount + $mediumRiskCount + $lowRiskCount > 0 ? ($mediumRiskCount / ($highRiskCount + $mediumRiskCount + $lowRiskCount)) * 100 : 0 }}%"></div>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-green-50 rounded-lg">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-medium text-green-800">Low Risk (<60%)</span>
+                                    <span class="text-xl font-bold text-green-900">{{ $lowRiskCount }}</span>
+                                </div>
+                                <div class="w-full bg-green-200 rounded-full h-2">
+                                    <div class="bg-green-600 h-2 rounded-full" style="width: {{ $highRiskCount + $mediumRiskCount + $lowRiskCount > 0 ? ($lowRiskCount / ($highRiskCount + $mediumRiskCount + $lowRiskCount)) * 100 : 0 }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Maintenance Activity -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Maintenance Activity</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Equipment</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scheduled Date</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">AI Risk</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    @forelse($recentMaintenance as $schedule)
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $schedule->equipment_name }}</td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">{{ $schedule->maintenanceType->name ?? 'N/A' }}</td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">{{ \Carbon\Carbon::parse($schedule->scheduled_date)->format('M d, Y') }}</td>
+                                        <td class="px-4 py-3 text-sm">
+                                            @if($schedule->status == 'completed')
+                                                <span class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full bg-green-100 text-green-800">Completed</span>
+                                            @elseif($schedule->status == 'pending' && \Carbon\Carbon::parse($schedule->scheduled_date)->isPast())
+                                                <span class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full bg-red-100 text-red-800">Overdue</span>
+                                            @else
+                                                <span class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-3 text-sm">
+                                            @if($schedule->ai_risk_score > 0)
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-sm font-medium">
+                                                        {{ number_format($schedule->ai_risk_score * 100, 0) }}%
+                                                    </span>
+                                                    @if($schedule->ai_risk_score >= 0.8)
+                                                        <span class="w-2 h-2 bg-red-500 rounded-full" title="High Risk"></span>
+                                                    @elseif($schedule->ai_risk_score >= 0.6)
+                                                        <span class="w-2 h-2 bg-yellow-500 rounded-full" title="Medium Risk"></span>
+                                                    @else
+                                                        <span class="w-2 h-2 bg-green-500 rounded-full" title="Low Risk"></span>
+                                                    @endif
+                                                </div>
+                                            @else
+                                                <span class="text-gray-400 text-sm">N/A</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="5" class="px-4 py-8 text-center text-gray-500">
+                                            No maintenance records found.
+                                        </td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- AI Insights -->
+                    <div class="mt-4 p-3 bg-yellow-50 rounded-lg mb-6">
+                        <p class="text-sm text-yellow-800">
+                            🤖 <strong>AI Insight:</strong> Our predictive maintenance system analyzes equipment history and usage patterns to identify high-risk equipment requiring immediate attention.
+                        </p>
+                    </div>
+
+                    <!-- Maintenance Trends Chart - REAL DATA -->
+                    <div class="bg-gray-50 rounded-xl p-4 mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Maintenance Completion Trend</h3>
+                        <div class="space-y-2">
+                            @php
+                            $maintenanceMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+                            $maxMaintenance = max($maintenanceData);
+                            @endphp
+                            
+                            @for($i = 0; $i < count($maintenanceMonths); $i++)
+                            <div class="flex items-center">
+                                <span class="text-xs text-gray-500 w-8">{{ $maintenanceMonths[$i] }}</span>
+                                <div class="flex-1 bg-gray-200 rounded-full h-2 ml-2">
+                                    <div class="bg-blue-500 h-2 rounded-full" style="width: {{ $maxMaintenance > 0 ? ($maintenanceData[$i] / $maxMaintenance) * 100 : 0 }}%"></div>
+                                </div>
+                                <span class="text-xs text-gray-500 w-8 text-right">{{ $maintenanceData[$i] }}</span>
+                            </div>
+                            @endfor
+                        </div>
+                    </div>
+
+                    <!-- Forward Files Button for Maintenance -->
+                    <div class="mt-6">
+                        <button type="button" 
+                                onclick="openForwardModal('Maintenance Compliance Report', 'Maintenance')" 
+                                class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                            Forward Maintenance Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI-Powered Predictive Analytics -->
+        <div class="mb-8">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="px-6 py-5 border-b border-gray-200 bg-purple-50">
+                    <h2 class="text-xl font-bold text-purple-900">🤖 AI-Powered Predictive Analytics</h2>
+                    <p class="text-sm text-purple-700 mt-1">Machine learning insights for proactive maintenance management</p>
+                </div>
+                <div class="p-6">
+                    <!-- AI Risk Summary -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <p class="text-sm text-gray-600 mb-1">High Risk Equipment</p>
+                            <p class="text-xl font-bold text-red-600">{{ $aiInsights['high_risk_equipment'] }}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <p class="text-sm text-gray-600 mb-1">At-Risk Percentage</p>
+                            <p class="text-xl font-bold text-orange-600">{{ $aiInsights['risk_percentage'] }}%</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <p class="text-sm text-gray-600 mb-1">Predicted Failures (30d)</p>
+                            <p class="text-xl font-bold text-yellow-600">{{ $aiPredictions['upcoming_failures_30days'] }}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <p class="text-sm text-gray-600 mb-1">Cost Savings</p>
+                            <p class="text-xl font-bold text-green-600">₱{{ number_format($aiPredictions['maintenance_cost_savings'], 0) }}</p>
+                        </div>
+                    </div>
+
+                    <!-- AI Recommendation -->
+                    <div class="mt-4 p-4 bg-purple-50 rounded-lg">
+                        <p class="text-sm text-purple-800">
+                            🤖 <strong>AI Recommendation:</strong> {{ $aiInsights['recommendation'] }}
+                        </p>
+                    </div>
+
+                    <!-- Predictive Maintenance Chart - REAL DATA -->
+                    <div class="bg-gray-50 rounded-xl p-4 mt-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Predictive Maintenance Timeline</h3>
+                        <div class="space-y-3">
+                            @php
+                            $weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                            $maxPredictive = max($predictiveData);
+                            @endphp
+                            
+                            @for($i = 0; $i < count($weeks); $i++)
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>{{ $weeks[$i] }}</span>
+                                    <span>{{ $predictiveData[$i] }} failures</span>
+                                </div>
+                                <div class="w-full bg-red-200 rounded-full h-3">
+                                    <div class="bg-red-500 h-3 rounded-full" style="width: {{ $maxPredictive > 0 ? ($predictiveData[$i] / $maxPredictive) * 100 : 0 }}%"></div>
+                                </div>
+                            </div>
+                            @endfor
                         </div>
                     </div>
                 </div>
@@ -365,53 +590,8 @@
             </div>
         </div>
 
-        <!-- ADMINISTRATIVE SYSTEMS SECTION -->
-        <div class="mb-8">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h2 class="text-xl font-bold text-gray-900 mb-4">Administrative Systems</h2>
-                <p class="text-gray-600 mb-6">Final reports and statements are forwarded to administrative systems for archiving and document management.</p>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Archiving Management -->
-                    <div class="bg-gray-50 rounded-xl p-4">
-                        <div class="flex items-center mb-4">
-                            <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9M5 11V9m2 6a6 6 0 1112 0 6 6 0 01-12 0z" />
-                                </svg>
-                            </div>
-                            <div class="ml-3">
-                                <h3 class="text-lg font-semibold text-gray-900">Archiving Management</h3>
-                                <p class="text-sm text-gray-600">Receives finalized reports/statements for long-term storage</p>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-lg p-3">
-                            <p class="text-sm text-gray-600">✅ 12 Final Reports Archived</p>
-                            <p class="text-sm text-gray-600">📅 Last Updated: Jan 22, 2026</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Document and File Manager -->
-                    <div class="bg-gray-50 rounded-xl p-4">
-                        <div class="flex items-center mb-4">
-                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3M9 17H7a2 2 0 01-2-2V5a2 2 0 012-2h6a2 2 0 012 2v1m-2 9a2 2 0 002 2h2a2 2 0 002-2m-4-1a2 2 0 012-2h2a2 2 0 012 2m-4 1a2 2 0 002 2h2a2 2 0 002-2m-4-1a2 2 0 012-2h2a2 2 0 012 2m-4 1a2 2 0 002 2h2a2 2 0 002-2" />
-                                </svg>
-                            </div>
-                            <div class="ml-3">
-                                <h3 class="text-lg font-semibold text-gray-900">Document and File Manager</h3>
-                                <p class="text-sm text-gray-600">Manages finalized reports/statements for easy access</p>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-lg p-3">
-                            <p class="text-sm text-gray-600">✅ 8 Documents Processed</p>
-                            <p class="text-sm text-gray-600">📁 Categories: Financial, Compliance, Project</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+     
+        
     </div>
 </div>
 
@@ -461,11 +641,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Forward Files Modal Functions
 function openForwardModal(documentType, category) {
-    // Store the document type and category in localStorage
     localStorage.setItem('forwardDocumentType', documentType);
     localStorage.setItem('forwardCategory', category);
-    
-    // Open the modal
     document.getElementById('forwardModal').style.display = 'block';
 }
 
@@ -473,15 +650,13 @@ function closeForwardModal() {
     document.getElementById('forwardModal').style.display = 'none';
 }
 
-// Close modal when clicking outside
 window.onclick = function(event) {
-    const modal = document.getElementById('forwardModal');
+    const modal = document.getElementById('forwardModal');ss
     if (event.target === modal) {
         closeForwardModal();
     }
 }
 
-// Close with Escape key
 document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {
         closeForwardModal();

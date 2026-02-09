@@ -5,10 +5,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\LandingController;
-use App\Http\Controllers\InvoiceController; // <-- Existing controller (we'll use it for billing_invoices)
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\ContractController;
-
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\PaymentApiController;
@@ -46,142 +45,108 @@ Route::post('/register', [RegisterController::class, 'register'])->name('registe
 Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
 Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 
+
 /*
 |--------------------------------------------------------------------------
 | Dashboard & User
 |--------------------------------------------------------------------------
 */
-Route::get('/dashboard', [AuthController::class, 'showMainPage'])->name('dashboard');
+Route::get('/dashboard', [ReportingController::class, 'dashboard'])->name('dashboard');
 Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
 Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
 
-/*
+
 /*
 |--------------------------------------------------------------------------
-| Billing & Invoicing (Cleaned)
+| Billing & Invoicing
 |--------------------------------------------------------------------------
 */
-// Main billing invoices route (MISSING!)
-Route::get('/billing-invoices', [BillingInvoiceController::class, 'index'])
-    ->name('billing.invoices.index');
-
-// Demo invoice generation
-Route::post('/billing-invoices/demo', [BillingInvoiceController::class, 'demoStore'])
-    ->name('billing.invoices.demo-store');
-
-// Scan duplicates
-Route::post('/billing-invoices/scan', [BillingInvoiceController::class, 'scanDuplicates'])
-    ->name('billing.invoices.scan');
-
-// PDF download
-Route::get('/billing-invoices/{id}/pdf', [BillingInvoiceController::class, 'downloadPdf'])
-    ->name('billing.invoices.pdf');
-
-// Show single invoice
-Route::get('/billing-invoices/{id}', [BillingInvoiceController::class, 'show'])
-    ->name('billing.invoices.show');
-
-// InvoiceController routes (existing)
-Route::resource('invoices', InvoiceController::class)->except(['create', 'edit']);
-Route::patch('/invoices/{id}/status', [InvoiceController::class, 'updateStatus'])->name('invoices.update.status');
-Route::delete('/invoices/{id}', [InvoiceController::class, 'destroy'])->name('invoices.destroy');
-
-
-Route::post('/billing/invoices/{id}/forward-financials', [BillingController::class, 'forwardIssuedBill'])
-    ->name('billing.invoices.forward-financials');
-
-    Route::post('/billing/invoices/bulk-forward', [BillingInvoiceController::class, 'bulkForwardToFinancials'])
-    ->name('billing.invoices.bulk-forward');
-
-   Route::get('/test-forward', function() {
-    return redirect()->route('billing.invoices.index')
-        ->with('success', '✅ Test success message working!');
+Route::prefix('billing/invoices')->name('billing.invoices.')->group(function () {
+    Route::get('/', [BillingInvoiceController::class, 'index'])->name('index');
+    Route::post('/demo-store', [BillingInvoiceController::class, 'demoStore'])->name('demo-store');
+    Route::post('/scan', [BillingInvoiceController::class, 'scanDuplicates'])->name('scan');
+    Route::get('/{id}/pdf', [BillingInvoiceController::class, 'downloadPdf'])->name('pdf');
+    Route::get('/{id}', [BillingInvoiceController::class, 'show'])->name('show');
+    Route::post('/bulk-forward', [BillingInvoiceController::class, 'bulkForwardToFinancials'])->name('bulk-forward');
 });
+
+
 /*
 |--------------------------------------------------------------------------
 | Record & Payment Management
 |--------------------------------------------------------------------------
 */
-Route::post('/records/{id}/forward-payment', [RecordController::class, 'forwardPaymentToFinancials'])
-    ->name('records.forward-payment');
-
-// Record & Payment Routes
 Route::get('/record-payment', [RecordController::class, 'index'])->name('record.index');
 Route::post('/record-payment', [RecordController::class, 'store'])->name('record.store');
 
+
 /*
 |--------------------------------------------------------------------------
-| Schedule Preventive (Views Only)
+| Schedule Preventive Maintenance
 |--------------------------------------------------------------------------
 */
-Route::view('/maintenance-notif', 'SchedulePreventive.maintenance-notif')->name('maintenance-notif');
+Route::get('/maintenance-sched', [MaintenanceController::class, 'index'])->name('maintenance-sched');
 Route::get('/maintenance-history', [MaintenanceController::class, 'showHistoryLog'])->name('maintenance-history');
+Route::get('/maintenance-dashboard', [MaintenanceController::class, 'dashboard'])->name('maintenance-dashboard');
 Route::get('/assign-tech', [TechnicianController::class, 'index'])->name('assign-tech');
-Route::post('/technicians/{technician}/upload-image', [TechnicianController::class, 'uploadImage'])
-     ->name('technicians.uploadImage');
+Route::post('/technicians/{technician}/upload-image', [TechnicianController::class, 'uploadImage'])->name('technicians.uploadImage');
+Route::post('/maintenance/{id}/upload-proof', [MaintenanceController::class, 'markCompleted'])->name('maintenance.complete');
+Route::post('/send-email-notification', [MaintenanceController::class, 'sendEmailNotification']);
+
 
 /*
 |--------------------------------------------------------------------------
-| Contract & Permit (Views Only)
+| Contract Management
 |--------------------------------------------------------------------------
 */
-// Contract Management Routes
-Route::get('/contract-management', [ContractController::class, 'index'])->name('contract.management');
-// Dapat nasa taas ng file: use statement
-
-// Contract Management Routes
 Route::get('/contract-management', [ContractController::class, 'index'])->name('contract.management');
 Route::post('/contract-management', [ContractController::class, 'store'])->name('contracts.store');
-Route::get('/contract-management/{id}', [ContractController::class, 'show'])->name('contracts.show'); 
-Route::get('/contract-management/{id}/pdf', [ContractController::class, 'exportPdf'])->name('contracts.pdf');
+
+// Contract Actions
+Route::get('/contracts/{id}', [ContractController::class, 'show'])->name('contracts.show');
+Route::get('/contracts/{id}/view', [ContractController::class, 'view'])->name('contracts.view');
+Route::get('/contracts/{id}/edit', [ContractController::class, 'edit'])->name('contracts.edit');
+Route::put('/contracts/{id}', [ContractController::class, 'update'])->name('contracts.update');
+Route::delete('/contracts/{id}', [ContractController::class, 'destroy'])->name('contracts.destroy');
+Route::post('/contracts/{id}/refresh-status', [ContractController::class, 'refreshStatus'])->name('contracts.refresh-status');
 
 
 /*
 |--------------------------------------------------------------------------
-| Reporting & Analytics (Views Only)
+| Permit Management
+|--------------------------------------------------------------------------
+*/
+Route::get('/manage-permits', [ContractController::class, 'permitsIndex'])->name('manage-permits');
+Route::post('/permits', [ContractController::class, 'storePermit'])->name('permits.store');
+Route::get('/permits/{id}/view', [ContractController::class, 'viewPermit'])->name('permits.view');
+Route::get('/permits/{id}/edit', [ContractController::class, 'editPermit'])->name('permits.edit');
+Route::put('/permits/{id}', [ContractController::class, 'updatePermit'])->name('permits.update');
+Route::delete('/permits/{id}', [ContractController::class, 'destroyPermit'])->name('permits.destroy');
+
+
+/*
+|--------------------------------------------------------------------------
+| Reporting & Analytics
 |--------------------------------------------------------------------------
 */
 Route::get('/financial-report', [ReportingController::class, 'index'])->name('financial-report');
-
-    // Financial Report routes
-Route::get('/financial-report', [ReportingController::class, 'index'])->name('financial-report')->middleware('auth');
 Route::get('/financial-report/export/excel', [ReportingController::class, 'exportExcel'])->name('financial-report.export.excel');
 Route::get('/financial-report/export/pdf', [ReportingController::class, 'exportPdf'])->name('financial-report.export.pdf');
 
-Route::post('/api/send-to-document-manager', [DocumentManagerController::class, 'storeReport'])->name('document.manager.store');
-// Add this route
-Route::post('/forward-document', [ReportingController::class, 'forwardDocument'])->name('forward.document');
-Route::get('/forward-files', function () {
-    return view('forward-form');
-})->name('forward.files');
+
 /*
 |--------------------------------------------------------------------------
 | Delivery & Receipts
 |--------------------------------------------------------------------------
 */
 Route::get('/delivery', [InvoiceController::class, 'delivery'])->name('delivery');
-Route::post('/invoices/{id}/generate-receipt', [RecordController::class, 'generateReceipt'])
-    ->name('invoices.generateReceipt');
+Route::post('/invoices/{id}/generate-receipt', [RecordController::class, 'generateReceipt'])->name('invoices.generateReceipt');
 Route::resource('receipts', ReceiptController::class);
 
 
-// Temporary proxy for development
-Route::get('/test-admin-api', function () {
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, 'https://admin.cranecali-ms.com/api/documents/store');
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-    
-    return "HTTP Code: " . $httpCode . "<br>Response: " . $response;
-});
-
 /*
 |--------------------------------------------------------------------------
-| Maintenance
+| Maintenance API Routes
 |--------------------------------------------------------------------------
 */
 Route::prefix('maintenance')->name('maintenance.')->group(function () {
@@ -192,22 +157,13 @@ Route::prefix('maintenance')->name('maintenance.')->group(function () {
     Route::put('/{id}', [MaintenanceController::class, 'update'])->name('update');
     Route::delete('/{id}', [MaintenanceController::class, 'destroy'])->name('destroy');
 });
-Route::get('/maintenance-sched', [MaintenanceController::class, 'index'])->name('maintenance-sched');
-Route::get('/calendar/events', [MaintenanceController::class, 'calendarEvents'])->name('calendar.events');
+
 
 /*
 |--------------------------------------------------------------------------
-| Contract
+| Payments & Jobs
 |--------------------------------------------------------------------------
 */
-Route::post('/make-contract', [ContractController::class, 'store'])->name('contracts.store');
-
-/*
-|--------------------------------------------------------------------------
-| Payments
-|--------------------------------------------------------------------------
-*/
-
 Route::prefix('dashboard/payments')->as('dashboard.payments.')->group(function () {
     Route::get('/', [PaymentApiController::class, 'index'])->name('index');
     Route::get('/summary', [PaymentApiController::class, 'summary'])->name('summary');
@@ -215,22 +171,9 @@ Route::prefix('dashboard/payments')->as('dashboard.payments.')->group(function (
     Route::post('/{id}/reminder', [PaymentApiController::class, 'sendReminder'])->name('sendReminder');
 });
 
-Route::prefix('dashboard')->name('dashboard.')->group(function () {
-    Route::get('/payments', [PaymentApiController::class, 'fetchInvoices'])->name('payments.fetch');
-    Route::put('/payments/{id}/status', [PaymentApiController::class, 'updateStatus'])->name('payments.updateStatus');
-    Route::post('/payments/{id}/reminder', [PaymentApiController::class, 'sendReminder'])->name('payments.sendReminder');
-});
-
 Route::get('/dashboard/jobs', [JobController::class, 'index'])->name('jobs.index');
 Route::put('/dashboard/jobs/{job}/status', [JobController::class, 'updateStatus'])->name('jobs.updateStatus');
 
-Route::post('/send-email-notification', [MaintenanceController::class, 'sendEmailNotification']);
-Route::post('/maintenance/{id}/upload-proof', [MaintenanceController::class, 'markCompleted'])->name('maintenance.complete');
-
-Route::get('/billing/record', [InvoiceController::class, 'record'])->name('billing.record');
-Route::get('/billing/record/{id}', [InvoiceController::class, 'show'])->name('billing.show');
-
-Route::resource('technicians', TechnicianController::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -242,21 +185,12 @@ Route::get('/verify-otp', [OTPController::class, 'showVerifyForm'])->name('otp.v
 Route::post('/verify-otp', [OTPController::class, 'verify'])->name('otp.verify.submit');
 Route::get('/resend-otp', [OTPController::class, 'resend'])->name('otp.resend');
 
+
 /*
 |--------------------------------------------------------------------------
-| AI-Driven Billing & Invoicing (New System)
+| Test Routes
 |--------------------------------------------------------------------------
 */
-Route::prefix('billing-invoices')->name('billing.invoices.')->middleware('auth')->group(function () {
-    Route::get('/', [BillingInvoiceController::class, 'index'])->name('index');
-    Route::get('/create', [BillingInvoiceController::class, 'create'])->name('create');
-    Route::post('/', [BillingInvoiceController::class, 'store'])->name('store');
-    Route::get('/{id}', [BillingInvoiceController::class, 'show'])->name('show');
-});
-
-
-
-
 Route::get('/test-db', function() {
     try {
         $records = \DB::table('records')->count();
@@ -266,4 +200,43 @@ Route::get('/test-db', function() {
     }
 });
 
+Route::get('/auto-logout', function () {
+    auth()->logout();
+    session()->invalidate();
+    session()->regenerateToken();
+    return redirect('/');
+})->name('auto.logout');
 
+// Test route to manually create invoice + record
+Route::get('/test-invoice-record', function () {
+    // Create invoice
+    $invoice = \App\Models\BillingInvoice::create([
+        'invoice_uid' => 'INV-TEST-' . time(),
+        'client_name' => 'Test Client',
+        'equipment_type' => 'mobile_crane',
+        'equipment_id' => 'MOB-9999',
+        'hours_used' => 8,
+        'hourly_rate' => 2500,
+        'total_amount' => 22400,
+        'billing_period_start' => now()->subDays(2),
+        'billing_period_end' => now(),
+        'status' => 'issued'
+    ]);
+
+    // Insert record (bypass all constraints)
+    \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+    \DB::table('records')->insert([
+        'invoice_id' => $invoice->id,
+        'payment_uid' => 'PAY-TEST-' . $invoice->id,
+        'payment_method' => 'pending',
+        'reference_number' => $invoice->invoice_uid,
+        'status' => 'pending',
+        'total' => 0,
+        'client_name' => $invoice->client_name,
+        'created_at' => now(),
+        'updated_at' => now()
+    ]);
+    \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+    return "✅ Invoice ID: {$invoice->id} | Record created!";
+});

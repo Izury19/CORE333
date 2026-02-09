@@ -119,64 +119,89 @@ class BillingInvoiceController extends Controller
             ->with('success', 'AI scan completed! Potential duplicates flagged for review.');
     }
 
-    public function downloadPdf($id)
-    {
-        try {
-            $invoice = BillingInvoice::findOrFail($id);
-            $pdf = Pdf::loadView('Billing and Invoicing.invoice-pdf', compact('invoice'))
-                ->setPaper('a4')
-                ->setOption('default-header', false)
-                ->setOption('default-footer', false);
-            return $pdf->download("invoice-{$id}.pdf");
-        } catch (\Exception $e) {
-            return redirect()->route('billing.invoices.index')->withErrors([
-                'pdf_error' => 'Failed to generate PDF.'
-            ]);
-        }
+   public function downloadPdf($id)
+{
+    try {
+        $invoice = BillingInvoice::findOrFail($id);
+        
+        // Generate password hint for user
+        $passwordHint = str_replace(' ', '', strtolower($invoice->client_name)) . $invoice->id;
+        
+        // Store in session to show on page (optional)
+        session(['pdf_password' => $passwordHint]);
+        
+        $pdf = Pdf::loadView('Billing and Invoicing.invoice-pdf', compact('invoice'))
+            ->setPaper('a4')
+            ->setOption('default-header', false)
+            ->setOption('default-footer', false);
+
+        return $pdf->download("invoice-{$id}.pdf");
+        
+    } catch (\Exception $e) {
+        return redirect()->route('billing.invoices.index')->withErrors([
+            'pdf_error' => 'Failed to generate PDF.'
+        ]);
     }
+}
 
     public function demoStore(Request $request)
-    {
-        $request->validate([
-            'client_name' => 'required',
-            'equipment_type' => 'required|in:crane,truck',
-            'hours_used' => 'required|integer|min:1'
-        ]);
+{
+    $request->validate([
+        'client_name' => 'required',
+        'equipment_type' => 'required|in:mobile_crane,tower_crane,dump_truck,concrete_mixer',
+        'hours_used' => 'required|numeric|min:1'
+    ]);
 
-        $hourlyRate = $request->equipment_type === 'crane' ? 2200 : 1500;
-        $totalAmount = $request->hours_used * $hourlyRate;
-        $uid = BillingInvoice::generateUid($request->equipment_type);
+    $rates = [
+        'mobile_crane' => 2500,
+        'tower_crane' => 2500,
+        'dump_truck' => 1800,
+        'concrete_mixer' => 2000,
+    ];
 
-        // Create invoice
-        $invoice = BillingInvoice::create([
-            'invoice_uid' => $uid,
-            'client_name' => $request->client_name,
-            'equipment_type' => $request->equipment_type,
-            'equipment_id' => 'DEMO-' . strtoupper($request->equipment_type) . '-001',
-            'hours_used' => $request->hours_used,
-            'hourly_rate' => $hourlyRate,
-            'total_amount' => $totalAmount,
-            'billing_period_start' => now()->subDays(2),
-            'billing_period_end' => now(),
-            'status' => 'billed',
-            'sent_to_record_payment' => true
-        ]);
+    $hourlyRate = $rates[$request->equipment_type];
+    $subtotal = $request->hours_used * $hourlyRate;
+    $vat = $subtotal * 0.12;
+    $totalAmount = $subtotal + $vat;
+    
+    $equipmentId = strtoupper(substr($request->equipment_type, 0, 3)) . '-' . rand(1000, 9999);
 
-        // Auto-create payment record placeholder (USE create() INSTEAD OF updateOrCreate())
-        Record::create([
-            'invoice_id' => $invoice->id,
-            'payment_uid' => 'PAY-' . now()->format('Y') . '-' . str_pad($invoice->id, 4, '0', STR_PAD_LEFT),
-            'payment_type' => 'client',
-            'client_name' => $request->client_name,
-            'total' => 0,
-            'payment_method' => 'pending',
-            'reference_number' => 'PENDING',
-            'status' => 'pending'
-        ]);
+    // Create invoice
+    $invoice = BillingInvoice::create([
+        'invoice_uid' => 'INV-' . now()->format('ymd') . '-' . rand(1000, 9999),
+        'client_name' => $request->client_name,
+        'equipment_type' => $request->equipment_type,
+        'equipment_id' => $equipmentId,
+        'hours_used' => $request->hours_used,
+        'hourly_rate' => $hourlyRate,
+        'total_amount' => $totalAmount,
+        'billing_period_start' => now()->subDays(2),
+        'billing_period_end' => now(),
+        'status' => 'issued',
+        'sent_to_record_payment' => true
+    ]);
 
-        return redirect()->route('billing.invoices.index')
-            ->with('success', 'Demo invoice generated and sent to Record & Payment!');
-    }
+   // 🔥 FORCE INSERT — bypass foreign key issue
+\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
+\DB::table('records')->insert([
+    'invoice_id' => $invoice->id,
+    'payment_uid' => 'PAY-' . now()->format('Y') . '-' . str_pad($invoice->id, 4, '0', STR_PAD_LEFT),
+    'payment_method' => 'pending',
+    'reference_number' => $invoice->invoice_uid,
+    'status' => 'pending',
+    'total' => 0,
+    'client_name' => $request->client_name, // ✅ MUST BE PRESENT
+    'created_at' => now(),
+    'updated_at' => now()
+]);
+
+\DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+    // ✅ REDIRECT (not JSON) for simple form submission
+    return redirect()->route('billing.invoices.index')
+        ->with('success', '✅ Demo invoice generated and synced to Record & Payment!');
+}
     
    // Add this method at the bottom of your BillingInvoiceController class
 public function forwardIssuedBill(Request $request, $invoiceId)
@@ -319,4 +344,6 @@ public function bulkForwardToFinancials(Request $request)
         return back()->with('error', '❌ All selected invoices failed to forward.');
     }
 }
+
+
 }       

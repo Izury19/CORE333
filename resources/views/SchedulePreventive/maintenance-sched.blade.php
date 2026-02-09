@@ -1,410 +1,446 @@
-@extends('layouts.maintenance')
+@extends('layouts.app')
 
 @section('content')
-
 <style>
-body {
-    background-color: #f4f6f8;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    padding: 0;
-    margin: 0;
+.maintenance-dashboard {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1.5rem;
 }
-h2.mb-4 {
-    font-weight: 900;
-    color: #f0f0f0;
-    text-align: center;
-    letter-spacing: 1.5px;
-    margin: 40px 0 30px;
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
-
-.container {
-    background-color: #fff;
-    border-radius: 16px;
-    padding: 40px 30px;
-    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2);
-    max-width: 1000px; 
-    margin: 40px auto;
-}
-.card h4 {
-    color: #0d6efd;
+.dashboard-title {
+    font-size: 1.75rem;
     font-weight: 700;
-    margin-bottom: 25px;
-    font-size: 1.5rem;
-    letter-spacing: 0.05em;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
 }
-.btn-primary {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
+.dashboard-title svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: #3b82f6;
+}
+.search-container {
+    position: relative;
+    min-width: 300px;
+    max-width: 400px;
+}
+.search-input {
+    width: 100%;
+    padding: 0.75rem 1.25rem 0.75rem 2.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    background-color: #f8fafc;
+}
+.search-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    background-color: white;
+}
+.search-icon {
+    position: absolute;
+    left: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    width: 1rem;
+    height: 1rem;
+}
+.action-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #3b82f6;
+    color: white;
+    border-radius: 0.375rem;
     font-weight: 600;
-    box-shadow: 0 3px 6px rgba(13, 110, 253, 0.4);
-    transition: all 0.3s ease;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    text-decoration: none;
 }
-.btn-primary:hover, .btn-primary:focus {
-    background-color: #0b5ed7;
-    border-color: #0a58ca;
-    box-shadow: 0 5px 12px rgba(11, 94, 215, 0.6);
-    transform: translateY(-2px);
+.action-button:hover {
+    background-color: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
-.btn-sm {
-    margin-right: 6px;
-    transition: background-color 0.2s ease;
-}
-.btn-sm.btn-info:hover {
-    background-color: #0a58ca;
-}
-.btn-sm.btn-danger:hover {
-    background-color: #c82333;
-}
-form.mb-4 input.form-control {
-    border-radius: 10px;
-    border: 1.5px solid #ced4da;
-    transition: border-color 0.3s ease;
-}
-form.mb-4 input.form-control:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 8px rgba(13, 110, 253, 0.4);
-}
-.alert-success,
-.alert-danger {
-    margin-top: 15px;
-    border-radius: 10px;
-    font-weight: 600;
-    transition: opacity 0.6s ease, transform 0.6s ease, max-height 0.6s ease;
+.table-container {
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
     overflow: hidden;
+    border: 1px solid #e2e8f0;
 }
-
-/* Table styles */
 .table-responsive {
-    margin-top: 35px;
     overflow-x: auto;
 }
 table {
-    table-layout: fixed;
     width: 100%;
     border-collapse: collapse;
 }
-table th {
-    background-color: #0d6efd;
-    color: white;
-    text-align: center;
+thead {
+    background-color: #f8fafc;
+}
+th {
+    padding: 1rem 1.25rem;
+    text-align: left;
+    font-size: 0.75rem;
     font-weight: 700;
+    text-transform: uppercase;
     letter-spacing: 0.05em;
-    padding: 15px 12px;
-    user-select: none;
-    white-space: nowrap;
-    overflow: hidden;
+    color: #64748b;
+    border-bottom: 2px solid #e2e8f0;
 }
-table th:nth-child(1), table td:nth-child(1) { width: 12%; }
-table th:nth-child(2), table td:nth-child(2) { width: 18%; }
-table th:nth-child(3), table td:nth-child(3) { width: 16%; }
-table th:nth-child(4), table td:nth-child(4) { width: 14%; }
-table th:nth-child(5), table td:nth-child(5) { width: 20%; }
-table th:nth-child(6), table td:nth-child(6) { width: 10%; }
-table th:nth-child(7), table td:nth-child(7) { width: 13%; }
-table td {
-    vertical-align: middle;
-    padding: 12px 10px;
-    text-align: center;
-    font-size: 0.95rem;
-    color: #333;
-    word-wrap: break-word;
-    white-space: normal;
+tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+    transition: background-color 0.2s ease;
 }
-.table-danger {
-    background-color: #f8d7da !important;
-    color: #842029;
-    font-weight: 600;
+tbody tr:last-child {
+    border-bottom: none;
 }
 tbody tr:hover {
-    background-color: #e9f0ff;
-    cursor: pointer;
-    transition: background-color 0.25s ease;
+    background-color: #f8fafc;
 }
-
-/* Badges */
-.badge {
-    font-size: 0.9em;
-    padding: 0.5em 0.8em;
-    border-radius: 20px;
+td {
+    padding: 1rem 1.25rem;
+    font-size: 0.875rem;
+    color: #334155;
+}
+.equipment-name {
     font-weight: 600;
+    color: #1e293b;
+}
+.recurring-badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 0.25rem;
+    background-color: #dbeafe;
+    color: #1d4ed8;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 0.25rem;
 }
-.badge-pending { background-color: #f0ad4e; color: #212529; }
-.badge-completed { background-color: #87CEEB; color: #212529; }
-.badge-overdue { background-color: #e74c3c; color: #fff; }
-.badge.bg-secondary { background-color: #e2e3e5; color: #41464b; }
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.375rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    min-width: 80px;
+    text-align: center;
+}
+.status-pending { 
+    background-color: #fef3c7; 
+    color: #92400e; 
+}
+.status-completed { 
+    background-color: #dcfce7; 
+    color: #166534; 
+}
+.priority-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.priority-critical { 
+    background-color: #fee2e2; 
+    color: #dc2626; 
+}
+.priority-high { 
+    background-color: #ffedd5; 
+    color: #ea580c; 
+}
+.priority-medium { 
+    background-color: #fef9c3; 
+    color: #ca8a04; 
+}
+.priority-low { 
+    background-color: #dcfce7; 
+    color: #166534; 
+}
+.action-links {
+    display: flex;
+    gap: 0.75rem;
+}
+.action-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    transition: all 0.2s ease;
+}
+.edit-link {
+    color: #3b82f6;
+    background-color: #eff6ff;
+}
+.edit-link:hover {
+    color: #2563eb;
+    background-color: #dbeafe;
+}
+.delete-link {
+    color: #dc2626;
+    background-color: #fef2f2;
+}
+.delete-link:hover {
+    color: #b91c1c;
+    background-color: #fee2e2;
+}
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #64748b;
+}
+.empty-state svg {
+    width: 4rem;
+    height: 4rem;
+    margin-bottom: 1rem;
+    color: #cbd5e1;
+}
+.pagination-container {
+    padding: 1.25rem 1.25rem 0;
+    border-top: 1px solid #e2e8f0;
+}
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+}
+.pagination a,
+.pagination span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+.pagination a {
+    color: #3b82f6;
+    background-color: #eff6ff;
+}
+.pagination a:hover {
+    background-color: #dbeafe;
+}
+.pagination .active {
+    background-color: #3b82f6;
+    color: white;
+}
+.pagination .disabled {
+    color: #94a3b8;
+    background-color: #f1f5f9;
+    cursor: not-allowed;
+}
 
-/* Responsive */
-@media (max-width: 767px) {
-    .container { padding: 30px 20px; max-width: 95%; }
-    form.mb-4 .row.g-2 > div { flex: 100% !important; max-width: 100% !important; }
-    .btn.btn-primary.mt-2 { width: 100%; }
-}
-
-/* Search Input + Clear Button */
-#searchInput {
-    height: 45px;
-    font-size: 15px;
-    padding-right: 40px; /* space para hindi dumikit ang text sa X */
-}
-#clearSearch {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    border: none;
-    background: transparent;
-    font-size: 18px;
-    color: #888;
-    cursor: pointer;
-    display: none;
-}
-#clearSearch:hover {
-    color: #dc3545; /* red kapag hover */
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .search-container {
+        min-width: 100%;
+    }
+    .action-button {
+        justify-content: center;
+    }
+    th, td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.8125rem;
+    }
+    .equipment-name {
+        font-size: 0.875rem;
+    }
 }
 </style>
 
-
-<div class="container mt-4">
-    <h2 class="mb-4" style="color: #0d6efd;">🛠 Maintenance Schedule</h2>
-
-    {{-- Search --}}
-    <form action="{{ route('maintenance.index') }}" method="GET" class="mb-4" id="searchForm">
-        <div class="d-flex justify-content-center mt-3 flex-wrap gap-2 align-items-center">
-            <div class="position-relative" style="flex: 1; max-width: 400px;">
-                <input type="text" name="search" id="searchInput"
-                    class="form-control rounded-pill ps-3 pe-5"
-                    placeholder="Search equipment, type, or technician..."
-                    value="{{ request('search') }}">
-
-                <button type="button" id="clearSearch">&times;</button>
-            </div>
-
-            <button type="submit" class="btn btn-primary rounded-pill px-4">
-                <i class="fas fa-search"></i> Search
-            </button>
+<div class="maintenance-dashboard">
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Maintenance Schedule
+        </h1>
+        
+        <div class="search-container">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <form method="GET" action="{{ route('maintenance.index') }}">
+                <input type="text" 
+                       name="search" 
+                       class="search-input"
+                       placeholder="Search equipment or maintenance type..."
+                       value="{{ request('search') }}">
+            </form>
         </div>
-    </form>
-
-
-    {{-- Add Form --}}
-    <div class="card mb-4 p-3">
-        <h4><i class="fas fa-plus-circle"></i> Add New Schedule</h4>
-
-        @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul class="mb-0">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        <form action="{{ route('maintenance.store') }}" method="POST" class="row gy-3 gx-4 mt-1">
-            @csrf
-            <div class="col-md-6">
-                <label for="equipment_name" class="form-label">Equipment Name</label>
-                <input type="text" class="form-control" id="equipment_name" name="equipment_name"
-                       value="{{ old('equipment_name') }}" required>
-            </div>
-            <div class="col-md-6">
-                <label for="maintenance_type_id" class="form-label">Maintenance Type</label>
-                <select class="form-control" id="maintenance_type_id" name="maintenance_type_id" required>
-                    <option value="">-- Select Maintenance Type --</option>
-                    @foreach ($maintenanceTypes as $type)
-                        <option value="{{ $type->maintenance_types_id }}" 
-                            {{ old('maintenance_type_id') == $type->maintenance_types_id ? 'selected' : '' }}>
-                            {{ $type->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-6">
-                <label for="scheduled_date" class="form-label">Scheduled Date</label>
-                <input type="date" class="form-control" id="scheduled_date" name="scheduled_date"
-                       value="{{ old('scheduled_date') }}" required>
-            </div>
-            <div class="col-md-6">
-                <label for="status" class="form-label">Status</label>
-                <select class="form-select" id="status" name="status" required>
-                    <option value="pending" {{ old('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                    <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Completed</option>
-                </select>
-            </div>
-            <div class="col-md-12">
-                <label for="technician_name" class="form-label">Assigned Technician</label>
-                <input list="technicians" class="form-control" id="technician_name" name="technician_name"
-                       value="{{ old('technician_name') }}" required>
-                <datalist id="technicians">
-                    @foreach($technicians as $technician)
-                        <option value="{{ $technician->name }}">
-                    @endforeach
-                </datalist>
-            </div>
-            <div class="col-12">
-                <button type="submit" class="btn btn-primary mt-2 rounded-pill">
-                    <i class="fas fa-plus"></i> Add Schedule
-                </button>
-            </div>
-        </form>
     </div>
 
-    {{-- Table --}}
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped">
-            <thead class="table-primary">
-                <tr>
-                    <th>Equipment</th>
-                    <th>Maintenance Type</th>
-                    <th>Scheduled Date</th>
-                    <th>Status</th>
-                    <th>Assigned Technician</th>
-                    <th>Days Left</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($schedules as $schedule)
-                    @php
-                        $scheduledDate = \Carbon\Carbon::parse($schedule->scheduled_date);
-                        $daysLeft = now()->diffInDays($scheduledDate, false);
-                        $isOverdue = $daysLeft < 0 && $schedule->status == 'pending';
-                    @endphp
-                    <tr class="{{ $isOverdue ? 'table-danger' : '' }}">
-                        <td>{{ $schedule->equipment_name }}</td>
-                        <td>{{ $schedule->maintenanceType->name ?? 'N/A' }}</td>
-                        <td>{{ $scheduledDate->format('F d, Y') }}</td>
-                        <td>
-                            @if($schedule->status == 'pending')
-                                <span class="badge badge-pending"><i class="fas fa-clock me-1"></i> Pending</span>
-                            @elseif($schedule->status == 'completed')
-                                <span class="badge badge-completed"><i class="fas fa-check-circle me-1"></i> Completed</span>
-                            @elseif($schedule->status == 'overdue')
-                                <span class="badge badge-overdue"><i class="fas fa-exclamation-triangle me-1"></i> Overdue</span>
-                            @else
-                                <span class="badge bg-secondary">Unknown</span>
-                            @endif
-                        </td>
-                        <td>{{ $schedule->technician_name }}</td>
-                        <td>
-                            @php $daysLeftInt = (int) round($daysLeft); @endphp
-                            @if($daysLeftInt > 0)
-                                <span class="text-primary">{{ $daysLeftInt }} day(s)</span>
-                            @elseif($daysLeftInt == 0)
-                                <span class="text-warning">Today</span>
-                            @else
-                                <span class="text-danger">{{ abs($daysLeftInt) }} day(s) overdue</span>
-                            @endif
-                        </td>
-                        <td class="d-flex align-items-center">
-                            <a href="{{ route('maintenance.edit', $schedule->maintenance_sched_id) }}" class="btn btn-sm btn-info me-1">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                            <form action="{{ route('maintenance.destroy', $schedule->maintenance_sched_id) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger px-2 py-1 delete-btn">
-                                    <i class="fas fa-trash-alt"></i> Delete
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                @endforeach
-                @if($schedules->isEmpty())
+    <div class="table-container">
+        <div class="table-responsive">
+            <table>
+                <thead>
                     <tr>
-                        <td colspan="7" class="text-center text-muted">No maintenance schedules found.</td>
+                        <th>Equipment</th>
+                        <th>Type</th>
+                        <th>Scheduled Date</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>AI Risk</th>
+                        <th>Actions</th>
                     </tr>
-                @endif
-            </tbody>
-        </table>
-        <div class="d-flex justify-content-center mt-3">
-            {{ $schedules->withQueryString()->links() }}
+                </thead>
+                <tbody>
+                    @forelse($schedules as $schedule)
+                    <tr>
+                        <td>
+                            <div class="equipment-name">{{ $schedule->equipment_name }}</div>
+                            @if($schedule->is_recurring)
+                                <span class="recurring-badge">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    </svg>
+                                    Recurring
+                                </span>
+                            @endif
+                        </td>
+                        <td>{{ $schedule->maintenanceType->name ?? 'N/A' }}</td>
+                        <td>{{ \Carbon\Carbon::parse($schedule->scheduled_date)->format('M d, Y') }}</td>
+                        <td>
+                            <span class="priority-badge priority-{{ $schedule->priority }}">
+                                {{ ucfirst($schedule->priority) }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-badge status-{{ $schedule->status }}">
+                                {{ ucfirst($schedule->status) }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @if($schedule->ai_risk_score > 0)
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm font-medium text-gray-900">
+                                        {{ number_format($schedule->ai_risk_score * 100, 0) }}%
+                                    </span>
+                                    @if($schedule->ai_risk_score >= 0.8)
+                                        <span class="w-2 h-2 bg-red-500 rounded-full" title="High Risk"></span>
+                                    @elseif($schedule->ai_risk_score >= 0.6)
+                                        <span class="w-2 h-2 bg-yellow-500 rounded-full" title="Medium Risk"></span>
+                                    @else
+                                        <span class="w-2 h-2 bg-green-500 rounded-full" title="Low Risk"></span>
+                                    @endif
+                                </div>
+                            @else
+                                <span class="text-gray-400 text-sm">N/A</span>
+                            @endif
+                        </td>
+                        <td>
+                            <div class="action-links">
+                                <a href="{{ route('maintenance.edit', $schedule->maintenance_sched_id) }}" 
+                                   class="action-link edit-link">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="14" height="14">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                    Edit
+                                </a>
+                                <form action="{{ route('maintenance.destroy', $schedule->maintenance_sched_id) }}" 
+                                      method="POST" style="display: inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" 
+                                            class="action-link delete-link"
+                                            onclick="return confirm('Are you sure you want to delete this maintenance schedule? This action cannot be undone.')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="14" height="14">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <h3 class="font-semibold text-lg mb-2">No maintenance schedules found</h3>
+                                <p>Get started by creating your first maintenance schedule.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
+
+        @if($schedules->hasPages())
+        <div class="pagination-container">
+            <div class="pagination">
+                {{-- Previous Page Link --}}
+                @if ($schedules->onFirstPage())
+                    <span class="disabled">&laquo; Previous</span>
+                @else
+                    <a href="{{ $schedules->previousPageUrl() }}" rel="prev">&laquo; Previous</a>
+                @endif
+
+                {{-- Pagination Elements --}}
+                @foreach ($schedules->links()->elements[0] as $page => $url)
+                    @if ($page == $schedules->currentPage())
+                        <span class="active">{{ $page }}</span>
+                    @else
+                        <a href="{{ $url }}">{{ $page }}</a>
+                    @endif
+                @endforeach
+
+                {{-- Next Page Link --}}
+                @if ($schedules->hasMorePages())
+                    <a href="{{ $schedules->nextPageUrl() }}" rel="next">Next &raquo;</a>
+                @else
+                    <span class="disabled">Next &raquo;</span>
+                @endif
+            </div>
+        </div>
+        @endif
+    </div>
+
+    <div class="mt-6 text-right">
+        <a href="{{ route('maintenance.create') }}" class="action-button">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Add New Schedule
+        </a>
     </div>
 </div>
-
-{{-- Font Awesome --}}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-{{-- Scripts --}}
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    let deleteForm;
-    const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-
-    document.querySelectorAll('.delete-btn').forEach(button => {
-        button.addEventListener('click', function(event) {
-            event.preventDefault();
-            deleteForm = this.closest('form');
-            deleteModal.show();
-        });
-    });
-
-    confirmDeleteBtn.addEventListener('click', function() {
-        if (deleteForm) deleteForm.submit();
-    });
-});
-
-document.addEventListener("DOMContentLoaded", function() {
-    let alerts = document.querySelectorAll(".alert-success, .alert-danger");
-    alerts.forEach(alertBox => {
-        setTimeout(() => {
-            alertBox.style.maxHeight = alertBox.scrollHeight + "px";
-            alertBox.style.opacity = "1";
-            setTimeout(() => {
-                alertBox.style.opacity = "0";
-                alertBox.style.transform = "translateY(-20px)";
-                alertBox.style.maxHeight = "0";
-                setTimeout(() => alertBox.remove(), 600);
-            }, 4000);
-        }, 100);
-    });
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-    const searchInput = document.getElementById("searchInput");
-    const clearBtn = document.getElementById("clearSearch");
-    const searchForm = document.getElementById("searchForm");
-
-    function toggleClearBtn() {
-        clearBtn.style.display = searchInput.value ? "block" : "none";
-    }
-
-    clearBtn.addEventListener("click", function () {
-        searchInput.value = "";
-        searchForm.submit(); // balik sa default
-    });
-
-    searchInput.addEventListener("input", toggleClearBtn);
-
-    toggleClearBtn();
-});
-</script>
-
-{{-- Delete Confirmation Modal --}}
-<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title" id="deleteConfirmModalLabel"><i class="fas fa-exclamation-triangle"></i> Confirm Delete</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        Are you sure you want to delete this maintenance schedule? This action cannot be undone.
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" id="confirmDeleteBtn" class="btn btn-danger rounded-pill">Yes, Delete</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 @endsection

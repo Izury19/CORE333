@@ -6,29 +6,25 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up()
+    public function up(): void
     {
         Schema::create('contracts', function (Blueprint $table) {
             $table->id();
-            $table->string('company_name');       // PALITAN 'contract_title' TO 'company_name'
-            $table->string('client_name');
-            $table->string('client_email');       // DAGDAGAN ito
-            $table->string('client_number');      // DAGDAGAN ito
-            $table->date('start_date');
-            $table->date('end_date');
-            $table->string('equipment_type');
-            $table->string('payment_type');
-            $table->text('contract_details')->nullable();
+            $table->string('contract_number')->unique();
+            $table->string('contract_type');
+            $table->string('counterparty');
+            $table->date('effective_date');
+            $table->date('expiration_date');
+            $table->text('description')->nullable();
+            $table->enum('legal_status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->unsignedBigInteger('submitted_by');
             $table->timestamps();
+            
+            // Optional: Foreign key to users table
+            $table->foreign('submitted_by')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('contracts');
